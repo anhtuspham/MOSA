@@ -57,4 +57,8 @@ class AppConstants{
     'Bảo hiểm': Colors.blueGrey,
     'Thuế': Colors.tealAccent,
   };
+
+  static const String dbName = 'finance_tracker.db';
+  static const int dbVersion = 1;
+  static const String tableTransactions = 'transaction';
 }

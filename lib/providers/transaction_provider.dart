@@ -28,12 +28,39 @@ class TransactionProvider extends ChangeNotifier {
 
   double get balance => totalIncome - totalExpense;
 
+  List<TransactionModel> getTransactionModelByType(String type) {
+    return _transactions.where((element) => element.type == type).toList();
+  }
+
   // CRUD
-  Future<void> loadTransaction() async{}
+  Future<void> loadTransaction() async {
+    _isLoading = true;
+    notifyListeners();
 
-  Future<void> addTransaction(TransactionModel transaction) async{}
+    try {
+      _transactions = await databaseService.getAllTransactions();
+      print('Loaded ${_transactions.length} transactions');
+    } catch (e) {
+      print('Error loading transactions: $e');
+    } finally {
+      _isLoading = true;
+      notifyListeners();
+    }
+  }
 
-  Future<void> updateTransaction(TransactionModel transaction) async{}
+  Future<void> addTransaction(TransactionModel transaction) async {
+    try{
+      final id = await databaseService.insertTransaction(transaction);
+      final newTransaction = transaction.copyWith(id: id);
+      _transactions.insert(0, newTransaction);
+      notifyListeners();
+      print('Transaction added with id: $id');
+    } catch(e){
+      print('Error adding transaction: $e');
+    }
+  }
 
-  Future<void> deleteTransaction(int id) async{}
+  Future<void> updateTransaction(TransactionModel transaction) async {}
+
+  Future<void> deleteTransaction(int id) async {}
 }
