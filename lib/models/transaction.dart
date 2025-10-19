@@ -20,11 +20,12 @@ class TransactionModel {
   factory TransactionModel.fromMap(Map<String, dynamic> map) {
     return TransactionModel(
       id: map['id'] as int?,
-      title: map['tittle'],
-      amount: map['amount'],
+      title: map['title'],
+      amount: (map['amount'] as num).toDouble(),
       date: DateTime.parse(map['date'] as String),
       type: map['type'],
       category: map['category'],
+      note: map['note'] as String?,
     );
   }
 

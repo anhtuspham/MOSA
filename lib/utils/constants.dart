@@ -60,5 +60,5 @@ class AppConstants{
 
   static const String dbName = 'finance_tracker.db';
   static const int dbVersion = 1;
-  static const String tableTransactions = 'transaction';
+  static const String tableTransactions = 'transactions';
 }

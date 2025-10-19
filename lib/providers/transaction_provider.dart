@@ -43,7 +43,7 @@ class TransactionProvider extends ChangeNotifier {
     } catch (e) {
       print('Error loading transactions: $e');
     } finally {
-      _isLoading = true;
+      _isLoading = false;
       notifyListeners();
     }
   }
@@ -57,10 +57,46 @@ class TransactionProvider extends ChangeNotifier {
       print('Transaction added with id: $id');
     } catch(e){
       print('Error adding transaction: $e');
+      rethrow;
     }
   }
 
-  Future<void> updateTransaction(TransactionModel transaction) async {}
+  Future<void> updateTransaction(TransactionModel transaction) async {
+    try{
+      await databaseService.updateTransaction(transaction);
+      final index = _transactions.indexWhere((element) => element.id == transaction.id);
+      if(index != -1){
+        _transactions[index] = transaction;
+        notifyListeners();
+      }
+    } catch(e){
+      print('Error update transaction $e');
+      rethrow;
+    }
+  }
 
-  Future<void> deleteTransaction(int id) async {}
+  Future<void> deleteTransaction(int id) async {
+    try{
+      await databaseService.deleteTransaction(id);
+      _transactions.removeWhere((element) => element.id == id);
+      notifyListeners();
+    } catch(e){
+      print('Error deleting transaction $e');
+      rethrow;
+    }
+  }
+
+  Future<void> filterByDateRange(DateTime start, DateTime end) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      _transactions = await databaseService.getTransactionsByDateRange(start, end);
+    } catch (e) {
+      print('❌ Error filtering transactions: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
 }
