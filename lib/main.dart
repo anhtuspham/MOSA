@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mosa/providers/transaction_provider.dart';
 import 'package:mosa/screens/home_screen.dart';
 import 'package:mosa/utils/test_data.dart';
@@ -14,16 +15,21 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => TransactionProvider()..loadTransaction(),
-      child: MaterialApp(
-        title: 'Finance Tracker',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-          useMaterial3: true,
+    return ScreenUtilInit(
+      designSize: const Size(392, 852),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      child: ChangeNotifierProvider(
+        create: (_) => TransactionProvider()..loadTransaction(),
+        child: MaterialApp(
+          title: 'Finance Tracker',
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlue),
+            useMaterial3: true,
+          ),
+          home: const HomeScreen(),
         ),
-        home: const TestDatabaseScreen(),
       ),
     );
   }
