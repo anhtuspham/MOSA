@@ -41,9 +41,10 @@ dependencies:
   flutter_local_notifications: ^17.2.3
   sqflite: ^2.4.2
   provider: ^6.1.5
-  fl_chart: ^1.0.0
+  fl_chart: ^1.1.0
   rename_app: ^1.6.5
   flutter_screenutil: ^5.9.3
+  percent_indicator: ^4.2.5
 
 dev_dependencies:
   flutter_test:
@@ -56,6 +57,9 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
   flutter_launcher_icons: ^0.14.4
+
+dependency_overrides:
+  vector_math: 2.2.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -95,6 +99,19 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
+  fonts:
+    - family: EuclidCircularA
+      fonts:
+        - asset: assets/fonts/Euclid Circular A Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Euclid Circular A Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Euclid Circular A SemiBold.ttf
+          weight: 500
+        - asset: assets/fonts/Euclid Circular A Medium.ttf
+          weight: 300
+        - asset: assets/fonts/Euclid Circular A Italic.ttf
+          weight: 400
   # fonts:
   #   - family: Schyler
   #     fonts:

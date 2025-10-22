@@ -1,6 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mosa/screens/home_screen/income_screen.dart';
+
+import '../../widgets/transaction_item.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -67,18 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
         body: TabBarView(
           children: [
             Center(child: Column(children: [Icon(Icons.analytics), Text('Không có dữ liệu')])),
-            ListTile(
-              leading: Icon(Icons.calendar_month),
-              title: Text('Điều chỉnh số dư'),
-              subtitle: Text('Điều chỉnh số dư chuyển khoản'),
-              trailing: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('117.167đ'),
-                  Text('Hôm nay', style: TextStyle(color: Colors.grey)),
-                ],
-              ),
-            ),
+            IncomeScreen(),
             Center(child: Text('Tab 3')),
           ],
         ),
