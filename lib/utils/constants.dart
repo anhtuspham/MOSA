@@ -5,6 +5,8 @@ class AppConstants{
   static const String typeIncome = 'income';
   static const String typeOutCome = 'outcome';
 
+  static const double scaleTextFactor = 1.5;
+
   static const Map<String, IconData> incomeCategories = {
     'Lương': Icons.attach_money,
     'Thưởng': Icons.card_giftcard,

@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mosa/screens/home_screen/income_screen.dart';
+import 'package:mosa/screens/home_screen/outcome_screen.dart';
+import 'package:mosa/screens/home_screen/overview_screen.dart';
 
 import '../../widgets/transaction_item.dart';
 
@@ -13,6 +15,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  int currentPageIndex = 0;
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -44,11 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(color: Colors.redAccent, shape: BoxShape.circle),
-                    child: Text(
-                      '3',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.white, fontSize: 12),
-                    ),
+                    child: Text('3', textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 12)),
                   ),
                 ),
               ],
@@ -60,19 +60,30 @@ class _HomeScreenState extends State<HomeScreen> {
             indicatorSize: TabBarIndicatorSize.tab,
             unselectedLabelStyle: TextStyle(color: Colors.white),
             labelStyle: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-            tabs: [
-              Tab(child: Text('Tất cả')),
-              Tab(child: Text('Thu nhập ')),
-              Tab(child: Text('Chi tiêu')),
-            ],
+            tabs: [Tab(child: Text('Tất cả')), Tab(child: Text('Thu nhập ')), Tab(child: Text('Chi tiêu'))],
           ),
         ),
         body: TabBarView(
           children: [
-            Center(child: Column(children: [Icon(Icons.analytics), Text('Không có dữ liệu')])),
+            OverviewScreen(),
             IncomeScreen(),
-            Center(child: Text('Tab 3')),
+            OutcomeScreen(),
           ],
+        ),
+        bottomNavigationBar: NavigationBar(
+          destinations: [
+            NavigationDestination(icon: Icon(Icons.home_filled), label: 'Tổng quan'),
+            NavigationDestination(icon: Icon(Icons.wallet), label: 'Tài khoản'),
+            NavigationDestination(icon: Icon(Icons.add_circle_outlined), label: 'Ghi chép'),
+            NavigationDestination(icon: Icon(Icons.analytics), label: 'Thống kê'),
+            NavigationDestination(icon: Icon(Icons.widgets_outlined), label: 'Cài đặt'),
+          ],
+          onDestinationSelected: (value) {
+            setState(() {
+              currentPageIndex = value;
+            });
+          },
+          selectedIndex: currentPageIndex,
         ),
       ),
     );

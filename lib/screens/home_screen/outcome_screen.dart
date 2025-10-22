@@ -1,18 +1,17 @@
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:mosa/widgets/transaction_item.dart';
 
 import '../../widgets/category_pie_chart.dart';
+import '../../widgets/transaction_item.dart';
 
-class IncomeScreen extends StatefulWidget {
-  const IncomeScreen({super.key});
+class OutcomeScreen extends StatefulWidget {
+  const OutcomeScreen({super.key});
 
   @override
-  State<IncomeScreen> createState() => _IncomeScreenState();
+  State<OutcomeScreen> createState() => _OutcomeScreenState();
 }
 
-class _IncomeScreenState extends State<IncomeScreen> {
+class _OutcomeScreenState extends State<OutcomeScreen> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
@@ -24,7 +23,7 @@ class _IncomeScreenState extends State<IncomeScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Tổng thu'),
+            Text('Tổng chi'),
             Text('892.167 đ'),
           ],
         ),
