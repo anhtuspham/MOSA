@@ -22,6 +22,11 @@ class AppColors {
   static const Color income = Color(0xFF4CAF50);
   static const Color expense = Color(0xFFF44336);
 
+  // Border colors
+  static const Color border = Color(0xFF898989);
+  static const Color borderLight = Color(0xFFAEAEAE);
+  static const Color borderLighter = Color(0xFFF5F5F5);
+
   // 20 Chart Colors - Vibrant & Distinguishable
   static const List<Color> chartColors = [
     Color(0xFF2196F3), // Blue

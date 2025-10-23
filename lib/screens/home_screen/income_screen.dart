@@ -1,7 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:mosa/widgets/transaction_item.dart';
+import 'package:mosa/widgets/transaction_category_item.dart';
 
 import '../../widgets/category_pie_chart.dart';
 
@@ -30,9 +30,9 @@ class _IncomeScreenState extends State<IncomeScreen> {
         ),
       ),
       CategoryPieChart(categoryData: {'Ăn uống': 300000, 'Xe cộ': 900000, 'Đi chơi': 900000, 'Mua sắm': 980000, 'Khác': 900000,},),
-      TransactionItem(),
-      TransactionItem(),
-      TransactionItem(),
+      TransactionCategoryItem(),
+      TransactionCategoryItem(),
+      TransactionCategoryItem(),
     ],);
   }
 }

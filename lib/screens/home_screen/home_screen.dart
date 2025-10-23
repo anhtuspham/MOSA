@@ -5,7 +5,7 @@ import 'package:mosa/screens/home_screen/income_screen.dart';
 import 'package:mosa/screens/home_screen/outcome_screen.dart';
 import 'package:mosa/screens/home_screen/overview_screen.dart';
 
-import '../../widgets/transaction_item.dart';
+import '../../widgets/transaction_category_item.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

@@ -46,7 +46,6 @@ class CategoryPieChart extends StatelessWidget {
     double maxCategoryWidth = 0;
     for (var element in categoryData.entries) {
       final textPainter = getTextPainter(element.key);
-      print('max ${textPainter.width}');
       maxCategoryWidth = max(maxCategoryWidth, textPainter.width);
     }
 

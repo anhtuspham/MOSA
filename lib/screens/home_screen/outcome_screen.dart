@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../widgets/category_pie_chart.dart';
-import '../../widgets/transaction_item.dart';
+import '../../widgets/transaction_category_item.dart';
 
 class OutcomeScreen extends StatefulWidget {
   const OutcomeScreen({super.key});
@@ -29,9 +29,9 @@ class _OutcomeScreenState extends State<OutcomeScreen> {
         ),
       ),
       CategoryPieChart(categoryData: {'Ăn uống': 300000, 'Xe cộ': 900000, 'Đi chơi': 900000, 'Mua sắm': 980000, 'Khác': 900000,},),
-      TransactionItem(),
-      TransactionItem(),
-      TransactionItem(),
+      TransactionCategoryItem(),
+      TransactionCategoryItem(),
+      TransactionCategoryItem(),
     ],);
   }
 }

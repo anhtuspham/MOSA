@@ -63,4 +63,15 @@ class AppConstants{
   static const String dbName = 'finance_tracker.db';
   static const int dbVersion = 1;
   static const String tableTransactions = 'transactions';
+
+  static const String sunday = 'Chủ nhật';
+  static const String monday = 'Thứ 2';
+  static const String tuesday = 'Thứ 3';
+  static const String wednesday = 'Thứ 4';
+  static const String thursday = 'Thứ 5';
+  static const String friday = 'Thứ 6';
+  static const String saturday = 'Thứ 7';
+  static const String yesterday = 'Hôm qua';
+  static const String today = 'Hôm nay';
+  static const String tomorrow = 'Ngày mai';
 }
