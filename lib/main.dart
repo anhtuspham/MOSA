@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mosa/providers/date_filter_provider.dart';
 import 'package:mosa/providers/transaction_provider.dart';
-import 'package:mosa/screens/home_screen/home_screen.dart';
-import 'package:mosa/utils/test_data.dart';
+import 'package:mosa/router/app_router.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -23,11 +22,11 @@ class MyApp extends StatelessWidget {
       splitScreenMode: true,
       child: ChangeNotifierProvider(
         create: (_) => TransactionProvider()..loadTransaction(),
-        child: MaterialApp(
+        child: MaterialApp.router(
           title: 'Finance Tracker',
           debugShowCheckedModeBanner: false,
           theme: ThemeData(fontFamily: 'EuclidCircularA', colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlue), useMaterial3: true),
-          home: const HomeScreen(),
+          routerConfig: goRouter,
         ),
       ),
     );

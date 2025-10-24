@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:mosa/screens/home_screen/income_screen.dart';
-import 'package:mosa/screens/home_screen/outcome_screen.dart';
-import 'package:mosa/screens/home_screen/overview_screen.dart';
+import 'package:mosa/screens/overview_screen/income_screen.dart';
 
 import '../../widgets/transaction_category_item.dart';
+import '../overview_screen/outcome_screen.dart';
+import '../overview_screen/overview_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
