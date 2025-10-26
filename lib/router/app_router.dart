@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mosa/router/app_routes.dart';
+import 'package:mosa/screens/category/category_screen.dart';
 import 'package:mosa/screens/login/login_screen.dart';
 import 'package:mosa/screens/overview/overview_screen.dart';
 import 'package:mosa/screens/setting/setting_screen.dart';
@@ -53,7 +54,8 @@ final goRouter = GoRouter(
           ])
         ]),
 
-    GoRoute(path: AppRoutes.login, name: 'login', builder: (context, state) => LoginScreen())
+    GoRoute(path: AppRoutes.login, name: 'login', builder: (context, state) => LoginScreen()),
+    GoRoute(path: AppRoutes.categoryList, name: 'categoryList', builder: (context, state) => CategoryScreen())
   ],
   errorBuilder: (context, state) {
     return Scaffold(
