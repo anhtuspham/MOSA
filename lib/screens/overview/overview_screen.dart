@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mosa/providers/date_filter_provider.dart';
+import 'package:mosa/providers/transaction_provider.dart';
 import 'package:mosa/widgets/transaction_in_period_time.dart';
 import 'package:provider/provider.dart';
 
@@ -44,7 +45,9 @@ class _OverviewScreenState extends State<OverviewScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(3),
                       decoration: BoxDecoration(border: Border.all(color: AppColors.border), borderRadius: BorderRadius.circular(8)),
-                      child: Row(children: [Text(selectedMonth, style: TextStyle(fontWeight: FontWeight.w500)), const Icon(Icons.keyboard_arrow_down)]),
+                      child: Row(
+                        children: [Text(selectedMonth, style: TextStyle(fontWeight: FontWeight.w500)), const Icon(Icons.keyboard_arrow_down)],
+                      ),
                     ),
                   ),
                 ],
@@ -61,7 +64,11 @@ class _OverviewScreenState extends State<OverviewScreen> {
                     child: Column(
                       children: [
                         Text('Tổng thu', style: TextStyle(fontWeight: FontWeight.bold)),
-                        Text('35.000đ', style: TextStyle(color: AppColors.income, fontSize: 18, fontWeight: FontWeight.w500)),
+                        Consumer<TransactionProvider>(
+                          builder:
+                              (context, value, _) =>
+                                  Text('${value.totalIncome}đ', style: TextStyle(color: AppColors.income, fontSize: 18, fontWeight: FontWeight.w500)),
+                        ),
                       ],
                     ),
                   ),
@@ -70,7 +77,13 @@ class _OverviewScreenState extends State<OverviewScreen> {
                     child: Column(
                       children: [
                         Text('Tổng chi', style: TextStyle(fontWeight: FontWeight.bold)),
-                        Text('1.072.167đ', style: TextStyle(color: AppColors.expense, fontSize: 18, fontWeight: FontWeight.w500)),
+                        Consumer<TransactionProvider>(
+                          builder:
+                              (context, value, _) => Text(
+                                '${value.totalExpense}',
+                                style: TextStyle(color: AppColors.expense, fontSize: 18, fontWeight: FontWeight.w500),
+                              ),
+                        ),
                       ],
                     ),
                   ),
@@ -88,11 +101,13 @@ class _OverviewScreenState extends State<OverviewScreen> {
     );
   }
 
-  Future<void> _handleOnRefresh() async{
-    try{
-      await Future.delayed(Duration(seconds: 1));
-    } catch(e){
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Lỗi: $e')));
+  Future<void> _handleOnRefresh() async {
+    try {
+      await context.read<TransactionProvider>().loadTransaction();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Lỗi: $e')));
+      }
     }
   }
 }

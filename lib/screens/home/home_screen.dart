@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:mosa/screens/overview_screen/income_screen.dart';
 
 import '../../widgets/transaction_category_item.dart';
-import '../overview_screen/outcome_screen.dart';
-import '../overview_screen/overview_screen.dart';
+import '../overview/income_screen.dart';
+import '../overview/outcome_screen.dart';
+import '../overview/overview_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -69,21 +69,6 @@ class _HomeScreenState extends State<HomeScreen> {
             IncomeScreen(),
             OutcomeScreen(),
           ],
-        ),
-        bottomNavigationBar: NavigationBar(
-          destinations: [
-            NavigationDestination(icon: Icon(Icons.home_filled), label: 'Tổng quan'),
-            NavigationDestination(icon: Icon(Icons.wallet), label: 'Tài khoản'),
-            NavigationDestination(icon: Icon(Icons.add_circle_outlined), label: 'Ghi chép'),
-            NavigationDestination(icon: Icon(Icons.analytics), label: 'Thống kê'),
-            NavigationDestination(icon: Icon(Icons.widgets_outlined), label: 'Cài đặt'),
-          ],
-          onDestinationSelected: (value) {
-            setState(() {
-              currentPageIndex = value;
-            });
-          },
-          selectedIndex: currentPageIndex,
         ),
       ),
     );
