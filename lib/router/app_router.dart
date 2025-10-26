@@ -11,6 +11,20 @@ import 'package:mosa/screens/wallet/wallet_screen.dart';
 
 import '../screens/home/home_screen.dart';
 
+/// Go Router Configuration with StatefulShellRoute
+///
+/// Architecture:
+/// ├─ StatefulShellRoute (Main Shell)
+/// │  ├─ ShellScaffoldScreen (AppBar + BottomNav)
+/// │  └─ Branches (5):
+/// │     ├─ /overview → HomeScreen (with 3 internal tabs)
+/// │     ├─ /wallet → WalletShellScreen
+/// │     ├─ /stats → StatsShellScreen
+/// │     └─ /settings → SettingsShellScreen
+/// │
+/// └─ Overlay Routes (on top of shell):
+///    ├─ /add-transaction → AddTransactionScreen
+///    └─ /edit-transaction/:id → AddTransactionScreen
 
 final goRouter = GoRouter(
   initialLocation: AppRoutes.overview,
