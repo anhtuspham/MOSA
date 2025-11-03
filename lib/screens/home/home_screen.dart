@@ -1,8 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../widgets/transaction_category_item.dart';
 import '../overview/income_screen.dart';
 import '../overview/outcome_screen.dart';
 import '../overview/overview_screen.dart';
