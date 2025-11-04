@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../widgets/category_pie_chart.dart';
@@ -14,7 +13,6 @@ class OutcomeScreen extends StatefulWidget {
 class _OutcomeScreenState extends State<OutcomeScreen> {
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.sizeOf(context);
     return Column(children: [
       Container(
         padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),

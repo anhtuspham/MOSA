@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
+
+/// Mục danh mục giao dịch hiển thị thông tin về danh mục và tỷ lệ phần trăm theo đường line
 class TransactionCategoryItem extends StatelessWidget {
   const TransactionCategoryItem({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.sizeOf(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       margin: const EdgeInsets.only(bottom: 12),

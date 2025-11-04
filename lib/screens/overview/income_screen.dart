@@ -1,5 +1,3 @@
-import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mosa/widgets/transaction_category_item.dart';
 
@@ -15,7 +13,6 @@ class IncomeScreen extends StatefulWidget {
 class _IncomeScreenState extends State<IncomeScreen> {
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.sizeOf(context);
     return Column(children: [
       Container(
         padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),

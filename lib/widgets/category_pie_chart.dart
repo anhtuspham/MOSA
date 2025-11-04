@@ -1,12 +1,12 @@
 import 'dart:math';
 
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mosa/utils/app_colors.dart';
 import 'package:mosa/utils/constants.dart';
 import 'package:mosa/utils/utils.dart';
 
+/// Biểu đồ hình tròn thể hiện tỷ lệ các danh mục
 class CategoryPieChart extends StatelessWidget {
   final Map<String, double> categoryData;
 

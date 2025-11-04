@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mosa/router/app_routes.dart';
 
+/// Một Custom List Tile có thể tùy chỉnh phần leading, title, trailing và hành động khi nhấn
 class CustomListTile extends StatefulWidget {
   final Widget? leading;
   final Widget? title;

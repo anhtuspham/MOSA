@@ -22,28 +22,41 @@ class _CategoryScreenState extends State<CategoryScreen> with SingleTickerProvid
     _tabController.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Chọn hạng mục'),
-        leading: IconButton(onPressed: () {
-          context.pop();
-        }, icon: Icon(Icons.arrow_back)),
-        actions: [Icon(Icons.edit_note_sharp), const SizedBox(width: 4), Icon(Icons.filter_list)],
-        bottom: TabBar(
-          controller: _tabController,
-          indicatorColor: Colors.black,
-          indicatorSize: TabBarIndicatorSize.tab,
-          unselectedLabelStyle: TextStyle(color: Colors.white),
-          labelStyle: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-          tabs: [Tab(child: Text('Chi tiền')), Tab(child: Text('Thu tiền ')), Tab(child: Text('Vay nợ'))],
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Chọn hạng mục'),
+          leading: IconButton(
+            onPressed: () {
+              context.pop();
+            },
+            icon: Icon(Icons.arrow_back),
+          ),
+          actions: [
+            Icon(Icons.edit_note_sharp, size: 20),
+            const SizedBox(width: 4),
+            Icon(Icons.filter_list, size: 20),
+            const SizedBox(width: 12),
+          ],
+          actionsPadding: const EdgeInsets.all(12),
+          bottom: TabBar(
+            controller: _tabController,
+            indicatorColor: Colors.black,
+            indicatorSize: TabBarIndicatorSize.tab,
+            unselectedLabelStyle: TextStyle(color: Colors.white),
+            labelStyle: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+            tabs: [Tab(child: Text('Chi tiền')), Tab(child: Text('Thu tiền ')), Tab(child: Text('Vay nợ'))],
+          ),
+          backgroundColor: Colors.white,
         ),
-        backgroundColor: Colors.white,
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [Center(child: Text('Chi tiền')), Center(child: Text('Thu tiền')), Center(child: Text('Vay nợ'))],
+        body: TabBarView(
+          controller: _tabController,
+          children: [Center(child: Text('Chi tiền')), Center(child: Text('Thu tiền')), Center(child: Text('Vay nợ'))],
+        ),
       ),
     );
   }
