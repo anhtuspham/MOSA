@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mosa/utils/app_colors.dart';
+import 'package:mosa/widgets/tabBar_scaffold.dart';
 
+/// Screen to select transaction category with expense, income, and loan tabs
 class CategoryScreen extends StatefulWidget {
   const CategoryScreen({super.key});
 
@@ -8,56 +11,43 @@ class CategoryScreen extends StatefulWidget {
   State<CategoryScreen> createState() => _CategoryScreenState();
 }
 
-class _CategoryScreenState extends State<CategoryScreen> with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 3, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
+class _CategoryScreenState extends State<CategoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 3,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('Chọn hạng mục'),
-          leading: IconButton(
-            onPressed: () {
-              context.pop();
-            },
-            icon: Icon(Icons.arrow_back),
-          ),
-          actions: [
-            Icon(Icons.edit_note_sharp, size: 20),
-            const SizedBox(width: 4),
-            Icon(Icons.filter_list, size: 20),
-            const SizedBox(width: 12),
-          ],
-          actionsPadding: const EdgeInsets.all(12),
-          bottom: TabBar(
-            controller: _tabController,
-            indicatorColor: Colors.black,
-            indicatorSize: TabBarIndicatorSize.tab,
-            unselectedLabelStyle: TextStyle(color: Colors.white),
-            labelStyle: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-            tabs: [Tab(child: Text('Chi tiền')), Tab(child: Text('Thu tiền ')), Tab(child: Text('Vay nợ'))],
-          ),
-          backgroundColor: Colors.white,
-        ),
-        body: TabBarView(
-          controller: _tabController,
-          children: [Center(child: Text('Chi tiền')), Center(child: Text('Thu tiền')), Center(child: Text('Vay nợ'))],
-        ),
+    return TabBarScaffold(
+      title: const Text('Chọn hạng mục'),
+      leading: IconButton(
+        onPressed: () {
+          context.pop();
+        },
+        icon: const Icon(Icons.arrow_back),
       ),
+      actions: const [
+        Icon(Icons.edit_note_sharp),
+        SizedBox(width: 12),
+        Icon(Icons.filter_list),
+      ],
+      appBarBackgroundColor: AppColors.background,
+      tabs: const [
+        Tab(child: Text('Chi tiền')),
+        Tab(child: Text('Thu tiền')),
+        Tab(child: Text('Vay nợ')),
+      ],
+      body: TabBarView(
+        children: [
+          _buildCategoryTab('Chi tiền'),
+          _buildCategoryTab('Thu tiền'),
+          _buildCategoryTab('Vay nợ'),
+        ],
+      ),
+    );
+  }
+
+  /// Build category content for each tab
+  Widget _buildCategoryTab(String tabTitle) {
+    return Center(
+      child: Text(tabTitle),
     );
   }
 }

@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mosa/widgets/transaction_item.dart';
 
@@ -6,7 +5,7 @@ import '../utils/app_colors.dart';
 import '../utils/date_time_extension.dart';
 
 
-/// Widget hiển thị các giao dịch trong một khoảng thời gian cụ thể (ngày, tuần, tháng)
+/// Ghi chép thu chi trong 1 đơn vị thời gian
 class TransactionInPeriodTime extends StatefulWidget {
   final String typeDate;
   final DateTime date;

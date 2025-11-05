@@ -1,21 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:mosa/utils/app_colors.dart';
+import 'package:mosa/widgets/tabBar_scaffold.dart';
 
+/// Wallet management screen with accounts, savings, and accumulation tabs
 class WalletShellScreen extends StatelessWidget {
   const WalletShellScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
-          Icon(Icons.wallet, size: 64, color: Colors.grey),
-          SizedBox(height: 16),
-          Text('Quản lý tài khoản'),
-          SizedBox(height: 8),
-          Text('Sẽ implement ở Day 8', style: TextStyle(color: Colors.grey)),
-        ],
+    return TabBarScaffold(
+      title: const Text('Tài khoản', style: TextStyle(fontWeight: FontWeight.w500)),
+      actions: const [Icon(Icons.search), SizedBox(width: 10), Icon(Icons.filter)],
+      tabs: const [Tab(text: 'Tài khoản'), Tab(text: 'Sổ tiết kiệm'), Tab(text: 'Tích lũy')],
+      appBarBackgroundColor: AppColors.background,
+      body: TabBarView(
+        children: [_buildWalletTab('Tài khoản'), _buildWalletTab('Sổ tiết kiệm'), _buildWalletTab('Tích lũy')],
       ),
     );
+  }
+
+  /// Build wallet content for each tab
+  static Widget _buildWalletTab(String tabTitle) {
+    return Center(child: Text(tabTitle));
   }
 }
