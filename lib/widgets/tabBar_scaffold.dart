@@ -88,6 +88,9 @@ class TabBarScaffold extends StatefulWidget {
   /// If null, uses the standard AppBar height.
   final double? appBarHeight;
 
+  // Custom floatAtion button in bottom bar
+  final FloatingActionButton? floatingActionButton;
+
   const TabBarScaffold({
     super.key,
     required this.title,
@@ -102,17 +105,14 @@ class TabBarScaffold extends StatefulWidget {
     this.initialIndex = 0,
     this.elevation = true,
     this.appBarHeight,
-  }) : assert(
-    body != null || children != null,
-    'Either body or children must be provided',
-  );
+    this.floatingActionButton
+  }) : assert(body != null || children != null, 'Either body or children must be provided');
 
   @override
   State<TabBarScaffold> createState() => _TabBarScaffoldState();
 }
 
-class _TabBarScaffoldState extends State<TabBarScaffold>
-    with TickerProviderStateMixin {
+class _TabBarScaffoldState extends State<TabBarScaffold> with TickerProviderStateMixin {
   late TabController _tabController;
   late TabBarConfig _tabBarConfig;
 
@@ -120,11 +120,7 @@ class _TabBarScaffoldState extends State<TabBarScaffold>
   void initState() {
     super.initState();
     _tabBarConfig = widget.tabBarConfig ?? TabBarConfig.defaultConfig();
-    _tabController = TabController(
-      length: widget.tabs.length,
-      initialIndex: widget.initialIndex,
-      vsync: this,
-    );
+    _tabController = TabController(length: widget.tabs.length, initialIndex: widget.initialIndex, vsync: this);
     _tabController.addListener(_onTabChanged);
   }
 
@@ -133,11 +129,7 @@ class _TabBarScaffoldState extends State<TabBarScaffold>
     super.didUpdateWidget(oldWidget);
     if (widget.tabs.length != oldWidget.tabs.length) {
       _tabController.dispose();
-      _tabController = TabController(
-        length: widget.tabs.length,
-        initialIndex: widget.initialIndex,
-        vsync: this,
-      );
+      _tabController = TabController(length: widget.tabs.length, initialIndex: widget.initialIndex, vsync: this);
       _tabController.addListener(_onTabChanged);
     }
   }
@@ -172,10 +164,7 @@ class _TabBarScaffoldState extends State<TabBarScaffold>
   Widget _buildBody() {
     // If children provided, auto-build TabBarView with controller
     if (widget.children != null) {
-      return TabBarView(
-        controller: _tabController,
-        children: widget.children!,
-      );
+      return TabBarView(controller: _tabController, children: widget.children!);
     }
     // Otherwise use provided body
     return widget.body!;
@@ -189,16 +178,13 @@ class _TabBarScaffoldState extends State<TabBarScaffold>
         leading: widget.leading,
         actions: widget.actions,
         actionsPadding: EdgeInsets.symmetric(horizontal: 12.w),
-        backgroundColor:
-            widget.appBarBackgroundColor ?? Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: widget.appBarBackgroundColor ?? Theme.of(context).colorScheme.inversePrimary,
         elevation: widget.elevation ? null : 0,
         toolbarHeight: widget.appBarHeight,
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(kToolbarHeight),
-          child: _buildTabBar(),
-        ),
+        bottom: PreferredSize(preferredSize: Size.fromHeight(kToolbarHeight), child: _buildTabBar()),
       ),
       body: _buildBody(),
+      floatingActionButton: widget.floatingActionButton,
     );
   }
 }

@@ -1,38 +1,54 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:mosa/router/app_routes.dart';
 
 /// Một Custom List Tile có thể tùy chỉnh phần leading, title, trailing và hành động khi nhấn
-class CustomListTile extends StatefulWidget {
+class CustomListTile extends StatelessWidget {
   final Widget? leading;
-  final Widget? title;
+  final Widget title;
+  final Widget? subTitle;
   final Widget? trailing;
   final VoidCallback? onTap;
-  const CustomListTile({super.key, this.leading, this.title, this.trailing, this.onTap});
+  final bool enable;
+  // Padding
+  final double horizontalGap;
+  const CustomListTile({
+    super.key,
+    required this.title,
+    this.leading,
+    this.subTitle,
+    this.trailing,
+    this.onTap,
+    this.enable = false,
+    this.horizontalGap = 20,
+  });
 
-  @override
-  State<CustomListTile> createState() => _CustomListTileState();
-}
-
-class _CustomListTileState extends State<CustomListTile> {
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        child: Row(
-          children: [
-            widget.leading ?? const SizedBox(),
-            SizedBox(width: 12),
-            widget.title ?? const SizedBox(),
-            Spacer(),
-            widget.trailing ?? const SizedBox(),
-          ],
-        ),
+    final child = Container(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        children: [
+          if (leading != null) ...[leading!],
+          SizedBox(width: horizontalGap),
+          Expanded(child: _buildTitleAndSubtitlePart(title, subTitle)),
+          if (trailing != null) ...[SizedBox(width: horizontalGap), trailing!],
+        ],
       ),
-      onTap: () {
-        context.push(AppRoutes.categoryList);
-      },
     );
+    return _buildInkWell(child);
+  }
+
+  Widget _buildInkWell(Widget child) {
+    return InkWell(onTap: enable ? onTap : null, child: child);
+  }
+
+  Widget _buildTitleAndSubtitlePart(Widget title, Widget? subTitle) {
+    if (subTitle != null) {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [title, subTitle],
+      );
+    }
+    return title;
   }
 }

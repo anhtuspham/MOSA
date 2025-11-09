@@ -54,7 +54,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 ),
                 isExpanded: true,
                 alignment: Alignment.center,
-                value: _selectedType.value,
+                initialValue: _selectedType.value,
                 items: [
                   DropdownMenuItem(value: 'Chi tiền', child: Text('Chi tiền')),
                   DropdownMenuItem(value: 'Thu tiền', child: Text('Thu tiền')),
@@ -145,6 +145,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                                   CustomListTile(
                                     leading: Icon(Icons.add_circle_rounded),
                                     title: Text('Chọn hạng mục'),
+                                    enable: true,
                                     trailing: Row(
                                       children: [Text('Tất cả'), const SizedBox(width: 12), Icon(Icons.chevron_right)],
                                     ),
@@ -165,6 +166,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                                     leading: Icon(Icons.money),
                                     title: Text('Zalopay'),
                                     trailing: Icon(Icons.chevron_right),
+                                    enable: true,
                                     onTap: () {
                                       context.push(AppRoutes.categoryList);
                                     },
@@ -173,6 +175,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                                     leading: Icon(Icons.calendar_month_outlined),
                                     title: Text('Hôm nay - 01/11/2025'),
                                     trailing: Text('22:53'),
+                                    enable: true,
                                     onTap: () {
                                       context.push(AppRoutes.categoryList);
                                     },

@@ -7,7 +7,7 @@ import 'package:mosa/screens/setting/setting_screen.dart';
 import 'package:mosa/screens/shell_scaffold/shell_scaffold_screen.dart';
 import 'package:mosa/screens/stats/screen/stats_screen.dart';
 import 'package:mosa/screens/transaction/add_transaction_screen.dart';
-import 'package:mosa/screens/wallet/wallet_screen.dart';
+import 'package:mosa/screens/wallet/screen/wallet_screen.dart';
 
 import '../screens/home/home_screen.dart';
 

@@ -2,10 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
-
-/// Mục danh mục giao dịch hiển thị thông tin về danh mục và tỷ lệ phần trăm theo đường line
-class TransactionCategoryItem extends StatelessWidget {
-  const TransactionCategoryItem({super.key});
+class ProgressInfoItem extends StatelessWidget {
+  final IconData leadingIcon;
+  final Widget title;
+  final Widget? trailing;
+  final double? currentProgress;
+  final Color linearColors;
+  final IconData forwardIcon;
+  const ProgressInfoItem({
+    super.key,
+    required this.leadingIcon,
+    required this.title,
+    this.trailing,
+    this.currentProgress,
+    this.linearColors = Colors.red,
+    this.forwardIcon = Icons.arrow_forward_ios_rounded,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -25,28 +37,22 @@ class TransactionCategoryItem extends StatelessWidget {
                     Icon(Icons.calendar_month),
                     SizedBox(width: 8.w),
                     Expanded(child: Text('Điều chỉnh số dư')),
-                    Row(
-                      children: [
-                        Text('(32.39%)', style: TextStyle(color: Colors.grey[500], fontSize: 11.sp)),
-                        const SizedBox(width: 3),
-                        Text('117.167 đ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp)),
-                      ],
-                    ),
+                    trailing ?? SizedBox(),
                   ],
                 ),
                 const SizedBox(height: 12),
                 LinearPercentIndicator(
                   padding: EdgeInsets.zero,
                   lineHeight: 7.0,
-                  percent: 0.2,
+                  percent: currentProgress ?? 0,
                   barRadius: Radius.circular(20),
-                  progressColor: Colors.red,
+                  progressColor: linearColors,
                 ),
               ],
             ),
           ),
           const SizedBox(width: 10),
-          Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Colors.grey[700]),
+          Icon(forwardIcon, size: 16, color: Colors.grey[700]),
         ],
       ),
     );
