@@ -12,7 +12,6 @@ class CategoryScreen extends StatefulWidget {
 }
 
 class _CategoryScreenState extends State<CategoryScreen> {
-
   @override
   Widget build(BuildContext context) {
     return TabBarScaffold(
@@ -23,31 +22,15 @@ class _CategoryScreenState extends State<CategoryScreen> {
         },
         icon: const Icon(Icons.arrow_back),
       ),
-      actions: const [
-        Icon(Icons.edit_note_sharp),
-        SizedBox(width: 12),
-        Icon(Icons.filter_list),
-      ],
+      actions: const [Icon(Icons.edit_note_sharp), SizedBox(width: 12), Icon(Icons.filter_list)],
       appBarBackgroundColor: AppColors.background,
-      tabs: const [
-        Tab(child: Text('Chi tiền')),
-        Tab(child: Text('Thu tiền')),
-        Tab(child: Text('Vay nợ')),
-      ],
-      body: TabBarView(
-        children: [
-          _buildCategoryTab('Chi tiền'),
-          _buildCategoryTab('Thu tiền'),
-          _buildCategoryTab('Vay nợ'),
-        ],
-      ),
+      tabs: const [Tab(child: Text('Chi tiền')), Tab(child: Text('Thu tiền')), Tab(child: Text('Vay nợ'))],
+      children: [_buildCategoryTab('Chi tiền'), _buildCategoryTab('Thu tiền'), _buildCategoryTab('Vay nợ')],
     );
   }
 
   /// Build category content for each tab
   Widget _buildCategoryTab(String tabTitle) {
-    return Center(
-      child: Text(tabTitle),
-    );
+    return Center(child: Text(tabTitle));
   }
 }

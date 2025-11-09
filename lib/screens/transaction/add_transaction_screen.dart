@@ -65,7 +65,6 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   if (value != null) {
                     setState(() {
                       _selectedType.value = value;
-                      print('Selected: $value');
                     });
                   }
                 },

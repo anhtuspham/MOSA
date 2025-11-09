@@ -4,12 +4,26 @@ class AppColors {
   // Primary App Colors
   static const Color primary = Color(0xFF2196F3);
   static const Color secondary = Color(0xFF03DAC6);
+  static const Color third = Color.fromARGB(255, 62, 164, 247);
+  static const Color fourth = Color.fromARGB(255, 99, 154, 199);
   static const Color background = Color(0xFFF5F5F5);
   static const Color primaryBackground = Color.fromARGB(255, 223, 240, 253);
   static const Color surface = Color(0xFFFFFFFF);
+  static const Color secondaryBackground = Color.fromARGB(255, 233, 232, 232);
+
+  static const Color primaryBlue = Color(0xFF0a84fa);
+  static const Color secondBlue = Color(0xFF0a83fa);
+  static const Color thirdBlue = Color(0xFF01aef0);
+  static const Color fourthBlue = Color(0xFF50defa);
+  static const Color fifthBlue = Color(0xFF3d90fd);
+  static const Color sixthBlue = Color.fromARGB(255, 59, 179, 223);
+
+  // background colors
+  static const Color firstBackGroundColor = Color.fromARGB(255, 231, 231, 231);
 
   // Text Colors
   static const Color textPrimary = Color(0xFF212121);
+  static const Color textWhite = Color(0xFFffffff);
   static const Color textSecondary = Color(0xFF757575);
   static const Color textHint = Color(0xFFBDBDBD);
   static const Color textHighlight = Color(0xFF2196F3);

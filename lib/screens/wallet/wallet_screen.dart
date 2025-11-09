@@ -10,12 +10,10 @@ class WalletShellScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return TabBarScaffold(
       title: const Text('Tài khoản', style: TextStyle(fontWeight: FontWeight.w500)),
-      actions: const [Icon(Icons.search), SizedBox(width: 10), Icon(Icons.filter)],
+      actions: const [Icon(Icons.search), SizedBox(width: 10), Icon(Icons.sort_rounded)],
       tabs: const [Tab(text: 'Tài khoản'), Tab(text: 'Sổ tiết kiệm'), Tab(text: 'Tích lũy')],
       appBarBackgroundColor: AppColors.background,
-      body: TabBarView(
-        children: [_buildWalletTab('Tài khoản'), _buildWalletTab('Sổ tiết kiệm'), _buildWalletTab('Tích lũy')],
-      ),
+      children: [_buildWalletTab('Tài khoản'), _buildWalletTab('Sổ tiết kiệm'), _buildWalletTab('Tích lũy')],
     );
   }
 

@@ -56,7 +56,7 @@ class _ShellScaffoldScreenState extends State<ShellScaffoldScreen> {
           NavigationDestination(icon: Icon(Icons.home_filled), label: 'Tổng quan'),
           NavigationDestination(icon: Icon(Icons.wallet), label: 'Tài khoản'),
           NavigationDestination(icon: Icon(Icons.add_circle_outlined), label: 'Ghi chép'),
-          NavigationDestination(icon: Icon(Icons.analytics), label: 'Thống kê'),
+          NavigationDestination(icon: Icon(Icons.analytics), label: 'Báo cáo'),
           NavigationDestination(icon: Icon(Icons.widgets_outlined), label: 'Cài đặt'),
         ],
       ),
