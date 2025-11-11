@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mosa/screens/category/widgets/expense_category_screen.dart';
 import 'package:mosa/utils/app_colors.dart';
 import 'package:mosa/widgets/tabBar_scaffold.dart';
 
@@ -25,7 +26,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
       actions: const [Icon(Icons.edit_note_sharp), SizedBox(width: 12), Icon(Icons.filter_list)],
       appBarBackgroundColor: AppColors.background,
       tabs: const [Tab(child: Text('Chi tiền')), Tab(child: Text('Thu tiền')), Tab(child: Text('Vay nợ'))],
-      children: [_buildCategoryTab('Chi tiền'), _buildCategoryTab('Thu tiền'), _buildCategoryTab('Vay nợ')],
+      children: [ExpenseCategoryScreen(), _buildCategoryTab('Thu tiền'), _buildCategoryTab('Vay nợ')],
     );
   }
 

@@ -27,7 +27,7 @@ class _AccountTabScreenState extends State<AccountTabScreen> {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
+          padding: const EdgeInsets.symmetric(vertical: 12),
           child: SingleChildScrollView(
             child: Column(
               children: [
@@ -35,31 +35,68 @@ class _AccountTabScreenState extends State<AccountTabScreen> {
                   leading: Image.asset(AppIcons.logoMbBank, width: 30),
                   title: Text('Mb bank', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
                   subTitle: Text('913.024đ'),
-                  trailing: IconButton(onPressed: null, icon: Icon(Icons.more_vert, color: AppColors.textPrimary)),
+                  trailing: IconButton(
+                    onPressed: _handleShowBottomSheet,
+                    icon: Icon(Icons.more_vert, color: AppColors.textPrimary),
+                  ),
                 ),
                 CustomListTile(
                   leading: Image.asset(AppIcons.logoCash, width: 30),
                   title: Text('Tiền mặt', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
                   subTitle: Text('913.024đ'),
-                  trailing: IconButton(onPressed: null, icon: Icon(Icons.more_vert, color: AppColors.textPrimary)),
+                  trailing: IconButton(
+                    onPressed: _handleShowBottomSheet,
+                    icon: Icon(Icons.more_vert, color: AppColors.textPrimary),
+                  ),
                 ),
                 CustomListTile(
                   leading: Image.asset(AppIcons.logoMomo, width: 30),
                   title: Text('Mb bank', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
                   subTitle: Text('913.024đ'),
-                  trailing: IconButton(onPressed: null, icon: Icon(Icons.more_vert, color: AppColors.textPrimary)),
+                  trailing: IconButton(
+                    onPressed: _handleShowBottomSheet,
+                    icon: Icon(Icons.more_vert, color: AppColors.textPrimary),
+                  ),
                 ),
                 CustomListTile(
                   leading: Image.asset(AppIcons.logoZalopay, width: 30),
                   title: Text('Mb bank', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
                   subTitle: Text('913.024đ'),
-                  trailing: IconButton(onPressed: null, icon: Icon(Icons.more_vert, color: AppColors.textPrimary)),
+                  trailing: IconButton(
+                    onPressed: _handleShowBottomSheet,
+                    icon: Icon(Icons.more_vert, color: AppColors.textPrimary),
+                  ),
                 ),
               ],
             ),
           ),
         ),
       ],
+    );
+  }
+
+  void _handleShowBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder:
+          (context) => Container(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(leading: Icon(Icons.swap_horiz, size: 20), title: Text('Chuyển khoản'), dense: true),
+                ListTile(
+                  leading: Icon(Icons.currency_exchange, size: 20),
+                  title: Text('Điều chỉnh số dư'),
+                  dense: true,
+                ),
+                ListTile(leading: Icon(Icons.share, size: 20), title: Text('Chia sẻ tài khoản'), dense: true),
+                ListTile(leading: Icon(Icons.edit, size: 20), title: Text('Sửa'), dense: true),
+                ListTile(leading: Icon(Icons.delete, size: 20), title: Text('Xóa'), dense: true),
+                ListTile(leading: Icon(Icons.lock, size: 20), title: Text('Ngừng sử dụng'), dense: true),
+              ],
+            ),
+          ),
     );
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mosa/utils/app_colors.dart';
 import 'package:mosa/utils/app_icons.dart';
 import 'package:mosa/widgets/custom_list_tile.dart';
+import 'package:mosa/widgets/progress_info_item.dart';
 
 class AccumulatedTabScreen extends StatefulWidget {
   const AccumulatedTabScreen({super.key});
@@ -27,33 +28,29 @@ class _AccumulatedTabScreenState extends State<AccumulatedTabScreen> {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 0),
           child: SingleChildScrollView(
             child: Column(
               children: [
-                CustomListTile(
-                  leading: Image.asset(AppIcons.logoMbBank, width: 30),
-                  title: Text('Mb bank', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-                  subTitle: Text('913.024đ'),
-                  trailing: IconButton(onPressed: null, icon: Icon(Icons.more_vert, color: AppColors.textPrimary)),
-                ),
-                CustomListTile(
-                  leading: Image.asset(AppIcons.logoCash, width: 30),
-                  title: Text('Tiền mặt', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-                  subTitle: Text('913.024đ'),
-                  trailing: IconButton(onPressed: null, icon: Icon(Icons.more_vert, color: AppColors.textPrimary)),
-                ),
-                CustomListTile(
-                  leading: Image.asset(AppIcons.logoMomo, width: 30),
-                  title: Text('Mb bank', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-                  subTitle: Text('913.024đ'),
-                  trailing: IconButton(onPressed: null, icon: Icon(Icons.more_vert, color: AppColors.textPrimary)),
-                ),
-                CustomListTile(
-                  leading: Image.asset(AppIcons.logoZalopay, width: 30),
-                  title: Text('Mb bank', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-                  subTitle: Text('913.024đ'),
-                  trailing: IconButton(onPressed: null, icon: Icon(Icons.more_vert, color: AppColors.textPrimary)),
+                ProgressInfoItem(
+                  leadingIcon: Image.asset(AppIcons.moneyBag, width: 20),
+                  title: Text(
+                    'Tích lũy tiền sinh hoạt',
+                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  trailing: Text('30.000.000đ', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+                  currentProgress: 0.4,
+                  linearColors: AppColors.primary,
+                  forwardIcon: Icons.more_vert,
+                  subTitle: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Còn 286 ngày', style: TextStyle(color: Colors.grey[600])),
+                      Text('Cần thêm 18.245.163đ', style: TextStyle(color: Colors.grey[600])),
+                    ],
+                  ),
                 ),
               ],
             ),

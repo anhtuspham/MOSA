@@ -29,7 +29,7 @@ class _IncomeScreenState extends State<IncomeScreen> {
           categoryData: {'Ăn uống': 300000, 'Xe cộ': 900000, 'Đi chơi': 900000, 'Mua sắm': 980000, 'Khác': 900000},
         ),
         ProgressInfoItem(
-          leadingIcon: Icons.calendar_month,
+          leadingIcon: Icon(Icons.calendar_month),
           title: Text('Điều chỉnh số dư'),
           currentProgress: 0.2,
           trailing: Row(
@@ -41,7 +41,7 @@ class _IncomeScreenState extends State<IncomeScreen> {
           ),
         ),
         ProgressInfoItem(
-          leadingIcon: Icons.calendar_month,
+          leadingIcon: Icon(Icons.calendar_month),
           title: Text('Điều chỉnh số dư'),
           currentProgress: 0.2,
           trailing: Row(
@@ -53,7 +53,7 @@ class _IncomeScreenState extends State<IncomeScreen> {
           ),
         ),
         ProgressInfoItem(
-          leadingIcon: Icons.calendar_month,
+          leadingIcon: Icon(Icons.calendar_month),
           title: Text('Điều chỉnh số dư'),
           currentProgress: 0.2,
           trailing: Row(

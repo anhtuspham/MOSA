@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mosa/router/app_routes.dart';
-import 'package:mosa/screens/category/category_screen.dart';
+import 'package:mosa/screens/category/screen/category_screen.dart';
 import 'package:mosa/screens/login/login_screen.dart';
 import 'package:mosa/screens/setting/setting_screen.dart';
 import 'package:mosa/screens/shell_scaffold/shell_scaffold_screen.dart';
 import 'package:mosa/screens/stats/screen/stats_screen.dart';
 import 'package:mosa/screens/transaction/add_transaction_screen.dart';
+import 'package:mosa/screens/wallet/screen/select_wallet_screen.dart';
 import 'package:mosa/screens/wallet/screen/wallet_screen.dart';
 
 import '../screens/home/home_screen.dart';
@@ -54,7 +55,8 @@ final goRouter = GoRouter(
         ]),
 
     GoRoute(path: AppRoutes.login, name: 'login', builder: (context, state) => LoginScreen()),
-    GoRoute(path: AppRoutes.categoryList, name: 'categoryList', builder: (context, state) => CategoryScreen())
+    GoRoute(path: AppRoutes.categoryList, name: 'categoryList', builder: (context, state) => CategoryScreen()),
+    GoRoute(path: AppRoutes.selectWallet, name: 'selectWallet', builder: (context, state) => SelectWalletScreen(),)
   ],
   errorBuilder: (context, state) {
     return Scaffold(

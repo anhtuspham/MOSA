@@ -29,7 +29,7 @@ class _OutcomeScreenState extends State<OutcomeScreen> {
           categoryData: {'Ăn uống': 300000, 'Xe cộ': 900000, 'Đi chơi': 900000, 'Mua sắm': 980000, 'Khác': 900000},
         ),
         ProgressInfoItem(
-          leadingIcon: Icons.calendar_month,
+          leadingIcon: Icon(Icons.calendar_month),
           title: Text('Điều chỉnh số dư'),
           currentProgress: 0.2,
           trailing: Row(
@@ -41,9 +41,9 @@ class _OutcomeScreenState extends State<OutcomeScreen> {
           ),
         ),
         ProgressInfoItem(
-          leadingIcon: Icons.calendar_month,
+          leadingIcon: Icon(Icons.calendar_month),
           title: Text('Điều chỉnh số dư'),
-          currentProgress: 0.2,
+          currentProgress: 0.5,
           trailing: Row(
             children: [
               Text('(32.39%)', style: TextStyle(color: Colors.grey[500], fontSize: 11.sp)),
@@ -53,7 +53,7 @@ class _OutcomeScreenState extends State<OutcomeScreen> {
           ),
         ),
         ProgressInfoItem(
-          leadingIcon: Icons.calendar_month,
+          leadingIcon: Icon(Icons.calendar_month),
           title: Text('Điều chỉnh số dư'),
           currentProgress: 0.2,
           trailing: Row(

@@ -3,12 +3,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
 class ProgressInfoItem extends StatelessWidget {
-  final IconData leadingIcon;
+  final Widget leadingIcon;
   final Widget title;
   final Widget? trailing;
   final double? currentProgress;
   final Color linearColors;
   final IconData forwardIcon;
+  final Widget? subTitle;
   const ProgressInfoItem({
     super.key,
     required this.leadingIcon,
@@ -17,6 +18,7 @@ class ProgressInfoItem extends StatelessWidget {
     this.currentProgress,
     this.linearColors = Colors.red,
     this.forwardIcon = Icons.arrow_forward_ios_rounded,
+    this.subTitle,
   });
 
   @override
@@ -34,9 +36,10 @@ class ProgressInfoItem extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Icon(Icons.calendar_month),
+                    leadingIcon,
                     SizedBox(width: 8.w),
-                    Expanded(child: Text('Điều chỉnh số dư')),
+                    Expanded(child: title),
+                    SizedBox(width: 8.w),
                     trailing ?? SizedBox(),
                   ],
                 ),
@@ -48,6 +51,8 @@ class ProgressInfoItem extends StatelessWidget {
                   barRadius: Radius.circular(20),
                   progressColor: linearColors,
                 ),
+                const SizedBox(height: 12),
+                subTitle ?? SizedBox(),
               ],
             ),
           ),

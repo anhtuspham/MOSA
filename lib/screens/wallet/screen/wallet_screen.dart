@@ -44,7 +44,7 @@ class WalletShellScreen extends StatelessWidget {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
+          padding: const EdgeInsets.symmetric(vertical: 12),
           child: SingleChildScrollView(
             child: Column(
               children: [

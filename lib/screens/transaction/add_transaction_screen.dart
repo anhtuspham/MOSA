@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mosa/providers/wallet_provider.dart';
 import 'package:mosa/router/app_routes.dart';
 import 'package:mosa/widgets/custom_list_tile.dart';
 
 import '../../utils/app_colors.dart';
 
-class AddTransactionScreen extends StatefulWidget {
+class AddTransactionScreen extends ConsumerStatefulWidget {
   const AddTransactionScreen({super.key});
 
   @override
-  State<AddTransactionScreen> createState() => _AddTransactionScreenState();
+  ConsumerState<AddTransactionScreen> createState() => _AddTransactionScreenState();
 }
 
-class _AddTransactionScreenState extends State<AddTransactionScreen> {
+class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   late final ValueNotifier<String> _selectedType = ValueNotifier<String>('Chi tiền');
   final TextEditingController _amountController = TextEditingController();
 
@@ -25,6 +27,8 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final selectedWallet = ref.watch(selectedWalletNotifier);
+
     return Container(
       decoration: BoxDecoration(color: AppColors.primaryBackground),
       child: Padding(
@@ -138,7 +142,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                             ),
                             const SizedBox(height: 12),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              padding: const EdgeInsets.symmetric(vertical: 4),
                               decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6)),
                               child: Column(
                                 children: [
@@ -158,37 +162,43 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                             ),
                             const SizedBox(height: 12),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              padding: const EdgeInsets.symmetric(vertical: 4),
                               decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6)),
                               child: Column(
                                 children: [
                                   CustomListTile(
-                                    leading: Icon(Icons.money),
-                                    title: Text('Zalopay'),
+                                    leading:
+                                        selectedWallet != null
+                                            ? Image.asset(selectedWallet.icon, width: 22)
+                                            : Icon(Icons.money),
+                                    title: Text(selectedWallet?.name ?? 'Zalopay'),
                                     trailing: Icon(Icons.chevron_right),
                                     enable: true,
                                     onTap: () {
-                                      context.push(AppRoutes.categoryList);
+                                      context.push(AppRoutes.selectWallet);
                                     },
                                   ),
+                                  const SizedBox(height: 8),
                                   CustomListTile(
                                     leading: Icon(Icons.calendar_month_outlined),
                                     title: Text('Hôm nay - 01/11/2025'),
                                     trailing: Text('22:53'),
                                     enable: true,
-                                    onTap: () {
-                                      context.push(AppRoutes.categoryList);
-                                    },
+                                    onTap: null,
                                   ),
                                   CustomListTile(
                                     leading: Icon(Icons.notes_sharp),
-                                    title: Text(
-                                      'Diễn giải',
-                                      style: TextStyle(fontStyle: FontStyle.italic, color: AppColors.textHint),
+                                    title: TextField(
+                                      decoration: InputDecoration(
+                                        hintText: 'Diễn giải',
+                                        hintStyle: TextStyle(fontSize: 14, color: AppColors.textHint),
+                                        contentPadding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                        border: OutlineInputBorder(borderSide: BorderSide.none),
+                                      ),
+                                      style: TextStyle(fontSize: 14),
+                                      maxLines: 1,
                                     ),
-                                    onTap: () {
-                                      context.push(AppRoutes.categoryList);
-                                    },
+                                    onTap: null,
                                   ),
                                 ],
                               ),

@@ -41,6 +41,9 @@ abstract class AppRoutes {
   // ===== CATEGORY MANAGEMENT =====
   static const String categoryList = '/categories';
 
+  // ==== SELECT WALLET ====
+  static const String selectWallet = '/selectWallet';
+
   // ===== PHASE 2: GROUP FEATURES (PREPARED) =====
   static const String createGroup = '/create-group';
   static const String groupDetail = '/group/:groupId';

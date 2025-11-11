@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mosa/utils/app_colors.dart';
 
 /// Một Custom List Tile có thể tùy chỉnh phần leading, title, trailing và hành động khi nhấn
 class CustomListTile extends StatelessWidget {
@@ -10,6 +11,7 @@ class CustomListTile extends StatelessWidget {
   final bool enable;
   // Padding
   final double horizontalGap;
+  final Color? backgroundColor;
   const CustomListTile({
     super.key,
     required this.title,
@@ -19,14 +21,17 @@ class CustomListTile extends StatelessWidget {
     this.onTap,
     this.enable = false,
     this.horizontalGap = 20,
+    this.backgroundColor = AppColors.surface,
   });
 
   @override
   Widget build(BuildContext context) {
     final child = Container(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+      color: backgroundColor,
       child: Row(
         children: [
+          // SizedBox(width: horizontalGap),
           if (leading != null) ...[leading!],
           SizedBox(width: horizontalGap),
           Expanded(child: _buildTitleAndSubtitlePart(title, subTitle)),

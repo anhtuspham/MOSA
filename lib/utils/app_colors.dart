@@ -20,6 +20,7 @@ class AppColors {
 
   // background colors
   static const Color firstBackGroundColor = Color.fromARGB(255, 231, 231, 231);
+  static const Color lightBackGroundColor = Color.fromARGB(255, 223, 237, 250);
 
   // Text Colors
   static const Color textPrimary = Color(0xFF212121);

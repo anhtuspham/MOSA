@@ -4,4 +4,5 @@ class AppIcons{
   static const String logoCash = 'assets/icons/money.png';
   static const String logoMomo = 'assets/icons/logo-momo.png';
   static const String logoZalopay = 'assets/icons/logo-zalopay.png';
+  static const String moneyBag = 'assets/icons/money-bag.png';
 }
