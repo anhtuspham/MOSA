@@ -11,6 +11,11 @@ class AppColors {
   static const Color surface = Color(0xFFFFFFFF);
   static const Color secondaryBackground = Color.fromARGB(255, 233, 232, 232);
 
+  // Gold app colors
+  static const Color goldColor = Color(0xFFed8509);
+  static const Color lightGoldColor = Color(0xFFe5970b);
+  static const Color lighterGoldColor = Color(0xffe5970c);
+
   static const Color primaryBlue = Color(0xFF0a84fa);
   static const Color secondBlue = Color(0xFF0a83fa);
   static const Color thirdBlue = Color(0xFF01aef0);
