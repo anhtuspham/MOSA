@@ -5,6 +5,7 @@ import 'package:mosa/providers/date_filter_provider.dart';
 import 'package:mosa/providers/transaction_provider.dart';
 import 'package:mosa/router/app_router.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,6 +32,16 @@ class MyApp extends StatelessWidget {
         create: (_) => TransactionProvider()..loadTransaction(),
         child: MaterialApp.router(
           title: 'Finance Tracker',
+          locale: Locale('vi', 'VN'),
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: [
+            Locale('en'),
+            Locale('vi', 'VN'),
+          ],
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
             fontFamily: 'EuclidCircularA',

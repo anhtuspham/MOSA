@@ -1,4 +1,7 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:mosa/models/enums.dart';
 import 'package:mosa/services/database_service.dart';
 
 import '../models/transaction.dart';
@@ -16,19 +19,19 @@ class TransactionProvider extends ChangeNotifier {
 
   double get totalIncome {
     return _transactions
-        .where((transaction) => transaction.type == 'income')
+        .where((transaction) => transaction.type == TransactionType.income)
         .fold(0, (previousValue, element) => previousValue + element.amount);
   }
 
   double get totalExpense {
     return _transactions
-        .where((transaction) => transaction.type == 'outcome')
+        .where((transaction) => transaction.type == TransactionType.outcome)
         .fold(0, (previousValue, element) => previousValue + element.amount);
   }
 
   double get balance => totalIncome - totalExpense;
 
-  List<TransactionModel> getTransactionModelByType(String type) {
+  List<TransactionModel> getTransactionModelByType(TransactionType type) {
     return _transactions.where((element) => element.type == type).toList();
   }
 
@@ -54,9 +57,9 @@ class TransactionProvider extends ChangeNotifier {
       final newTransaction = transaction.copyWith(id: id);
       _transactions.insert(0, newTransaction);
       notifyListeners();
-      print('Transaction added with id: $id');
+      log('Transaction added with id: $id');
     } catch(e){
-      print('Error adding transaction: $e');
+      log('Error adding transaction: $e');
       rethrow;
     }
   }

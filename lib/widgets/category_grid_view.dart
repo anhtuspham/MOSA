@@ -3,8 +3,7 @@ import 'package:mosa/widgets/item_widget.dart';
 
 class CategoryGridView extends StatelessWidget {
   final List<ItemWidget> categories;
-  final Function(ItemWidget) onTap;
-  const CategoryGridView({super.key, required this.categories, required this.onTap});
+  const CategoryGridView({super.key, required this.categories});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +19,11 @@ class CategoryGridView extends StatelessWidget {
       itemCount: categories.length,
       itemBuilder: (context, index) {
         final category = categories[index];
-        return ItemWidget(iconPath: category.iconPath, title: category.title, onTap: () => onTap(category));
+        return ItemWidget(
+          iconPath: category.iconPath,
+          title: category.title,
+          itemId: category.itemId,
+        );
       },
     );
   }

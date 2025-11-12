@@ -1,10 +1,20 @@
+import 'dart:developer';
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mosa/models/enums.dart';
+import 'package:mosa/models/transaction.dart';
+import 'package:mosa/providers/category_provider.dart';
+import 'package:mosa/providers/transaction_provider.dart';
 import 'package:mosa/providers/wallet_provider.dart';
 import 'package:mosa/router/app_routes.dart';
+import 'package:mosa/utils/date_time_extension.dart';
 import 'package:mosa/widgets/custom_list_tile.dart';
+import 'package:mosa/widgets/date_time_picker_dialog.dart';
+import 'package:provider/provider.dart' as provider;
 
 import '../../utils/app_colors.dart';
 
@@ -18,16 +28,87 @@ class AddTransactionScreen extends ConsumerStatefulWidget {
 class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   late final ValueNotifier<String> _selectedType = ValueNotifier<String>('Chi tiền');
   final TextEditingController _amountController = TextEditingController();
+  final TextEditingController _noteController = TextEditingController();
+  late DateTime _selectedDateTime = DateTime.now();
+
+  TransactionType _mapVietnameseToTransactionType(String vietnamese) {
+    switch (vietnamese) {
+      case 'Chi tiền':
+        return TransactionType.outcome;
+      case 'Thu tiền':
+        return TransactionType.income;
+      case 'Cho vay':
+        return TransactionType.lend;
+      case 'Chuyển khoản':
+        return TransactionType.borrowing;
+      default:
+        return TransactionType.outcome;
+    }
+  }
+
+  String _generateSyncId() {
+    return DateTime.now().millisecondsSinceEpoch.toString() + math.Random().nextInt(1000).toString();
+  }
+
+  Future<void> _saveTransaction() async {
+    try {
+      final selectedCategory = ref.read(categoryNotifier);
+      final transactionProvider = provider.Provider.of<TransactionProvider>(context, listen: false);
+
+      // Validation
+      if (_amountController.text.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Vui lòng nhập số tiền')));
+        return;
+      }
+
+      if (selectedCategory == null) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Vui lòng chọn hạng mục')));
+        return;
+      }
+
+      final amount = double.tryParse(_amountController.text.replaceAll(',', ''));
+      if (amount == null || amount <= 0) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Số tiền không hợp lệ')));
+        return;
+      }
+
+      final transaction = TransactionModel(
+        title: selectedCategory.categoryName ?? 'Giao dịch',
+        amount: amount,
+        date: _selectedDateTime,
+        type: _mapVietnameseToTransactionType(_selectedType.value),
+        category: selectedCategory.categoryName ?? '',
+        note: _noteController.text.isNotEmpty ? _noteController.text : null,
+        createAt: DateTime.now(),
+        syncId: _generateSyncId(),
+      );
+
+      await transactionProvider.addTransaction(transaction);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Đã lưu giao dịch')));
+        context.pop();
+      }
+    } catch (e) {
+      log('Error saving transaction: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Lỗi khi lưu giao dịch')));
+      }
+    }
+  }
 
   @override
   void dispose() {
     _amountController.dispose();
+    _noteController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final selectedWallet = ref.watch(selectedWalletNotifier);
+    final selectedCategory = ref.watch(categoryNotifier);
+    final transactionProvider = provider.Provider.of<TransactionProvider>(context, listen: false);
 
     return Container(
       decoration: BoxDecoration(color: AppColors.primaryBackground),
@@ -74,7 +155,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 },
               ),
             ),
-            actions: [IconButton(onPressed: null, icon: Icon(Icons.check))],
+            actions: [IconButton(onPressed: _saveTransaction, icon: Icon(Icons.check))],
           ),
           body: Container(
             decoration: BoxDecoration(color: AppColors.primaryBackground),
@@ -147,8 +228,15 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                               child: Column(
                                 children: [
                                   CustomListTile(
-                                    leading: Icon(Icons.add_circle_rounded),
-                                    title: Text('Chọn hạng mục'),
+                                    leading:
+                                        selectedCategory != null
+                                            ? Image.asset(selectedCategory.iconPath ?? '', width: 22)
+                                            : Icon(Icons.add_circle_rounded),
+                                    title: Text(
+                                      selectedCategory != null
+                                          ? (selectedCategory.categoryName ?? '')
+                                          : 'Chọn hạng mục',
+                                    ),
                                     enable: true,
                                     trailing: Row(
                                       children: [Text('Tất cả'), const SizedBox(width: 12), Icon(Icons.chevron_right)],
@@ -181,14 +269,24 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                                   const SizedBox(height: 8),
                                   CustomListTile(
                                     leading: Icon(Icons.calendar_month_outlined),
-                                    title: Text('Hôm nay - 01/11/2025'),
-                                    trailing: Text('22:53'),
+                                    title: Text(
+                                      '${_selectedDateTime.getWeekdayNameBaseCurrent} - ${_selectedDateTime.ddMMyyy}',
+                                    ),
+                                    trailing: Text(_selectedDateTime.hhMM),
                                     enable: true,
-                                    onTap: null,
+                                    onTap: () async {
+                                      final selected = await showDateTimePicker(context: context) ?? DateTime.now();
+                                      if (selected != null) {
+                                        setState(() {
+                                          _selectedDateTime = selected;
+                                        });
+                                      }
+                                    },
                                   ),
                                   CustomListTile(
                                     leading: Icon(Icons.notes_sharp),
                                     title: TextField(
+                                      controller: _noteController,
                                       decoration: InputDecoration(
                                         hintText: 'Diễn giải',
                                         hintStyle: TextStyle(fontSize: 14, color: AppColors.textHint),
@@ -235,7 +333,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () => context.push(AppRoutes.categoryList),
+                        onPressed: _saveTransaction,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.buttonPrimary,
                           foregroundColor: Colors.white,

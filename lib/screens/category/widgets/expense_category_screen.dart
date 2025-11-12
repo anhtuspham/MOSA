@@ -1,4 +1,9 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:mosa/providers/category_provider.dart';
 import 'package:mosa/utils/app_colors.dart';
 import 'package:mosa/utils/app_icons.dart';
 import 'package:mosa/widgets/category_grid_view.dart';
@@ -6,14 +11,14 @@ import 'package:mosa/widgets/custom_expansion_tile.dart';
 import 'package:mosa/widgets/item_widget.dart';
 import 'package:mosa/widgets/search_bar_widget.dart';
 
-class ExpenseCategoryScreen extends StatefulWidget {
+class ExpenseCategoryScreen extends ConsumerStatefulWidget {
   const ExpenseCategoryScreen({super.key});
 
   @override
-  State<ExpenseCategoryScreen> createState() => _ExpenseCategoryScreenState();
+  ConsumerState<ExpenseCategoryScreen> createState() => _ExpenseCategoryScreenState();
 }
 
-class _ExpenseCategoryScreenState extends State<ExpenseCategoryScreen> {
+class _ExpenseCategoryScreenState extends ConsumerState<ExpenseCategoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -26,7 +31,7 @@ class _ExpenseCategoryScreenState extends State<ExpenseCategoryScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
               child: SearchBarWidget(
                 onChange: (value) {
-                  print(value);
+                  log(value);
                 },
                 onClear: () => print('Clear text'),
               ),
@@ -42,11 +47,7 @@ class _ExpenseCategoryScreenState extends State<ExpenseCategoryScreen> {
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: List.generate(15, (index) {
-                        return ItemWidget(
-                          iconPath: AppIcons.statisticIcon,
-                          title: 'Quỹ nhóm',
-                          onTap: () => print('onTap'),
-                        );
+                        return ItemWidget(itemId: '1',iconPath: AppIcons.statisticIcon, title: 'Quỹ nhóm');
                       }),
                     ),
                   ),
@@ -58,14 +59,13 @@ class _ExpenseCategoryScreenState extends State<ExpenseCategoryScreen> {
               children: [
                 CategoryGridView(
                   categories: [
-                    ItemWidget(iconPath: AppIcons.statisticIcon, title: 'Quỹ nhóm', onTap: () => print('onTap')),
-                    ItemWidget(iconPath: AppIcons.statisticIcon, title: 'Quỹ nhóm', onTap: () => print('onTap')),
-                    ItemWidget(iconPath: AppIcons.statisticIcon, title: 'Quỹ nhóm', onTap: () => print('onTap')),
-                    ItemWidget(iconPath: AppIcons.statisticIcon, title: 'Quỹ nhóm', onTap: () => print('onTap')),
-                    ItemWidget(iconPath: AppIcons.statisticIcon, title: 'Quỹ nhóm', onTap: () => print('onTap')),
-                    ItemWidget(iconPath: AppIcons.statisticIcon, title: 'Quỹ nhóm', onTap: () => print('onTap')),
+                    ItemWidget(itemId: '1', iconPath: AppIcons.statisticIcon, title: 'Ăn sáng'),
+                    ItemWidget(itemId: '2', iconPath: AppIcons.statisticIcon, title: 'Ăn trưa'),
+                    ItemWidget(itemId: '3', iconPath: AppIcons.statisticIcon, title: 'Ăn chiều'),
+                    ItemWidget(itemId: '4', iconPath: AppIcons.statisticIcon, title: 'Ăn tối'),
+                    ItemWidget(itemId: '5', iconPath: AppIcons.statisticIcon, title: 'Đồ uống'),
+                    ItemWidget(itemId: '6', iconPath: AppIcons.statisticIcon, title: 'Khác'),
                   ],
-                  onTap: (itemWidget) => print(itemWidget.iconPath),
                 ),
               ],
             ),
@@ -76,14 +76,13 @@ class _ExpenseCategoryScreenState extends State<ExpenseCategoryScreen> {
               children: [
                 CategoryGridView(
                   categories: [
-                    ItemWidget(iconPath: AppIcons.statisticIcon, title: 'Quỹ nhóm', onTap: () => print('onTap')),
-                    ItemWidget(iconPath: AppIcons.statisticIcon, title: 'Quỹ nhóm', onTap: () => print('onTap')),
-                    ItemWidget(iconPath: AppIcons.statisticIcon, title: 'Quỹ nhóm', onTap: () => print('onTap')),
-                    ItemWidget(iconPath: AppIcons.statisticIcon, title: 'Quỹ nhóm', onTap: () => print('onTap')),
-                    ItemWidget(iconPath: AppIcons.statisticIcon, title: 'Quỹ nhóm', onTap: () => print('onTap')),
-                    ItemWidget(iconPath: AppIcons.statisticIcon, title: 'Quỹ nhóm', onTap: () => print('onTap')),
+                    ItemWidget(itemId: '1', iconPath: AppIcons.statisticIcon, title: 'Ăn sáng'),
+                    ItemWidget(itemId: '2', iconPath: AppIcons.statisticIcon, title: 'Ăn trưa'),
+                    ItemWidget(itemId: '3', iconPath: AppIcons.statisticIcon, title: 'Ăn chiều'),
+                    ItemWidget(itemId: '4', iconPath: AppIcons.statisticIcon, title: 'Ăn tối'),
+                    ItemWidget(itemId: '5', iconPath: AppIcons.statisticIcon, title: 'Đồ uống'),
+                    ItemWidget(itemId: '6', iconPath: AppIcons.statisticIcon, title: 'Khác'),
                   ],
-                  onTap: (itemWidget) => print(itemWidget.iconPath),
                 ),
               ],
             ),

@@ -34,7 +34,11 @@ class DatabaseService {
         category TEXT NOT NULL,
         date TEXT NOT NULL,
         type TEXT NOT NULL,
-        note TEXT
+        note TEXT,
+        createAt TEXT NOT NULL,
+        updateAt TEXT,
+        isSynced INTEGER NOT NULL DEFAULT 0,
+        syncId TEXT NOT NULL
       )
     ''');
 

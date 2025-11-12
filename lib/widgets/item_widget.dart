@@ -1,15 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:mosa/models/category.dart';
+import 'package:mosa/providers/category_provider.dart';
 
-class ItemWidget extends StatelessWidget {
+class ItemWidget extends ConsumerWidget {
   final String iconPath;
   final String title;
-  final VoidCallback onTap;
-  const ItemWidget({super.key, required this.iconPath, required this.title, required this.onTap});
+  final String itemId;
+  const ItemWidget({super.key, required this.iconPath, required this.title, required this.itemId});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: () {
+        ref
+            .read(categoryNotifier.notifier)
+            .selectCategory(Category(categoryId: itemId, iconPath: iconPath, categoryName: title));
+        context.pop();
+      },
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,

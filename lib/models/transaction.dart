@@ -1,11 +1,17 @@
+import 'package:mosa/models/enums.dart';
+
 class TransactionModel {
   final int? id;
   final String title;
   final double amount;
   final DateTime date;
-  final String type; // income or outcome
+  final TransactionType type;
   final String category;
   final String? note;
+  final DateTime createAt;
+  final DateTime? updateAt;
+  final bool isSynced;
+  final String syncId;
 
   TransactionModel({
     this.id,
@@ -15,6 +21,10 @@ class TransactionModel {
     required this.type,
     required this.category,
     this.note,
+    required this.createAt,
+    this.updateAt,
+    this.isSynced = false,
+    required this.syncId
   });
 
   factory TransactionModel.fromMap(Map<String, dynamic> map) {
@@ -23,9 +33,16 @@ class TransactionModel {
       title: map['title'],
       amount: (map['amount'] as num).toDouble(),
       date: DateTime.parse(map['date'] as String),
-      type: map['type'],
+      type: TransactionType.values.firstWhere(
+        (e) => e.toString().split('.').last == map['type'],
+        orElse: () => TransactionType.outcome,
+      ),
       category: map['category'],
       note: map['note'] as String?,
+      createAt: DateTime.parse(map['createAt'] as String),
+      updateAt: map['updateAt'] != null ? DateTime.parse(map['updateAt'] as String) : null,
+      isSynced: map['isSynced'] ?? false,
+      syncId: map['syncId']
     );
   }
 
@@ -35,9 +52,13 @@ class TransactionModel {
       'title': title,
       'amount': amount,
       'date': date.toIso8601String(),
-      'type': type,
+      'type': type.toString().split('.').last,
       'category': category,
       'note': note,
+      'createAt': createAt.toIso8601String(),
+      'updateAt': updateAt?.toIso8601String(),
+      'isSynced': isSynced,
+      'syncId': syncId
     };
   }
 
@@ -47,8 +68,14 @@ class TransactionModel {
     double? amount,
     String? category,
     DateTime? date,
-    String? type,
+    TransactionType? type,
     String? note,
+    DateTime? createAt,
+    DateTime? updateAt,
+    bool? isSynced,
+    String? syncId,
+
+
   }) {
     return TransactionModel(
       id: id ?? this.id,
@@ -58,6 +85,10 @@ class TransactionModel {
       date: date ?? this.date,
       type: type ?? this.type,
       note: note ?? this.note,
+      createAt: createAt ?? this.createAt,
+      updateAt: updateAt ?? this.updateAt,
+      isSynced: isSynced ?? this.isSynced,
+      syncId: syncId ?? this.syncId,
     );
   }
 
