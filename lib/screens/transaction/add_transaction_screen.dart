@@ -87,7 +87,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Đã lưu giao dịch')));
-        context.pop();
+        // context.pop();
       }
     } catch (e) {
       log('Error saving transaction: $e');
@@ -276,12 +276,10 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                                     enable: true,
                                     onTap: () async {
                                       final selected = await showDateTimePicker(context: context) ?? DateTime.now();
-                                      if (selected != null) {
-                                        setState(() {
-                                          _selectedDateTime = selected;
-                                        });
-                                      }
-                                    },
+                                      setState(() {
+                                        _selectedDateTime = selected;
+                                      });
+                                                                        },
                                   ),
                                   CustomListTile(
                                     leading: Icon(Icons.notes_sharp),
