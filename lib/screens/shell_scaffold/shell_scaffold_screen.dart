@@ -1,18 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mosa/providers/transaction_provider.dart';
 import 'package:mosa/router/app_routes.dart';
 
-class ShellScaffoldScreen extends StatefulWidget {
+class ShellScaffoldScreen extends ConsumerStatefulWidget {
   final Widget child;
   final StatefulNavigationShell navigationShell;
 
   const ShellScaffoldScreen({super.key, required this.child, required this.navigationShell});
 
   @override
-  State<ShellScaffoldScreen> createState() => _ShellScaffoldScreenState();
+  ConsumerState<ShellScaffoldScreen> createState() => _ShellScaffoldScreenState();
 }
 
-class _ShellScaffoldScreenState extends State<ShellScaffoldScreen> {
+class _ShellScaffoldScreenState extends ConsumerState<ShellScaffoldScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(transactionProvider.notifier).loadTransactions();
+    });
+  }
 
   int _getSelectedIndex(){
     final location = GoRouter.of(context).routerDelegate.currentConfiguration.uri.path;

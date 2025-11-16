@@ -53,7 +53,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   Future<void> _saveTransaction() async {
     try {
       final selectedCategory = ref.read(categoryNotifier);
-      final transactionProvider = provider.Provider.of<TransactionProvider>(context, listen: false);
+      final transactionNotifier = ref.read(transactionProvider.notifier);
 
       // Validation
       if (_amountController.text.isEmpty) {
@@ -83,7 +83,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         syncId: _generateSyncId(),
       );
 
-      await transactionProvider.addTransaction(transaction);
+      await transactionNotifier.addTransaction(transaction);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Đã lưu giao dịch')));
@@ -108,7 +108,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   Widget build(BuildContext context) {
     final selectedWallet = ref.watch(selectedWalletNotifier);
     final selectedCategory = ref.watch(categoryNotifier);
-    final transactionProvider = provider.Provider.of<TransactionProvider>(context, listen: false);
 
     return Container(
       decoration: BoxDecoration(color: AppColors.primaryBackground),

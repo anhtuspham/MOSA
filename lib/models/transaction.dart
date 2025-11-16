@@ -41,7 +41,7 @@ class TransactionModel {
       note: map['note'] as String?,
       createAt: DateTime.parse(map['createAt'] as String),
       updateAt: map['updateAt'] != null ? DateTime.parse(map['updateAt'] as String) : null,
-      isSynced: map['isSynced'] ?? false,
+      isSynced: (map['isSynced'] as int?) == 1,
       syncId: map['syncId']
     );
   }
@@ -57,7 +57,7 @@ class TransactionModel {
       'note': note,
       'createAt': createAt.toIso8601String(),
       'updateAt': updateAt?.toIso8601String(),
-      'isSynced': isSynced,
+      'isSynced': isSynced ? 1 : 0,
       'syncId': syncId
     };
   }

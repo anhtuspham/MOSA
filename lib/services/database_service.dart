@@ -22,7 +22,22 @@ class DatabaseService {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, AppConstants.dbName);
 
-    return await openDatabase(path, version: AppConstants.dbVersion, onCreate: _onCreate);
+    return await openDatabase(
+      path,
+      version: AppConstants.dbVersion,
+      onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
+      onDowngrade: _onDowngrade,
+      singleInstance: true,
+    );
+  }
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    print('📦 Database upgraded from version $oldVersion to $newVersion');
+  }
+
+  Future<void> _onDowngrade(Database db, int oldVersion, int newVersion) async {
+    print('📦 Database downgraded from version $oldVersion to $newVersion');
   }
 
   Future<void> _onCreate(Database db, int version) async {
@@ -37,7 +52,7 @@ class DatabaseService {
         note TEXT,
         createAt TEXT NOT NULL,
         updateAt TEXT,
-        isSynced INTEGER NOT NULL DEFAULT 0,
+        isSynced BOOLEAN NOT NULL DEFAULT FALSE,
         syncId TEXT NOT NULL
       )
     ''');
@@ -47,14 +62,32 @@ class DatabaseService {
 
   // CREATE
   Future<int> insertTransaction(TransactionModel transaction) async {
-    final db = await database;
-    final id = await db.insert(
-      AppConstants.tableTransactions,
-      transaction.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-    print('✅ Transaction inserted with id: $id');
-    return id;
+    try {
+      final db = await database;
+      final id = await db.insert(
+        AppConstants.tableTransactions,
+        transaction.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+      print('✅ Transaction inserted with id: $id');
+      return id;
+    } catch (e) {
+      // Database lock issue - reset and retry
+      if (e.toString().contains('readonly')) {
+        print('⚠️ Database readonly error, attempting to reset...');
+        await _resetDatabase();
+        return await insertTransaction(transaction); // Retry once
+      }
+      rethrow;
+    }
+  }
+
+  // Reset database instance
+  Future<void> _resetDatabase() async {
+    if (_database != null) {
+      await _database!.close();
+    }
+    _database = null;
   }
 
   // READ ALL
@@ -85,23 +118,41 @@ class DatabaseService {
 
   // UPDATE
   Future<int> updateTransaction(TransactionModel transaction) async {
-    final db = await database;
-    final count = await db.update(
-      AppConstants.tableTransactions,
-      transaction.toMap(),
-      where: 'id = ?',
-      whereArgs: [transaction.id],
-    );
-    print('✅ Transaction updated: $count rows affected');
-    return count;
+    try {
+      final db = await database;
+      final count = await db.update(
+        AppConstants.tableTransactions,
+        transaction.toMap(),
+        where: 'id = ?',
+        whereArgs: [transaction.id],
+      );
+      print('✅ Transaction updated: $count rows affected');
+      return count;
+    } catch (e) {
+      if (e.toString().contains('readonly')) {
+        print('⚠️ Database readonly error, attempting to reset...');
+        await _resetDatabase();
+        return await updateTransaction(transaction);
+      }
+      rethrow;
+    }
   }
 
   // DELETE
   Future<int> deleteTransaction(int id) async {
-    final db = await database;
-    final count = await db.delete(AppConstants.tableTransactions, where: 'id = ?', whereArgs: [id]);
-    print('✅ Transaction deleted: $count rows affected');
-    return count;
+    try {
+      final db = await database;
+      final count = await db.delete(AppConstants.tableTransactions, where: 'id = ?', whereArgs: [id]);
+      print('✅ Transaction deleted: $count rows affected');
+      return count;
+    } catch (e) {
+      if (e.toString().contains('readonly')) {
+        print('⚠️ Database readonly error, attempting to reset...');
+        await _resetDatabase();
+        return await deleteTransaction(id);
+      }
+      rethrow;
+    }
   }
 
   // DELETE ALL

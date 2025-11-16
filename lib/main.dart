@@ -28,28 +28,25 @@ class MyApp extends StatelessWidget {
       designSize: const Size(392, 852),
       minTextAdapt: true,
       splitScreenMode: true,
-      child: ChangeNotifierProvider(
-        create: (_) => TransactionProvider()..loadTransaction(),
-        child: MaterialApp.router(
-          title: 'Finance Tracker',
-          locale: Locale('vi', 'VN'),
-          localizationsDelegates: const [
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: [
-            Locale('en'),
-            Locale('vi', 'VN'),
-          ],
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            fontFamily: 'EuclidCircularA',
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlue),
-            useMaterial3: true,
-          ),
-          routerConfig: goRouter,
+      child: MaterialApp.router(
+        title: 'Finance Tracker',
+        locale: Locale('vi', 'VN'),
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: [
+          Locale('en'),
+          Locale('vi', 'VN'),
+        ],
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          fontFamily: 'EuclidCircularA',
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlue),
+          useMaterial3: true,
         ),
+        routerConfig: goRouter,
       ),
     );
   }
