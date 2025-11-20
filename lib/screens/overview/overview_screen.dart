@@ -20,6 +20,7 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
     final selectedMonth = context.watch<DateFilterProvider>().selectedMonth;
     final totalIncome = ref.watch(totalIncomeProvider);
     final totalExpense = ref.watch(totalExpenseProvider);
+    final transactionNotifier = ref.watch(transactionProvider);
 
     return RefreshIndicator(
       onRefresh: _handleOnRefresh,

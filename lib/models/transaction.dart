@@ -1,4 +1,5 @@
 import 'package:mosa/models/enums.dart';
+import 'package:mosa/models/wallets.dart';
 
 class TransactionModel {
   final int? id;
@@ -12,6 +13,7 @@ class TransactionModel {
   final DateTime? updateAt;
   final bool isSynced;
   final String syncId;
+  final String wallet;
 
   TransactionModel({
     this.id,
@@ -24,7 +26,8 @@ class TransactionModel {
     required this.createAt,
     this.updateAt,
     this.isSynced = false,
-    required this.syncId
+    required this.syncId,
+    required this.wallet,
   });
 
   factory TransactionModel.fromMap(Map<String, dynamic> map) {
@@ -42,7 +45,8 @@ class TransactionModel {
       createAt: DateTime.parse(map['createAt'] as String),
       updateAt: map['updateAt'] != null ? DateTime.parse(map['updateAt'] as String) : null,
       isSynced: (map['isSynced'] as int?) == 1,
-      syncId: map['syncId']
+      syncId: map['syncId'],
+      wallet: map['wallet'],
     );
   }
 
@@ -58,7 +62,8 @@ class TransactionModel {
       'createAt': createAt.toIso8601String(),
       'updateAt': updateAt?.toIso8601String(),
       'isSynced': isSynced ? 1 : 0,
-      'syncId': syncId
+      'syncId': syncId,
+      'wallet': wallet
     };
   }
 
@@ -74,6 +79,7 @@ class TransactionModel {
     DateTime? updateAt,
     bool? isSynced,
     String? syncId,
+    String? wallet
 
 
   }) {
@@ -89,6 +95,7 @@ class TransactionModel {
       updateAt: updateAt ?? this.updateAt,
       isSynced: isSynced ?? this.isSynced,
       syncId: syncId ?? this.syncId,
+      wallet: wallet ?? this.wallet
     );
   }
 

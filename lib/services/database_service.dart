@@ -47,6 +47,7 @@ class DatabaseService {
         title TEXT NOT NULL,
         amount REAL NOT NULL,
         category TEXT NOT NULL,
+        wallet TEXT NOT NULL,
         date TEXT NOT NULL,
         type TEXT NOT NULL,
         note TEXT,

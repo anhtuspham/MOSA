@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mosa/models/enums.dart';
 import 'package:mosa/models/transaction.dart';
+import 'package:mosa/models/wallets.dart';
 import 'package:mosa/providers/category_provider.dart';
 import 'package:mosa/providers/transaction_provider.dart';
 import 'package:mosa/providers/wallet_provider.dart';
@@ -54,6 +55,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     try {
       final selectedCategory = ref.read(categoryNotifier);
       final transactionNotifier = ref.read(transactionProvider.notifier);
+      final selectedWallet = ref.read(selectedWalletNotifier);
 
       // Validation
       if (_amountController.text.isEmpty) {
@@ -81,6 +83,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         note: _noteController.text.isNotEmpty ? _noteController.text : null,
         createAt: DateTime.now(),
         syncId: _generateSyncId(),
+        wallet: selectedWallet?.name ?? 'Tiền mặt',
       );
 
       await transactionNotifier.addTransaction(transaction);
@@ -278,7 +281,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                                       setState(() {
                                         _selectedDateTime = selected;
                                       });
-                                                                        },
+                                    },
                                   ),
                                   CustomListTile(
                                     leading: Icon(Icons.notes_sharp),

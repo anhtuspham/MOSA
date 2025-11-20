@@ -109,104 +109,11 @@ final transactionByTypeProvider = Provider.family<List<TransactionModel>, Transa
   return transaction.where((element) => element.type == type).toList();
 });
 
+final transactionByDateProvider = Provider.family<List<TransactionModel>, DateTime>((ref, date) {
+  final transaction = ref.watch(transactionProvider);
+  return transaction.where((element) => element.date == date).toList();
+});
+
 final transactionsInitialLoadProvider = FutureProvider<void>((ref) async {
   await ref.read(transactionProvider.notifier).loadTransactions();
 });
-
-// class TransactionProvider extends ChangeNotifier {
-//   final DatabaseService databaseService = DatabaseService();
-//
-//   List<TransactionModel> _transactions = [];
-//
-//   List<TransactionModel> get transactions => _transactions;
-//
-//   bool _isLoading = false;
-//
-//   bool get isLoading => _isLoading;
-//
-//   double get totalIncome {
-//     return _transactions
-//         .where((transaction) => transaction.type == TransactionType.income)
-//         .fold(0, (previousValue, element) => previousValue + element.amount);
-//   }
-//
-//   double get totalExpense {
-//     return _transactions
-//         .where((transaction) => transaction.type == TransactionType.outcome)
-//         .fold(0, (previousValue, element) => previousValue + element.amount);
-//   }
-//
-//   double get balance => totalIncome - totalExpense;
-//
-//   List<TransactionModel> getTransactionModelByType(TransactionType type) {
-//     return _transactions.where((element) => element.type == type).toList();
-//   }
-//
-//   // CRUD
-//   Future<void> loadTransaction() async {
-//     _isLoading = true;
-//     notifyListeners();
-//
-//     try {
-//       _transactions = await databaseService.getAllTransactions();
-//       print('Loaded ${_transactions.length} transactions');
-//     } catch (e) {
-//       print('Error loading transactions: $e');
-//     } finally {
-//       _isLoading = false;
-//       notifyListeners();
-//     }
-//   }
-//
-//   Future<void> addTransaction(TransactionModel transaction) async {
-//     try{
-//       final id = await databaseService.insertTransaction(transaction);
-//       final newTransaction = transaction.copyWith(id: id);
-//       _transactions.insert(0, newTransaction);
-//       notifyListeners();
-//       log('Transaction added with id: $id');
-//     } catch(e){
-//       log('Error adding transaction: $e');
-//       rethrow;
-//     }
-//   }
-//
-//   Future<void> updateTransaction(TransactionModel transaction) async {
-//     try{
-//       await databaseService.updateTransaction(transaction);
-//       final index = _transactions.indexWhere((element) => element.id == transaction.id);
-//       if(index != -1){
-//         _transactions[index] = transaction;
-//         notifyListeners();
-//       }
-//     } catch(e){
-//       print('Error update transaction $e');
-//       rethrow;
-//     }
-//   }
-//
-//   Future<void> deleteTransaction(int id) async {
-//     try{
-//       await databaseService.deleteTransaction(id);
-//       _transactions.removeWhere((element) => element.id == id);
-//       notifyListeners();
-//     } catch(e){
-//       print('Error deleting transaction $e');
-//       rethrow;
-//     }
-//   }
-//
-//   Future<void> filterByDateRange(DateTime start, DateTime end) async {
-//     _isLoading = true;
-//     notifyListeners();
-//
-//     try {
-//       _transactions = await databaseService.getTransactionsByDateRange(start, end);
-//     } catch (e) {
-//       print('❌ Error filtering transactions: $e');
-//     } finally {
-//       _isLoading = false;
-//       notifyListeners();
-//     }
-//   }
-// }

@@ -13,8 +13,10 @@ Future<DateTime?> showDateTimePicker({required BuildContext context, DateTime? i
   );
 
   if (pickedDate == null) return null;
+  final now = DateTime.now();
+  final initialTime = TimeOfDay(hour: now.hour, minute: now.minute);
 
-  time = await showTimePicker(context: context, initialTime: TimeOfDay.fromDateTime(pickedDate));
+  time = await showTimePicker(context: context, initialTime: initialTime);
 
   if (time == null) return null;
   return DateTime(pickedDate.year, pickedDate.month, pickedDate.day, time.hour, time.minute);
