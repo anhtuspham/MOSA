@@ -11,10 +11,7 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
     ProviderScope(
-      child: MultiProvider(
-        providers: [ChangeNotifierProvider(create: (_) => DateFilterProvider())],
-        child: const MyApp(),
-      ),
+      child: const MyApp(),
     ),
   );
 }

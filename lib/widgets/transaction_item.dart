@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mosa/utils/helpers.dart';
+import 'package:mosa/utils/utils.dart';
 
 import '../utils/app_colors.dart';
 
@@ -37,7 +39,7 @@ class TransactionItem extends StatelessWidget {
           ),
           Column(
             children: [
-              Text('$amount đ', style: TextStyle(fontSize: 16.sp, color: AppColors.expense)),
+              Text(Helpers.formatCurrency(amount), style: TextStyle(fontSize: 16.sp, color: AppColors.expense)),
               Row(
                 children: [
                   Icon(Icons.wallet, size: 16.sp),

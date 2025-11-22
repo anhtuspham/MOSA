@@ -51,6 +51,11 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     return DateTime.now().millisecondsSinceEpoch.toString() + math.Random().nextInt(1000).toString();
   }
 
+  void _clearTransaction() async{
+    _amountController.clear();
+    _noteController.clear();
+  }
+
   Future<void> _saveTransaction() async {
     try {
       final selectedCategory = ref.read(categoryNotifier);
@@ -87,6 +92,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       );
 
       await transactionNotifier.addTransaction(transaction);
+      _clearTransaction();
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Đã lưu giao dịch')));
@@ -272,7 +278,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                                   CustomListTile(
                                     leading: Icon(Icons.calendar_month_outlined),
                                     title: Text(
-                                      '${_selectedDateTime.getWeekdayNameBaseCurrent} - ${_selectedDateTime.ddMMyyy}',
+                                      '${_selectedDateTime.weekdayLabel} - ${_selectedDateTime.ddMMyyy}',
                                     ),
                                     trailing: Text(_selectedDateTime.hhMM),
                                     enable: true,

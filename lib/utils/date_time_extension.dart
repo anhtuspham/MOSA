@@ -1,7 +1,6 @@
 import 'package:intl/intl.dart';
 import 'package:mosa/utils/constants.dart';
 
-
 extension DateTimeExtension on DateTime {
   DateTime get startOfDay => DateTime(year, month, day, 0, 0, 0);
 
@@ -27,7 +26,7 @@ extension DateTimeExtension on DateTime {
     return DateTime(year, month + 1, 1).subtract(const Duration(seconds: 1));
   }
 
-  String get weekdayName{
+  String get weekdayName {
     final List<String> weekdays = [
       AppConstants.sunday,
       AppConstants.monday,
@@ -40,18 +39,16 @@ extension DateTimeExtension on DateTime {
     return weekdays[weekday % 7];
   }
 
-  String get getWeekdayNameBaseCurrent{
-    final currentWeekday = DateTime.now().weekday;
-    int weekdayStatus = currentWeekday - weekday;
-    switch (weekdayStatus) {
-      case 0:
-        return AppConstants.today;
-      case 1:
-        return AppConstants.yesterday;
-      default:
-        return weekdayName;
+  String get weekdayLabel {
+    final now = DateTime.now();
+    final diffDays = now.difference(this).inDays;
+
+    switch(diffDays){
+      case 0: return AppConstants.today;
+      case 1: return AppConstants.yesterday;
+      default: return weekdayName;
     }
-}
+  }
 
   DateTime get startOfPreviousMonth {
     if (month == 1) {
@@ -68,13 +65,9 @@ extension DateTimeExtension on DateTime {
   }
 
   DateTime get endOfWeek {
-    return add(Duration(days: 7 - weekday)).copyWith(
-      hour: 23,
-      minute: 59,
-      second: 59,
-      millisecond: 999,
-      microsecond: 999,
-    );
+    return add(
+      Duration(days: 7 - weekday),
+    ).copyWith(hour: 23, minute: 59, second: 59, millisecond: 999, microsecond: 999);
   }
 }
 
@@ -177,7 +170,6 @@ String getWeekDateRange(DateTime date) {
   return '${DateFormat('dd/MM').format(startOfWeek)} - ${DateFormat('dd/MM/yyyy').format(endOfWeek)}';
 }
 
-String convertDateTimeToString(DateTime time){
+String convertDateTimeToString(DateTime time) {
   return DateFormat('dd/MM/yyyy').format(time);
 }
-

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mosa/providers/date_filter_provider.dart';
 import 'package:mosa/providers/transaction_provider.dart';
+import 'package:mosa/utils/helpers.dart';
 import 'package:mosa/widgets/transaction_in_period_time.dart';
 import 'package:provider/provider.dart';
 
@@ -17,10 +18,10 @@ class OverviewScreen extends ConsumerStatefulWidget {
 class _OverviewScreenState extends ConsumerState<OverviewScreen> {
   @override
   Widget build(BuildContext context) {
-    final selectedMonth = context.watch<DateFilterProvider>().selectedMonth;
     final totalIncome = ref.watch(totalIncomeProvider);
     final totalExpense = ref.watch(totalExpenseProvider);
-    final transactionNotifier = ref.watch(transactionProvider);
+    final groupedTransactions = ref.watch(transactionGroupByDateProvider);
+    final dateFilterNotifier = ref.watch(dateRangeFilterProvider);
 
     return RefreshIndicator(
       onRefresh: _handleOnRefresh,
@@ -35,25 +36,26 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
                 children: [
                   Text('Lịch sử ghi chép', style: TextStyle(fontWeight: FontWeight.bold)),
                   PopupMenuButton(
-                    initialValue: selectedMonth,
+                    initialValue: dateFilterNotifier.name,
                     onSelected: (value) {
-                      context.read<DateFilterProvider>().setMonth(value);
+                      ref.read(dateRangeFilterProvider.notifier).state = DateRangeFilter.values.firstWhere(
+                        (element) => element.name == value,
+                      );
                     },
                     itemBuilder:
-                        (context) => [
-                          PopupMenuItem(value: 'Tuần này', child: Text('Tuần này')),
-                          PopupMenuItem(value: 'Tháng này', child: Text('Tháng này')),
-                          PopupMenuItem(value: 'Năm nay', child: Text('Năm nay')),
-                        ],
+                        (context) =>
+                            DateRangeFilter.values.map((e) {
+                              return PopupMenuItem(value: e.name, child: Text(_getFilterLabel(e)));
+                            }).toList(),
                     child: Container(
-                      padding: const EdgeInsets.all(3),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
                         border: Border.all(color: AppColors.border),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Row(
                         children: [
-                          Text(selectedMonth, style: TextStyle(fontWeight: FontWeight.w500)),
+                          Text(_getFilterLabel(dateFilterNotifier), style: TextStyle(fontWeight: FontWeight.w500)),
                           const Icon(Icons.keyboard_arrow_down),
                         ],
                       ),
@@ -74,7 +76,7 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
                       children: [
                         Text('Tổng thu', style: TextStyle(fontWeight: FontWeight.bold)),
                         Text(
-                          '$totalIncomeđ',
+                          Helpers.formatCurrency(totalIncome),
                           style: TextStyle(color: AppColors.income, fontSize: 18, fontWeight: FontWeight.w500),
                         ),
                       ],
@@ -91,7 +93,7 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
                       children: [
                         Text('Tổng chi', style: TextStyle(fontWeight: FontWeight.bold)),
                         Text(
-                          '$totalExpense',
+                          Helpers.formatCurrency(totalExpense),
                           style: TextStyle(color: AppColors.expense, fontSize: 18, fontWeight: FontWeight.w500),
                         ),
                       ],
@@ -101,14 +103,35 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
               ),
             ),
             const SizedBox(height: 8),
-            TransactionInPeriodTime(date: DateTime.now()),
-            TransactionInPeriodTime(date: DateTime.now()),
-            TransactionInPeriodTime(date: DateTime.now().subtract(Duration(days: 1))),
-            TransactionInPeriodTime(date: DateTime.now().subtract(Duration(days: 2))),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: groupedTransactions.length,
+              itemBuilder: (context, index) {
+              final date = groupedTransactions.keys.elementAt(index);
+              return TransactionInPeriodTime(date: date);
+            },),
+            // TransactionInPeriodTime(date: DateTime.now()),
+            // TransactionInPeriodTime(date: DateTime.now()),
+            // TransactionInPeriodTime(date: DateTime.now().subtract(Duration(days: 1))),
+            // TransactionInPeriodTime(date: DateTime.now().subtract(Duration(days: 2))),
           ],
         ),
       ),
     );
+  }
+
+  String _getFilterLabel(DateRangeFilter filter) {
+    switch (filter) {
+      case DateRangeFilter.week:
+        return 'Tuần này';
+      case DateRangeFilter.month:
+        return 'Tháng này';
+      case DateRangeFilter.quarter:
+        return 'Quý này';
+      case DateRangeFilter.year:
+        return 'Năm này';
+    }
   }
 
   Future<void> _handleOnRefresh() async {

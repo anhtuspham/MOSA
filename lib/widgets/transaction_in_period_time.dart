@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mosa/providers/transaction_provider.dart';
 import 'package:mosa/widgets/transaction_item.dart';
 
+import '../providers/date_filter_provider.dart';
 import '../utils/app_colors.dart';
 import '../utils/date_time_extension.dart';
 
@@ -20,7 +21,11 @@ class TransactionInPeriodTime extends ConsumerStatefulWidget {
 class _TransactionInPeriodTimeState extends ConsumerState<TransactionInPeriodTime> {
   @override
   Widget build(BuildContext context) {
-    final transactionNotifier = ref.watch(transactionProvider);
+    final groupedNotifier = ref.watch(transactionGroupByDateProvider);
+    final totalAmount = ref.watch(totalByDateProvider(widget.date));
+
+    final transactionOfDay = groupedNotifier[widget.date] ?? [];
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       margin: const EdgeInsets.only(bottom: 16),
@@ -34,19 +39,19 @@ class _TransactionInPeriodTimeState extends ConsumerState<TransactionInPeriodTim
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(convertDateTimeToString(widget.date), style: TextStyle(fontWeight: FontWeight.bold)),
-                  Text(widget.date.getWeekdayNameBaseCurrent),
+                  Text(widget.date.weekdayLabel),
                 ],
               ),
-              Text('478.167đ', style: TextStyle(color: AppColors.expense)),
+              Text(totalAmount.expense.toString(), style: TextStyle(color: AppColors.expense)),
             ],
           ),
           const SizedBox(height: 8),
           ListView.builder(
-            itemCount: transactionNotifier.length,
+            itemCount: transactionOfDay.length,
             shrinkWrap: true,
             physics: NeverScrollableScrollPhysics(),
             itemBuilder: (context, index) {
-              final transaction = transactionNotifier[index];
+              final transaction = transactionOfDay[index];
               return TransactionItem(
                 category: transaction.category,
                 amount: transaction.amount,

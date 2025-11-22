@@ -2,19 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:mosa/models/enums.dart';
 import 'package:mosa/models/transaction.dart';
 import 'package:mosa/providers/transaction_provider.dart';
-
-class DateFilterProvider extends ChangeNotifier {
-  String _selectedMonth = 'Tháng này';
-
-  String get selectedMonth => _selectedMonth;
-
-  void setMonth(String month) {
-    _selectedMonth = month;
-    notifyListeners();
-  }
-}
 
 enum DateRangeFilter { week, month, quarter, year }
 
@@ -60,4 +50,39 @@ final filteredTransactionByDateRangeProvider = Provider<List<TransactionModel>>(
 
   filtered.sort((a, b) => a.date.compareTo(b.date));
   return filtered;
+});
+
+final transactionGroupByDateProvider = Provider<Map<DateTime, List<TransactionModel>>>((ref) {
+  final transactions = ref.watch(filteredTransactionByDateRangeProvider);
+  final grouped = <DateTime, List<TransactionModel>>{};
+
+  for (var transaction in transactions) {
+    final dateKey = DateTime(transaction.date.year, transaction.date.month, transaction.date.day);
+    if (grouped.containsKey(dateKey)) {
+      grouped[dateKey]!.add(transaction);
+    } else {
+      grouped[dateKey] = [transaction];
+    }
+  }
+
+  final sortedKey = grouped.keys.toList()..sort((a, b) => b.compareTo(a));
+  return Map.fromEntries(sortedKey.map((e) => MapEntry(e, grouped[e]!)));
+});
+
+final totalByDateProvider = Provider.family<({double income, double expense}), DateTime>((ref, date) {
+  final grouped = ref.watch(transactionGroupByDateProvider);
+  final transactions = grouped[date] ?? [];
+
+  double income = 0;
+  double expense = 0;
+
+  for (var transaction in transactions) {
+    if (transaction.type == TransactionType.income) {
+      income += transaction.amount;
+    } else {
+      expense += transaction.amount;
+    }
+  }
+
+  return (income: income, expense: expense);
 });
