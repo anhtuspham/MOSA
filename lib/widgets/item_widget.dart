@@ -5,27 +5,40 @@ import 'package:mosa/models/category.dart';
 import 'package:mosa/providers/category_provider.dart';
 
 class ItemWidget extends ConsumerWidget {
-  final String iconPath;
-  final String title;
   final String itemId;
-  const ItemWidget({super.key, required this.iconPath, required this.title, required this.itemId});
+  final String name;
+  final String? type;
+  final String? iconType;
+  final String iconPath;
+  final void Function()? onTap;
+
+  const ItemWidget({
+    super.key,
+    required this.itemId,
+    required this.name,
+    this.type,
+    this.iconType,
+    required this.iconPath,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return GestureDetector(
-      onTap: () {
-        ref
-            .read(categoryNotifier.notifier)
-            .selectCategory(Category(categoryId: itemId, iconPath: iconPath, categoryName: title));
-        context.pop();
-      },
+      onTap: onTap,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Image.asset(iconPath, width: 25),
+          Category(
+            id: itemId,
+            name: name,
+            type: type ?? '',
+            iconType: iconType ?? 'material',
+            iconPath: iconPath,
+          ).getIcon(),
           Text(
-            title,
+            name,
             style: TextStyle(fontSize: 12),
             textAlign: TextAlign.center,
             maxLines: 1,

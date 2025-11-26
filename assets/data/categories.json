@@ -1,0 +1,263 @@
+[
+  {
+    "id": "income_salary",
+    "name": "Lương",
+    "type": "income",
+    "iconType": "material",
+    "iconPath": "attach_money",
+    "color": "#4CAF50"
+  },
+  {
+    "id": "income_other",
+    "name": "Thu nhập khác",
+    "type": "income",
+    "iconType": "material",
+    "iconPath": "more_horiz",
+    "color": "#9E9E9E",
+    "children": [
+      {
+        "id": "income_bonus",
+        "name": "Thưởng",
+        "type": "income",
+        "iconType": "material",
+        "iconPath": "card_giftcard",
+        "color": "#2196F3",
+        "parentId": "income_other"
+      },
+      {
+        "id": "income_interest",
+        "name": "Tiền lãi",
+        "type": "income",
+        "iconType": "material",
+        "iconPath": "monetization_on",
+        "color": "#9C27B0",
+        "parentId": "income_other"
+      },
+      {
+        "id": "income_gift",
+        "name": "Quà tặng",
+        "type": "income",
+        "iconType": "material",
+        "iconPath": "card_giftcard",
+        "color": "#E91E63",
+        "parentId": "income_other"
+      },
+      {
+        "id": "income_investment",
+        "name": "Đầu tư",
+        "type": "income",
+        "iconType": "material",
+        "iconPath": "trending_up",
+        "color": "#009688",
+        "parentId": "income_other"
+      }
+    ]
+  },
+  {
+    "id": "expense_food",
+    "name": "Ăn uống",
+    "type": "expense",
+    "iconType": "material",
+    "iconPath": "restaurant",
+    "color": "#FF9800",
+    "children": [
+      {
+        "id": "expense_food_breakfast",
+        "name": "Sáng",
+        "type": "expense",
+        "iconType": "material",
+        "iconPath": "breakfast_dining",
+        "color": "#FF9800",
+        "parentId": "expense_food"
+      },
+      {
+        "id": "expense_food_lunch",
+        "name": "Trưa",
+        "type": "expense",
+        "iconType": "material",
+        "iconPath": "lunch_dining",
+        "color": "#FF9800",
+        "parentId": "expense_food"
+      },
+      {
+        "id": "expense_food_dinner",
+        "name": "Tối",
+        "type": "expense",
+        "iconType": "material",
+        "iconPath": "dinner_dining",
+        "color": "#FF9800",
+        "parentId": "expense_food"
+      }
+    ]
+  },
+  {
+    "id": "expense_shopping",
+    "name": "Mua sắm",
+    "type": "expense",
+    "iconType": "material",
+    "iconPath": "shopping_cart",
+    "color": "#F44336",
+    "children": [
+      {
+        "id": "expense_shopping_clothes",
+        "name": "Quần áo",
+        "type": "expense",
+        "iconType": "material",
+        "iconPath": "checkroom",
+        "color": "#F44336",
+        "parentId": "expense_shopping"
+      },
+      {
+        "id": "expense_shopping_electronics",
+        "name": "Điện tử",
+        "type": "expense",
+        "iconType": "material",
+        "iconPath": "devices",
+        "color": "#F44336",
+        "parentId": "expense_shopping"
+      },
+      {
+        "id": "expense_shopping_other",
+        "name": "Khác",
+        "type": "expense",
+        "iconType": "material",
+        "iconPath": "shopping_bag",
+        "color": "#F44336",
+        "parentId": "expense_shopping"
+      }
+    ]
+  },
+  {
+    "id": "expense_entertainment",
+    "name": "Giải trí",
+    "type": "expense",
+    "iconType": "material",
+    "iconPath": "movie",
+    "color": "#00BCD4"
+  },
+  {
+    "id": "expense_transport",
+    "name": "Di chuyển",
+    "type": "expense",
+    "iconType": "material",
+    "iconPath": "directions_car",
+    "color": "#3F51B5",
+    "children": [
+      {
+        "id": "expense_transport_taxi",
+        "name": "Taxi/Grab",
+        "type": "expense",
+        "iconType": "material",
+        "iconPath": "local_taxi",
+        "color": "#3F51B5",
+        "parentId": "expense_transport"
+      },
+      {
+        "id": "expense_transport_bus",
+        "name": "Xe buýt",
+        "type": "expense",
+        "iconType": "material",
+        "iconPath": "directions_bus",
+        "color": "#3F51B5",
+        "parentId": "expense_transport"
+      },
+      {
+        "id": "expense_transport_bike",
+        "name": "Xe đạp",
+        "type": "expense",
+        "iconType": "material",
+        "iconPath": "two_wheeler",
+        "color": "#3F51B5",
+        "parentId": "expense_transport"
+      }
+    ]
+  },
+  {
+    "id": "expense_bill",
+    "name": "Hóa đơn",
+    "type": "expense",
+    "iconType": "material",
+    "iconPath": "receipt",
+    "color": "#795548"
+  },
+  {
+    "id": "expense_health",
+    "name": "Sức khỏe",
+    "type": "expense",
+    "iconType": "material",
+    "iconPath": "health_and_safety",
+    "color": "#8BC34A"
+  },
+  {
+    "id": "expense_education",
+    "name": "Giáo dục",
+    "type": "expense",
+    "iconType": "material",
+    "iconPath": "school",
+    "color": "#FFC107"
+  },
+  {
+    "id": "expense_travel",
+    "name": "Du lịch",
+    "type": "expense",
+    "iconType": "material",
+    "iconPath": "flight",
+    "color": "#03A9F4"
+  },
+  {
+    "id": "expense_house",
+    "name": "Nhà cửa",
+    "type": "expense",
+    "iconType": "material",
+    "iconPath": "home",
+    "color": "#FF5722"
+  },
+  {
+    "id": "expense_coffee",
+    "name": "Cà phê",
+    "type": "expense",
+    "iconType": "material",
+    "iconPath": "local_cafe",
+    "color": "#CDDC39"
+  },
+  {
+    "id": "expense_other",
+    "name": "Khác",
+    "type": "expense",
+    "iconType": "material",
+    "iconPath": "more_horiz",
+    "color": "#9E9E9E"
+  },
+  {
+    "id": "lend_borrow",
+    "name": "Cho vay",
+    "type": "lend",
+    "iconType": "material",
+    "iconPath": "handshake",
+    "color": "#4CAF50"
+  },
+  {
+    "id": "lend_receive",
+    "name": "Mượn",
+    "type": "lend",
+    "iconType": "material",
+    "iconPath": "gavel",
+    "color": "#F44336"
+  },
+  {
+    "id": "lend_payback",
+    "name": "Trả nợ",
+    "type": "lend",
+    "iconType": "material",
+    "iconPath": "check_circle",
+    "color": "#2196F3"
+  },
+  {
+    "id": "lend_collect",
+    "name": "Thu nợ",
+    "type": "lend",
+    "iconType": "material",
+    "iconPath": "paid",
+    "color": "#FFC107"
+  }
+]

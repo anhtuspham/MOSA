@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mosa/providers/transaction_provider.dart';
+import 'package:mosa/utils/helpers.dart';
 import 'package:mosa/widgets/transaction_item.dart';
 
 import '../providers/date_filter_provider.dart';
@@ -22,7 +23,7 @@ class _TransactionInPeriodTimeState extends ConsumerState<TransactionInPeriodTim
   @override
   Widget build(BuildContext context) {
     final groupedNotifier = ref.watch(transactionGroupByDateProvider);
-    final totalAmount = ref.watch(totalByDateProvider(widget.date));
+    final totals = ref.watch(totalByDateProvider(widget.date));
 
     final transactionOfDay = groupedNotifier[widget.date] ?? [];
 
@@ -42,7 +43,7 @@ class _TransactionInPeriodTimeState extends ConsumerState<TransactionInPeriodTim
                   Text(widget.date.weekdayLabel),
                 ],
               ),
-              Text(totalAmount.expense.toString(), style: TextStyle(color: AppColors.expense)),
+              Text(Helpers.formatCurrency(totals.expense), style: TextStyle(color: AppColors.expense)),
             ],
           ),
           const SizedBox(height: 8),

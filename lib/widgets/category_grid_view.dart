@@ -20,9 +20,9 @@ class CategoryGridView extends StatelessWidget {
       itemBuilder: (context, index) {
         final category = categories[index];
         return ItemWidget(
-          iconPath: category.iconPath,
-          title: category.title,
           itemId: category.itemId,
+          name: category.name,
+          iconPath: category.iconPath,
         );
       },
     );

@@ -58,7 +58,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
   Future<void> _saveTransaction() async {
     try {
-      final selectedCategory = ref.read(categoryNotifier);
+      final selectedCategory = ref.read(selectedCategoryProvider);
       final transactionNotifier = ref.read(transactionProvider.notifier);
       final selectedWallet = ref.read(selectedWalletNotifier);
 
@@ -80,11 +80,11 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       }
 
       final transaction = TransactionModel(
-        title: selectedCategory.categoryName ?? 'Giao dịch',
+        title: selectedCategory.name ?? 'Giao dịch',
         amount: amount,
         date: _selectedDateTime,
         type: _mapVietnameseToTransactionType(_selectedType.value),
-        category: selectedCategory.categoryName ?? '',
+        category: selectedCategory.name ?? '',
         note: _noteController.text.isNotEmpty ? _noteController.text : null,
         createAt: DateTime.now(),
         syncId: _generateSyncId(),
@@ -116,7 +116,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   @override
   Widget build(BuildContext context) {
     final selectedWallet = ref.watch(selectedWalletNotifier);
-    final selectedCategory = ref.watch(categoryNotifier);
+    final selectedCategory = ref.watch(selectedCategoryProvider);
 
     return Container(
       decoration: BoxDecoration(color: AppColors.primaryBackground),
@@ -242,7 +242,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                                             : Icon(Icons.add_circle_rounded),
                                     title: Text(
                                       selectedCategory != null
-                                          ? (selectedCategory.categoryName ?? '')
+                                          ? (selectedCategory.name ?? '')
                                           : 'Chọn hạng mục',
                                     ),
                                     enable: true,

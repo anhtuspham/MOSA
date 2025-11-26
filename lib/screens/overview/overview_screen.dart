@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mosa/providers/date_filter_provider.dart';
 import 'package:mosa/providers/transaction_provider.dart';
+import 'package:mosa/utils/constants.dart';
 import 'package:mosa/utils/helpers.dart';
 import 'package:mosa/widgets/transaction_in_period_time.dart';
 import 'package:provider/provider.dart';
@@ -111,10 +112,6 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
               final date = groupedTransactions.keys.elementAt(index);
               return TransactionInPeriodTime(date: date);
             },),
-            // TransactionInPeriodTime(date: DateTime.now()),
-            // TransactionInPeriodTime(date: DateTime.now()),
-            // TransactionInPeriodTime(date: DateTime.now().subtract(Duration(days: 1))),
-            // TransactionInPeriodTime(date: DateTime.now().subtract(Duration(days: 2))),
           ],
         ),
       ),
@@ -124,13 +121,13 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
   String _getFilterLabel(DateRangeFilter filter) {
     switch (filter) {
       case DateRangeFilter.week:
-        return 'Tuần này';
+        return AppConstants.thisWeek;
       case DateRangeFilter.month:
-        return 'Tháng này';
+        return AppConstants.thisMonth;
       case DateRangeFilter.quarter:
-        return 'Quý này';
+        return AppConstants.thisQuarter;
       case DateRangeFilter.year:
-        return 'Năm này';
+        return AppConstants.thisYear;
     }
   }
 
