@@ -7,7 +7,7 @@ class TransactionModel {
   final double amount;
   final DateTime date;
   final TransactionType type;
-  final String category;
+  final String categoryId;
   final String? note;
   final DateTime createAt;
   final DateTime? updateAt;
@@ -21,7 +21,7 @@ class TransactionModel {
     required this.amount,
     required this.date,
     required this.type,
-    required this.category,
+    required this.categoryId,
     this.note,
     required this.createAt,
     this.updateAt,
@@ -40,7 +40,7 @@ class TransactionModel {
         (e) => e.toString().split('.').last == map['type'],
         orElse: () => TransactionType.outcome,
       ),
-      category: map['category'],
+      categoryId: map['categoryId'] ?? map['category'], // Fallback for old data
       note: map['note'] as String?,
       createAt: DateTime.parse(map['createAt'] as String),
       updateAt: map['updateAt'] != null ? DateTime.parse(map['updateAt'] as String) : null,
@@ -57,7 +57,7 @@ class TransactionModel {
       'amount': amount,
       'date': date.toIso8601String(),
       'type': type.toString().split('.').last,
-      'category': category,
+      'categoryId': categoryId,
       'note': note,
       'createAt': createAt.toIso8601String(),
       'updateAt': updateAt?.toIso8601String(),
@@ -71,7 +71,7 @@ class TransactionModel {
     int? id,
     String? title,
     double? amount,
-    String? category,
+    String? categoryId,
     DateTime? date,
     TransactionType? type,
     String? note,
@@ -87,7 +87,7 @@ class TransactionModel {
       id: id ?? this.id,
       title: title ?? this.title,
       amount: amount ?? this.amount,
-      category: category ?? this.category,
+      categoryId: categoryId ?? this.categoryId,
       date: date ?? this.date,
       type: type ?? this.type,
       note: note ?? this.note,
@@ -101,6 +101,6 @@ class TransactionModel {
 
   @override
   String toString(){
-    return 'Transaction(id: $id, title: $title, amount: $amount, date: $date, type: $type, category: $category, note: $note)';
+    return 'Transaction(id: $id, title: $title, amount: $amount, date: $date, type: $type, categoryId: $categoryId, note: $note)';
   }
 }

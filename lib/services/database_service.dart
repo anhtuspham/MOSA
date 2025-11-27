@@ -1,6 +1,8 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../models/transaction.dart';
+import '../models/category.dart';
+import '../services/category_service.dart';
 import '../utils/constants.dart';
 
 class DatabaseService {
@@ -34,6 +36,59 @@ class DatabaseService {
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     print('📦 Database upgraded from version $oldVersion to $newVersion');
+    
+    if (oldVersion < 2) {
+      await _migrateToVersion2(db);
+    }
+  }
+
+  Future<void> _migrateToVersion2(Database db) async {
+    print('🔄 Migrating to version 2: category name → categoryId');
+    
+    try {
+      // 1. Add categoryId column
+      await db.execute('ALTER TABLE ${AppConstants.tableTransactions} ADD COLUMN categoryId TEXT');
+      
+      // 2. Load categories to create name → id mapping
+      final categories = await CategoryService.loadCategories();
+      final categoryMap = <String, String>{};
+      
+      for (final category in categories) {
+        categoryMap[category.name] = category.id;
+      }
+      
+      // 3. Get all transactions
+      final transactions = await db.query(AppConstants.tableTransactions);
+      
+      // 4. Update each transaction with categoryId
+      for (final transaction in transactions) {
+        final categoryName = transaction['category'] as String;
+        final categoryId = categoryMap[categoryName];
+        
+        if (categoryId != null) {
+          await db.update(
+            AppConstants.tableTransactions,
+            {'categoryId': categoryId},
+            where: 'id = ?',
+            whereArgs: [transaction['id']],
+          );
+        } else {
+          // If no matching category found, use a default or create one
+          print('⚠️ No category found for: $categoryName');
+          await db.update(
+            AppConstants.tableTransactions,
+            {'categoryId': 'default-category'}, // You may want to handle this differently
+            where: 'id = ?',
+            whereArgs: [transaction['id']],
+          );
+        }
+      }
+      
+      print('✅ Migration to version 2 completed');
+    } catch (e) {
+      print('❌ Migration failed: $e');
+      rethrow;
+    }
   }
 
   Future<void> _onDowngrade(Database db, int oldVersion, int newVersion) async {
@@ -46,7 +101,8 @@ class DatabaseService {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         title TEXT NOT NULL,
         amount REAL NOT NULL,
-        category TEXT NOT NULL,
+        category TEXT,
+        categoryId TEXT,
         wallet TEXT NOT NULL,
         date TEXT NOT NULL,
         type TEXT NOT NULL,

@@ -81,11 +81,11 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       }
 
       final transaction = TransactionModel(
-        title: selectedCategory.name ?? 'Giao dịch',
+        title: selectedCategory.name,
         amount: amount,
         date: _selectedDateTime,
         type: _mapVietnameseToTransactionType(_selectedType.value),
-        category: selectedCategory.name ?? '',
+        categoryId: selectedCategory.id,
         note: _noteController.text.isNotEmpty ? _noteController.text : null,
         createAt: DateTime.now(),
         syncId: _generateSyncId(),

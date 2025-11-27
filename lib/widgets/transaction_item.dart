@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mosa/models/category.dart';
 import 'package:mosa/utils/helpers.dart';
-import 'package:mosa/utils/utils.dart';
-
 import '../utils/app_colors.dart';
 
 class TransactionItem extends StatelessWidget {
-  final String category;
+  final Category category;
   final String? note;
   final double amount;
   final String wallet;
@@ -22,13 +21,13 @@ class TransactionItem extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Icon(Icons.calendar_month),
+          category.getIcon(),
           SizedBox(width: 8.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(category),
+                Text(category.name),
                 if (note != null)
                   Text(
                     note!,

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mosa/providers/category_provider.dart';
+import 'package:mosa/providers/transaction_provider.dart';
 import 'package:mosa/utils/helpers.dart';
 import 'package:mosa/widgets/transaction_item.dart';
 
@@ -63,11 +65,37 @@ class _TransactionInPeriodTimeState extends ConsumerState<TransactionInPeriodTim
             physics: NeverScrollableScrollPhysics(),
             itemBuilder: (context, index) {
               final transaction = transactionOfDay[index];
-              return TransactionItem(
-                category: transaction.category,
-                amount: transaction.amount,
-                note: transaction.note,
-                wallet: transaction.wallet,
+              final categoryAsync = ref.watch(categoryByIdProvider(transaction.categoryId));
+
+              return categoryAsync.when(
+                data: (category) {
+                  if (category == null) {
+                    return Container(
+                      height: 60,
+                      margin: const EdgeInsets.only(bottom: 12),
+                      decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(10)),
+                      child: const Center(child: Text('Category not found')),
+                    );
+                  }
+                  return TransactionItem(
+                    category: category,
+                    amount: transaction.amount,
+                    note: transaction.note,
+                    wallet: transaction.wallet,
+                  );
+                },
+                loading: () => Container(
+                  height: 60,
+                  margin: const EdgeInsets.only(bottom: 12),
+                  decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(10)),
+                  child: const Center(child: CircularProgressIndicator()),
+                ),
+                error: (error, stack) => Container(
+                  height: 60,
+                  margin: const EdgeInsets.only(bottom: 12),
+                  decoration: BoxDecoration(color: Colors.red[100], borderRadius: BorderRadius.circular(10)),
+                  child: Center(child: Text('Error: ${error.toString()}')),
+                ),
               );
             },
           ),
