@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mosa/providers/transaction_provider.dart';
 import 'package:mosa/utils/helpers.dart';
 import 'package:mosa/widgets/transaction_item.dart';
 
@@ -29,7 +28,7 @@ class _TransactionInPeriodTimeState extends ConsumerState<TransactionInPeriodTim
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(color: Colors.white),
       child: Column(
         children: [
@@ -43,7 +42,18 @@ class _TransactionInPeriodTimeState extends ConsumerState<TransactionInPeriodTim
                   Text(widget.date.weekdayLabel),
                 ],
               ),
-              Text(Helpers.formatCurrency(totals.expense), style: TextStyle(color: AppColors.expense)),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  if (totals.income > 0)
+                    Text(
+                      Helpers.formatCurrency(totals.income),
+                      style: TextStyle(color: AppColors.income, fontSize: 16),
+                    ),
+                  if (totals.expense > 0)
+                    Text(Helpers.formatCurrency(totals.expense), style: TextStyle(color: AppColors.expense)),
+                ],
+              ),
             ],
           ),
           const SizedBox(height: 8),
@@ -61,11 +71,6 @@ class _TransactionInPeriodTimeState extends ConsumerState<TransactionInPeriodTim
               );
             },
           ),
-          // TransactionItem(),
-          // TransactionItem(),
-          // TransactionItem(),
-          // TransactionItem(),
-          // TransactionItem(),
         ],
       ),
     );

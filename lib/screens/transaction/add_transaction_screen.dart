@@ -17,6 +17,7 @@ import 'package:mosa/widgets/custom_list_tile.dart';
 import 'package:mosa/widgets/date_time_picker_dialog.dart';
 import 'package:provider/provider.dart' as provider;
 
+import '../../models/category.dart';
 import '../../utils/app_colors.dart';
 
 class AddTransactionScreen extends ConsumerStatefulWidget {
@@ -51,7 +52,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     return DateTime.now().millisecondsSinceEpoch.toString() + math.Random().nextInt(1000).toString();
   }
 
-  void _clearTransaction() async{
+  void _clearTransaction() async {
     _amountController.clear();
     _noteController.clear();
   }
@@ -140,10 +141,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                   floatingLabelAlignment: FloatingLabelAlignment.center,
                   contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 4),
                   border: OutlineInputBorder(borderSide: BorderSide.none),
-                  // border: OutlineInputBorder(
-                  //   borderRadius: BorderRadius.circular(8),
-                  //   borderSide: BorderSide(color: AppColors.lightBorder, width: 1),
-                  // ),
                 ),
                 isExpanded: true,
                 alignment: Alignment.center,
@@ -238,12 +235,10 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                                   CustomListTile(
                                     leading:
                                         selectedCategory != null
-                                            ? Image.asset(selectedCategory.iconPath ?? '', width: 22)
+                                            ? selectedCategory.getIcon()
                                             : Icon(Icons.add_circle_rounded),
                                     title: Text(
-                                      selectedCategory != null
-                                          ? (selectedCategory.name ?? '')
-                                          : 'Chọn hạng mục',
+                                      selectedCategory != null ? (selectedCategory.name ?? '') : 'Chọn hạng mục',
                                     ),
                                     enable: true,
                                     trailing: Row(
@@ -277,9 +272,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                                   const SizedBox(height: 8),
                                   CustomListTile(
                                     leading: Icon(Icons.calendar_month_outlined),
-                                    title: Text(
-                                      '${_selectedDateTime.weekdayLabel} - ${_selectedDateTime.ddMMyyy}',
-                                    ),
+                                    title: Text('${_selectedDateTime.weekdayLabel} - ${_selectedDateTime.ddMMyyy}'),
                                     trailing: Text(_selectedDateTime.hhMM),
                                     enable: true,
                                     onTap: () async {

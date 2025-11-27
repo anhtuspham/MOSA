@@ -1,45 +1,58 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:mosa/models/category.dart';
-import 'package:mosa/providers/category_provider.dart';
 
 class ItemWidget extends ConsumerWidget {
-  final String itemId;
-  final String name;
+  final Category? category;
+  final String? itemId;
+  final String? name;
   final String? type;
   final String? iconType;
-  final String iconPath;
+  final String? iconPath;
   final void Function()? onTap;
+  final CrossAxisAlignment? crossAxisAlignment;
 
   const ItemWidget({
     super.key,
-    required this.itemId,
-    required this.name,
+    this.category,
+    this.itemId,
+    this.name,
     this.type,
     this.iconType,
-    required this.iconPath,
+    this.iconPath,
+    this.crossAxisAlignment,
     this.onTap,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return GestureDetector(
+    return InkWell(
       onTap: onTap,
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: crossAxisAlignment ?? CrossAxisAlignment.center,
         children: [
-          Category(
-            id: itemId,
-            name: name,
-            type: type ?? '',
-            iconType: iconType ?? 'material',
-            iconPath: iconPath,
-          ).getIcon(),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child:
+                (category ??
+                        Category(
+                          id: itemId ?? '',
+                          name: name ?? '',
+                          type: type ?? '',
+                          iconType: iconType ?? 'material',
+                          iconPath: iconPath ?? '',
+                        ))
+                    .getIcon(),
+          ),
+          const SizedBox(height: 4),
           Text(
-            name,
-            style: TextStyle(fontSize: 12),
+            category?.name ?? name ?? '',
+            style: TextStyle(fontSize: 11),
             textAlign: TextAlign.center,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
