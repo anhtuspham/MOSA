@@ -6,8 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mosa/providers/category_provider.dart';
 import 'package:mosa/utils/app_colors.dart';
-import 'package:mosa/utils/app_icons.dart';
-import 'package:mosa/widgets/category_grid_view.dart';
 import 'package:mosa/widgets/custom_expansion_tile.dart';
 import 'package:mosa/widgets/item_widget.dart';
 import 'package:mosa/widgets/search_bar_widget.dart';
@@ -47,31 +45,6 @@ class _CategoryTabState extends ConsumerState<CategoryTab> {
               onClear: () => print('Clear text'),
             ),
           ),
-          // Container(
-          //   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          //   child: Column(
-          //     crossAxisAlignment: CrossAxisAlignment.start,
-          //     children: [
-          //       Text('Hay dùng'),
-          //       const SizedBox(height: 12),
-          //       SingleChildScrollView(
-          //         controller: _scrollController,
-          //         scrollDirection: Axis.horizontal,
-          //         child: Row(
-          //           children: List.generate(15, (index) {
-          //             return ItemWidget(
-          //               itemId: '1',
-          //               iconPath: AppIcons.statisticIcon,
-          //               name: 'Quỹ nhóm',
-          //               type: 'income',
-          //               iconType: 'material',
-          //             );
-          //           }),
-          //         ),
-          //       ),
-          //     ],
-          //   ),
-          // ),
           asyncCategories.when(
             data: (categories) {
               return ListView.builder(

@@ -34,7 +34,7 @@ class AppConstants{
   };
 
   static const String dbName = 'finance_tracker.db';
-  static const int dbVersion = 2;
+  static const int dbVersion = 3;
   static const String tableTransactions = 'transactions';
 
   static const String sunday = 'Chủ nhật';

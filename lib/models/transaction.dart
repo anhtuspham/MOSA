@@ -1,5 +1,5 @@
 import 'package:mosa/models/enums.dart';
-import 'package:mosa/models/wallets.dart';
+import 'package:mosa/utils/utils.dart';
 
 class TransactionModel {
   final int? id;
@@ -30,6 +30,22 @@ class TransactionModel {
     required this.wallet,
   });
 
+  factory TransactionModel.fromJson(Map<String, dynamic> json) {
+    return TransactionModel(
+      title: json['title'] as String,
+      amount: (json['amount'] as num).toDouble(),
+      categoryId: json['categoryId'] as String,
+      wallet: json['wallet'] as String,
+      date: DateTime.parse(json['date'] as String),
+      type: getTransactionType(json['type'] as String),
+      note: json['note'] as String?,
+      createAt: DateTime.now(),
+      updateAt: DateTime.now(),
+      isSynced: json['isSynced'] as bool? ?? false,
+      syncId: json['syncId'] as String? ?? '',
+    );
+  }
+
   factory TransactionModel.fromMap(Map<String, dynamic> map) {
     return TransactionModel(
       id: map['id'] as int?,
@@ -40,7 +56,7 @@ class TransactionModel {
         (e) => e.toString().split('.').last == map['type'],
         orElse: () => TransactionType.outcome,
       ),
-      categoryId: map['categoryId'] ?? map['category'], // Fallback for old data
+      categoryId: map['categoryId'],
       note: map['note'] as String?,
       createAt: DateTime.parse(map['createAt'] as String),
       updateAt: map['updateAt'] != null ? DateTime.parse(map['updateAt'] as String) : null,
@@ -50,7 +66,7 @@ class TransactionModel {
     );
   }
 
-  Map<String, dynamic> toMap(){
+  Map<String, dynamic> toMap() {
     return {
       'id': id,
       'title': title,
@@ -63,7 +79,7 @@ class TransactionModel {
       'updateAt': updateAt?.toIso8601String(),
       'isSynced': isSynced ? 1 : 0,
       'syncId': syncId,
-      'wallet': wallet
+      'wallet': wallet,
     };
   }
 
@@ -79,9 +95,7 @@ class TransactionModel {
     DateTime? updateAt,
     bool? isSynced,
     String? syncId,
-    String? wallet
-
-
+    String? wallet,
   }) {
     return TransactionModel(
       id: id ?? this.id,
@@ -95,12 +109,12 @@ class TransactionModel {
       updateAt: updateAt ?? this.updateAt,
       isSynced: isSynced ?? this.isSynced,
       syncId: syncId ?? this.syncId,
-      wallet: wallet ?? this.wallet
+      wallet: wallet ?? this.wallet,
     );
   }
 
   @override
-  String toString(){
+  String toString() {
     return 'Transaction(id: $id, title: $title, amount: $amount, date: $date, type: $type, categoryId: $categoryId, note: $note)';
   }
 }

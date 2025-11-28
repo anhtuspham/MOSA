@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:mosa/providers/date_filter_provider.dart';
-import 'package:mosa/providers/transaction_provider.dart';
 import 'package:mosa/router/app_router.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:mosa/services/database_service.dart';
 
-void main() {
+void main() async{
   WidgetsFlutterBinding.ensureInitialized();
+
+  // await DatabaseService().clearDatabase();
+
+  // await DatabaseService().importDatabaseFromAssets('assets/data/transactions.json');
+
   runApp(
     ProviderScope(
       child: const MyApp(),
