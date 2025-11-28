@@ -67,12 +67,9 @@ class _TransactionInPeriodTimeState extends ConsumerState<TransactionInPeriodTim
             itemBuilder: (context, index) {
               final transaction = transactionOfDay[index];
               final categoryAsync = ref.watch(categoryByIdProvider(transaction.categoryId));
-              log('categoryAsync ${categoryAsync.value}');
 
               return categoryAsync.when(
                 data: (category) {
-                  log('transactionID: ${transaction.categoryId}');
-                  log('category: ${category}');
                   if (category == null) {
                     return Container(
                       height: 60,

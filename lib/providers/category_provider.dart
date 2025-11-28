@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mosa/models/category.dart';
 import 'package:mosa/services/category_service.dart';
+import 'package:mosa/utils/collection_utils.dart';
+import 'package:mosa/utils/tree_utils.dart';
 
 final categoriesProvider = FutureProvider<List<Category>>((ref) {
   return CategoryService.loadCategories();
@@ -13,27 +15,12 @@ final categoryByTypeProvider = FutureProvider.family<List<Category>, String>((re
 
 final flattenedCategoryProvider = FutureProvider<List<Category>>((ref) async {
   final categories = await ref.watch(categoriesProvider.future);
-  List<Category> flattenedCategory = [];
-  for (var category in categories) {
-    if (!flattenedCategory.contains(category)) {
-      flattenedCategory.add(category);
-    }
-    if (category.children != null && category.children!.isNotEmpty) {
-      flattenedCategory.addAll(category.children!);
-    }
-  }
-  return flattenedCategory;
+  return TreeUtils.flatten(categories, (category) => category.children);
 });
 
 final categoryByIdProvider = FutureProvider.family<Category?, String>((ref, cateogryId) async {
   final categories = await ref.watch(flattenedCategoryProvider.future);
-  try {
-    return categories.firstWhere((element) {
-      return element.id == cateogryId;
-    });
-  } catch (e) {
-    return null;
-  }
+  return CollectionUtils.safeLookup(categories, (category) => category.id == cateogryId);
 });
 
 class CategoryNotifier extends Notifier<Category?> {

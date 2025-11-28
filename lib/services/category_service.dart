@@ -8,8 +8,6 @@ class CategoryService {
   static Future<List<Category>> loadCategories() async {
     try {
       final jsonString = await rootBundle.loadString('assets/data/categories.json');
-      log('Loaded categories: ${jsonDecode(jsonString).runtimeType}');
-
       final List<dynamic> jsonList = jsonDecode(jsonString);
 
       return jsonList.map((e) => Category.fromJson(e)).toList();

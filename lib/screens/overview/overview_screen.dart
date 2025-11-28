@@ -5,7 +5,6 @@ import 'package:mosa/providers/transaction_provider.dart';
 import 'package:mosa/utils/constants.dart';
 import 'package:mosa/utils/helpers.dart';
 import 'package:mosa/widgets/transaction_in_period_time.dart';
-import 'package:provider/provider.dart';
 
 import '../../utils/app_colors.dart';
 

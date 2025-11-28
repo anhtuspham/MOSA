@@ -4,38 +4,32 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:mosa/models/enums.dart';
 import 'package:mosa/models/transaction.dart';
 import 'package:mosa/providers/transaction_provider.dart';
+import 'package:mosa/utils/collection_utils.dart';
+import 'package:mosa/utils/date_utils.dart';
+import 'package:mosa/utils/transaction_utils.dart';
 
+/// Enum định nghĩa các loại khoảng thời gian để filter transactions
+/// - week: Lọc theo tuần (từ thứ 2 đến hôm nay)
+/// - month: Lọc theo tháng hiện tại
+/// - quarter: Lọc theo quý hiện tại
+/// - year: Lọc theo năm hiện tại
 enum DateRangeFilter { week, month, quarter, year }
 
+/// Provider quản lý loại filter thời gian đang được chọn
+///
+/// Mặc định: DateRangeFilter.month (lọc theo tháng)
+///
+/// Sử dụng:
+/// ```dart
+/// final filter = ref.watch(dateRangeFilterProvider);
+/// // Thay đổi filter
+/// ref.read(dateRangeFilterProvider.notifier).state = DateRangeFilter.week;
+/// ```
 final dateRangeFilterProvider = StateProvider<DateRangeFilter>((ref) => DateRangeFilter.month);
 
 final _getDateRangeProvider = Provider<DateTimeRange>((ref) {
   final filter = ref.watch(dateRangeFilterProvider);
-  final now = DateTime.now();
-  switch (filter) {
-    case DateRangeFilter.week:
-      final monday = now.subtract(Duration(days: now.weekday - 1));
-      return DateTimeRange(
-        start: DateTime(monday.year, monday.month, monday.day),
-        end: DateTime(now.year, now.month, now.day),
-      );
-    case DateRangeFilter.month:
-      return DateTimeRange(
-        start: DateTime(now.year, now.month, 1),
-        end: DateTime(now.year, now.month + 1, 1).subtract(Duration(seconds: 1)),
-      );
-    case DateRangeFilter.quarter:
-      final quarter = (now.month - 1) ~/ 3;
-      return DateTimeRange(
-        start: DateTime(now.year, quarter * 3 + 1, 1),
-        end: DateTime(now.year, quarter * 3 + 4).subtract(Duration(seconds: 1)),
-      );
-    case DateRangeFilter.year:
-      return DateTimeRange(
-        start: DateTime(now.year, 1, 1),
-        end: DateTime(now.year + 1, 1, 1).subtract(Duration(seconds: 1)),
-      );
-  }
+  return DateRangeUtils.getRange(filter);
 });
 
 final filteredTransactionByDateRangeProvider = Provider<List<TransactionModel>>((ref) {
@@ -53,35 +47,13 @@ final filteredTransactionByDateRangeProvider = Provider<List<TransactionModel>>(
 
 final transactionGroupByDateProvider = Provider<Map<DateTime, List<TransactionModel>>>((ref) {
   final transactions = ref.watch(filteredTransactionByDateRangeProvider);
-  final grouped = <DateTime, List<TransactionModel>>{};
-
-  for (var transaction in transactions) {
-    final dateKey = DateTime(transaction.date.year, transaction.date.month, transaction.date.day);
-    if (grouped.containsKey(dateKey)) {
-      grouped[dateKey]!.add(transaction);
-    } else {
-      grouped[dateKey] = [transaction];
-    }
-  }
-
-  final sortedKey = grouped.keys.toList()..sort((a, b) => b.compareTo(a));
-  return Map.fromEntries(sortedKey.map((e) => MapEntry(e, grouped[e]!)));
+  
+  return CollectionUtils.groupByAndSort(transactions, (t) => DateRangeUtils.dateOnly(t.date), descending: true);
 });
 
 final totalByDateProvider = Provider.family<({double income, double expense}), DateTime>((ref, date) {
   final grouped = ref.watch(transactionGroupByDateProvider);
   final transactions = grouped[date] ?? [];
 
-  double income = 0;
-  double expense = 0;
-
-  for (var transaction in transactions) {
-    if (transaction.type == TransactionType.income) {
-      income += transaction.amount;
-    } else {
-      expense += transaction.amount;
-    }
-  }
-
-  return (income: income, expense: expense);
+  return TransactionAggregator.calculatorTotals(transactions);
 });
