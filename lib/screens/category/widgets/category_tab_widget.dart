@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -42,7 +41,7 @@ class _CategoryTabState extends ConsumerState<CategoryTab> {
               onChange: (value) {
                 log(value);
               },
-              onClear: () => print('Clear text'),
+              onClear: () => log('Clear text'),
             ),
           ),
           asyncCategories.when(

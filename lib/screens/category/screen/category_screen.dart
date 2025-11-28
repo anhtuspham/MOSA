@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mosa/screens/category/widgets/category_tab_widget.dart';
-import 'package:mosa/screens/category/widgets/expense_category_screen.dart';
 import 'package:mosa/utils/app_colors.dart';
 import 'package:mosa/widgets/tabBar_scaffold.dart';
 

@@ -7,7 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mosa/models/enums.dart';
 import 'package:mosa/models/transaction.dart';
-import 'package:mosa/models/wallets.dart';
 import 'package:mosa/providers/category_provider.dart';
 import 'package:mosa/providers/transaction_provider.dart';
 import 'package:mosa/providers/wallet_provider.dart';
@@ -15,9 +14,7 @@ import 'package:mosa/router/app_routes.dart';
 import 'package:mosa/utils/date_time_extension.dart';
 import 'package:mosa/widgets/custom_list_tile.dart';
 import 'package:mosa/widgets/date_time_picker_dialog.dart';
-import 'package:provider/provider.dart' as provider;
 
-import '../../models/category.dart';
 import '../../utils/app_colors.dart';
 
 class AddTransactionScreen extends ConsumerStatefulWidget {
@@ -238,7 +235,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                                             ? selectedCategory.getIcon()
                                             : Icon(Icons.add_circle_rounded),
                                     title: Text(
-                                      selectedCategory != null ? (selectedCategory.name ?? '') : 'Chọn hạng mục',
+                                      selectedCategory != null ? (selectedCategory.name) : 'Chọn hạng mục',
                                     ),
                                     enable: true,
                                     trailing: Row(
