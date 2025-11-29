@@ -54,7 +54,7 @@ class TransactionModel {
       date: DateTime.parse(map['date'] as String),
       type: TransactionType.values.firstWhere(
         (e) => e.toString().split('.').last == map['type'],
-        orElse: () => TransactionType.outcome,
+        orElse: () => TransactionType.expense,
       ),
       categoryId: map['categoryId'],
       note: map['note'] as String?,

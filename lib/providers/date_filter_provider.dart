@@ -15,16 +15,6 @@ import 'package:mosa/utils/transaction_utils.dart';
 /// - year: Lọc theo năm hiện tại
 enum DateRangeFilter { week, month, quarter, year }
 
-/// Provider quản lý loại filter thời gian đang được chọn
-///
-/// Mặc định: DateRangeFilter.month (lọc theo tháng)
-///
-/// Sử dụng:
-/// ```dart
-/// final filter = ref.watch(dateRangeFilterProvider);
-/// // Thay đổi filter
-/// ref.read(dateRangeFilterProvider.notifier).state = DateRangeFilter.week;
-/// ```
 final dateRangeFilterProvider = StateProvider<DateRangeFilter>((ref) => DateRangeFilter.month);
 
 final _getDateRangeProvider = Provider<DateTimeRange>((ref) {
@@ -41,13 +31,13 @@ final filteredTransactionByDateRangeProvider = Provider<List<TransactionModel>>(
         return element.date.isAfter(dateRange.start) && element.date.isBefore(dateRange.end);
       }).toList();
 
-  filtered.sort((a, b) => a.date.compareTo(b.date));
+  filtered.sort((a, b) => b.date.compareTo(a.date));
   return filtered;
 });
 
 final transactionGroupByDateProvider = Provider<Map<DateTime, List<TransactionModel>>>((ref) {
   final transactions = ref.watch(filteredTransactionByDateRangeProvider);
-  
+
   return CollectionUtils.groupByAndSort(transactions, (t) => DateRangeUtils.dateOnly(t.date), descending: true);
 });
 

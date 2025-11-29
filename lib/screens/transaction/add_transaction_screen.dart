@@ -25,25 +25,10 @@ class AddTransactionScreen extends ConsumerStatefulWidget {
 }
 
 class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
-  late final ValueNotifier<String> _selectedType = ValueNotifier<String>('Chi tiền');
+  late final ValueNotifier<TransactionType> _selectedType = ValueNotifier<TransactionType>(TransactionType.expense);
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _noteController = TextEditingController();
   late DateTime _selectedDateTime = DateTime.now();
-
-  TransactionType _mapVietnameseToTransactionType(String vietnamese) {
-    switch (vietnamese) {
-      case 'Chi tiền':
-        return TransactionType.outcome;
-      case 'Thu tiền':
-        return TransactionType.income;
-      case 'Cho vay':
-        return TransactionType.lend;
-      case 'Chuyển khoản':
-        return TransactionType.borrowing;
-      default:
-        return TransactionType.outcome;
-    }
-  }
 
   String _generateSyncId() {
     return DateTime.now().millisecondsSinceEpoch.toString() + math.Random().nextInt(1000).toString();
@@ -52,6 +37,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   void _clearTransaction() async {
     _amountController.clear();
     _noteController.clear();
+    ref.read(selectedCategoryProvider.notifier).selectCategory(null);
   }
 
   Future<void> _saveTransaction() async {
@@ -81,7 +67,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         title: selectedCategory.name,
         amount: amount,
         date: _selectedDateTime,
-        type: _mapVietnameseToTransactionType(_selectedType.value),
+        type: _selectedType.value,
         categoryId: selectedCategory.id,
         note: _noteController.text.isNotEmpty ? _noteController.text : null,
         createAt: DateTime.now(),
@@ -143,15 +129,18 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 alignment: Alignment.center,
                 initialValue: _selectedType.value,
                 items: [
-                  DropdownMenuItem(value: 'Chi tiền', child: Text('Chi tiền')),
-                  DropdownMenuItem(value: 'Thu tiền', child: Text('Thu tiền')),
-                  DropdownMenuItem(value: 'Cho vay', child: Text('Cho vay')),
-                  DropdownMenuItem(value: 'Chuyển khoản', child: Text('Chuyển khoản')),
+                  DropdownMenuItem(value: TransactionType.expense, child: Text('Chi tiền')),
+                  DropdownMenuItem(value: TransactionType.income, child: Text('Thu tiền')),
+                  DropdownMenuItem(value: TransactionType.lend, child: Text('Cho vay')),
+                  DropdownMenuItem(value: TransactionType.borrowing, child: Text('Vay mượn')),
+                  DropdownMenuItem(value: TransactionType.transfer, child: Text('Chuyển khoản')),
                 ],
                 onChanged: (value) {
                   if (value != null) {
                     setState(() {
                       _selectedType.value = value;
+                      ref.read(currentTransactionByTypeProvider.notifier).state = _selectedType.value;
+                      _clearTransaction();
                     });
                   }
                 },
@@ -234,9 +223,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                                         selectedCategory != null
                                             ? selectedCategory.getIcon()
                                             : Icon(Icons.add_circle_rounded),
-                                    title: Text(
-                                      selectedCategory != null ? (selectedCategory.name) : 'Chọn hạng mục',
-                                    ),
+                                    title: Text(selectedCategory != null ? (selectedCategory.name) : 'Chọn hạng mục'),
                                     enable: true,
                                     trailing: Row(
                                       children: [Text('Tất cả'), const SizedBox(width: 12), Icon(Icons.chevron_right)],

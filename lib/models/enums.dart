@@ -1,6 +1,1 @@
-enum TransactionType {
-  income,
-  outcome,
-  lend,
-  borrowing
-}
+enum TransactionType { income, expense, lend, borrowing, transfer }

@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:mosa/models/enums.dart';
+import 'package:mosa/providers/date_filter_provider.dart';
 import 'package:mosa/services/database_service.dart';
 
 import '../models/transaction.dart';
@@ -86,15 +87,15 @@ final transactionProvider = StateNotifierProvider<TransactionNotifier, List<Tran
 });
 
 final totalIncomeProvider = Provider((ref) {
-  final transaction = ref.watch(transactionProvider);
+  final transaction = ref.watch(filteredTransactionByDateRangeProvider);
   return transaction
       .where((element) => element.type == TransactionType.income)
       .fold(0.0, (previousValue, element) => previousValue + element.amount);
 });
 
 final totalExpenseProvider = Provider((ref) {
-  final transactions = ref.watch(transactionProvider);
-  return transactions.where((t) => t.type == TransactionType.outcome).fold(0.0, (prev, curr) => prev + curr.amount);
+  final transactions = ref.watch(filteredTransactionByDateRangeProvider);
+  return transactions.where((t) => t.type == TransactionType.expense).fold(0.0, (prev, curr) => prev + curr.amount);
 });
 
 final balanceProvider = Provider((ref) {
@@ -116,3 +117,5 @@ final transactionByDateProvider = Provider.family<List<TransactionModel>, DateTi
 final transactionsInitialLoadProvider = FutureProvider<void>((ref) async {
   await ref.read(transactionProvider.notifier).loadTransactions();
 });
+
+final currentTransactionByTypeProvider = StateProvider<TransactionType?>((ref) => null);

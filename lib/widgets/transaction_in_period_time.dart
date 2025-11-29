@@ -51,10 +51,13 @@ class _TransactionInPeriodTimeState extends ConsumerState<TransactionInPeriodTim
                   if (totals.income > 0)
                     Text(
                       Helpers.formatCurrency(totals.income),
-                      style: TextStyle(color: AppColors.income, fontSize: 16),
+                      style: TextStyle(color: AppColors.income, fontSize: 14),
                     ),
                   if (totals.expense > 0)
-                    Text(Helpers.formatCurrency(totals.expense), style: TextStyle(color: AppColors.expense)),
+                    Text(
+                      Helpers.formatCurrency(totals.expense),
+                      style: TextStyle(color: AppColors.expense, fontSize: 14),
+                    ),
                 ],
               ),
             ],

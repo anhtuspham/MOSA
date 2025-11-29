@@ -206,10 +206,7 @@ class DatabaseService {
   // READ ALL
   Future<List<TransactionModel>> getAllTransactions() async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query(
-      AppConstants.tableTransactions,
-      orderBy: 'date DESC',
-    );
+    final List<Map<String, dynamic>> maps = await db.query(AppConstants.tableTransactions, orderBy: 'date DESC');
 
     return List.generate(maps.length, (i) {
       return TransactionModel.fromMap(maps[i]);
@@ -269,10 +266,7 @@ class DatabaseService {
   }
 
   // FILTER by date range
-  Future<List<TransactionModel>> getTransactionsByDateRange(
-    DateTime startDate,
-    DateTime endDate,
-  ) async {
+  Future<List<TransactionModel>> getTransactionsByDateRange(DateTime startDate, DateTime endDate) async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
       AppConstants.tableTransactions,
@@ -383,13 +377,13 @@ class DatabaseService {
       case 'income':
         return TransactionType.income;
       case 'expense':
-        return TransactionType.outcome;
+        return TransactionType.expense;
       case 'lend':
         return TransactionType.lend;
       case 'borrowing':
         return TransactionType.borrowing;
       default:
-        return TransactionType.outcome;
+        return TransactionType.expense;
     }
   }
 }
