@@ -103,14 +103,21 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
               ),
             ),
             const SizedBox(height: 8),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: groupedTransactions.length,
-              itemBuilder: (context, index) {
-              final date = groupedTransactions.keys.elementAt(index);
-              return TransactionInPeriodTime(date: date);
-            },),
+            groupedTransactions.when(
+              data: (grouped) {
+                return ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: grouped.length,
+                  itemBuilder: (context, index) {
+                    final date = grouped.keys.elementAt(index);
+                    return TransactionInPeriodTime(date: date);
+                  },
+                );
+              },
+              error: (_, _) => Center(child: Text('Error')),
+              loading: () => CircularProgressIndicator(),
+            ),
           ],
         ),
       ),
@@ -132,7 +139,7 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
 
   Future<void> _handleOnRefresh() async {
     try {
-      ref.read(transactionProvider.notifier).loadTransactions();
+      ref.invalidate(transactionProvider);
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Lỗi: $e')));

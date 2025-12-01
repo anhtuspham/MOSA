@@ -15,13 +15,6 @@ class ShellScaffoldScreen extends ConsumerStatefulWidget {
 }
 
 class _ShellScaffoldScreenState extends ConsumerState<ShellScaffoldScreen> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(transactionProvider.notifier).loadTransactions();
-    });
-  }
 
   int _getSelectedIndex(){
     final location = GoRouter.of(context).routerDelegate.currentConfiguration.uri.path;

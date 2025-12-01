@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mosa/providers/category_provider.dart';
 import 'package:mosa/utils/helpers.dart';
+import 'package:mosa/widgets/error_widget.dart';
+import 'package:mosa/widgets/loading_widget.dart';
 import 'package:mosa/widgets/transaction_item.dart';
 
 import '../providers/date_filter_provider.dart';
@@ -26,8 +28,9 @@ class _TransactionInPeriodTimeState extends ConsumerState<TransactionInPeriodTim
   Widget build(BuildContext context) {
     final groupedNotifier = ref.watch(transactionGroupByDateProvider);
     final totals = ref.watch(totalByDateProvider(widget.date));
+    final categoryAsync = ref.watch(flattenedCategoryProvider);
 
-    final transactionOfDay = groupedNotifier[widget.date] ?? [];
+    final transactionOfDay = groupedNotifier.whenData((group) => group[widget.date] ?? []);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -45,65 +48,65 @@ class _TransactionInPeriodTimeState extends ConsumerState<TransactionInPeriodTim
                   Text(widget.date.weekdayLabel),
                 ],
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  if (totals.income > 0)
-                    Text(
-                      Helpers.formatCurrency(totals.income),
-                      style: TextStyle(color: AppColors.income, fontSize: 14),
+              totals.when(
+                data:
+                    (totalData) => Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        if (totalData.income > 0)
+                          Text(
+                            Helpers.formatCurrency(totalData.income),
+                            style: TextStyle(color: AppColors.income, fontSize: 14),
+                          ),
+                        if (totalData.expense > 0)
+                          Text(
+                            Helpers.formatCurrency(totalData.expense),
+                            style: TextStyle(color: AppColors.expense, fontSize: 14),
+                          ),
+                      ],
                     ),
-                  if (totals.expense > 0)
-                    Text(
-                      Helpers.formatCurrency(totals.expense),
-                      style: TextStyle(color: AppColors.expense, fontSize: 14),
-                    ),
-                ],
+                loading: () => CircularProgressIndicator(),
+                error: (_, _) => Center(child: Text('Error')),
               ),
             ],
           ),
           const SizedBox(height: 8),
-          ListView.builder(
-            itemCount: transactionOfDay.length,
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            itemBuilder: (context, index) {
-              final transaction = transactionOfDay[index];
-              final categoryAsync = ref.watch(categoryByIdProvider(transaction.categoryId));
-
+          transactionOfDay.when(
+            data: (transactionsData) {
               return categoryAsync.when(
-                data: (category) {
-                  if (category == null) {
-                    return Container(
-                      height: 60,
-                      margin: const EdgeInsets.only(bottom: 12),
-                      decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(10)),
-                      child: const Center(child: Text('Category not found')),
-                    );
-                  }
-                  return TransactionItem(
-                    category: category,
-                    amount: transaction.amount,
-                    note: transaction.note,
-                    wallet: transaction.wallet,
+                data: (categories) {
+                  final cateogryMap = {for (var category in categories) category.id: category};
+                  
+                  return ListView.builder(
+                    itemCount: transactionsData.length,
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      final transaction = transactionsData[index];
+                      final category = cateogryMap[transaction.categoryId];
+                      if (category == null) {
+                        return Container(
+                          height: 60,
+                          margin: const EdgeInsets.only(bottom: 12),
+                          decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(10)),
+                          child: const Center(child: Text('Category not found')),
+                        );
+                      }
+                      return TransactionItem(
+                        category: category,
+                        amount: transaction.amount,
+                        note: transaction.note,
+                        wallet: transaction.wallet,
+                      );
+                    },
                   );
                 },
-                loading:
-                    () => Container(
-                      height: 60,
-                      margin: const EdgeInsets.only(bottom: 12),
-                      decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(10)),
-                      child: const Center(child: CircularProgressIndicator()),
-                    ),
-                error:
-                    (error, stack) => Container(
-                      height: 60,
-                      margin: const EdgeInsets.only(bottom: 12),
-                      decoration: BoxDecoration(color: Colors.red[100], borderRadius: BorderRadius.circular(10)),
-                      child: Center(child: Text('Error: ${error.toString()}')),
-                    ),
+                error: (error, stackTrace) => ErrorSectionWidget(error: error),
+                loading: () => LoadingSectionWidget(),
               );
             },
+            loading: () => CircularProgressIndicator(),
+            error: (error, stackTrace) => Center(child: Text('Error: $error')),
           ),
         ],
       ),

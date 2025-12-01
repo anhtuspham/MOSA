@@ -10,92 +10,74 @@ import '../models/transaction.dart';
 
 final databaseServiceProvider = Provider<DatabaseService>((ref) => DatabaseService());
 
-class TransactionNotifier extends StateNotifier<List<TransactionModel>> {
-  final DatabaseService databaseService;
-  bool _isLoading = false;
-
-  TransactionNotifier(this.databaseService) : super([]);
-
-  bool get isLoading => _isLoading;
-
-  Future<void> loadTransactions() async {
-    _isLoading = true;
-    try {
-      final transactions = await databaseService.getAllTransactions();
-      state = transactions;
-      print('Loaded ${state.length} transactions');
-    } catch (e) {
-      print('Error loading transaction $e');
-      rethrow;
-    } finally {
-      _isLoading = false;
-    }
+class TransactionNotifier extends AsyncNotifier<List<TransactionModel>> {
+  @override
+  Future<List<TransactionModel>> build() async {
+    return await _databaseService.getAllTransactions();
   }
 
+  DatabaseService get _databaseService => ref.read(databaseServiceProvider);
+
   Future<void> addTransaction(TransactionModel transaction) async {
-    try {
-      final id = await databaseService.insertTransaction(transaction);
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final id = await _databaseService.insertTransaction(transaction);
       final newTransaction = transaction.copyWith(id: id);
-      state = [newTransaction, ...state];
-    } catch (e) {
-      log('Error add transaction $e');
-      rethrow;
-    }
+      return [newTransaction, ...state.requireValue];
+    });
   }
 
   Future<void> updateTransaction(TransactionModel transaction) async {
-    try {
-      await databaseService.updateTransaction(transaction);
-      final index = state.indexWhere((element) => element == transaction);
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      await _databaseService.updateTransaction(transaction);
+      final index = state.requireValue.indexWhere((element) => element == transaction);
       if (index != -1) {
-        state = [...state.sublist(0, index), transaction, ...state.sublist(index + 1)];
+        return [...state.requireValue.sublist(0, index), transaction, ...state.requireValue.sublist(index + 1)];
       }
-    } catch (e) {
-      log('Error update transaction $e');
-      rethrow;
-    }
+      return state.requireValue;
+    });
   }
 
   Future<void> deleteTransaction(int id) async {
-    try {
-      await databaseService.deleteTransaction(id);
-      state = state.where((element) => element.id != id).toList();
-    } catch (e) {
-      log('Error deleting transaction $e');
-      rethrow;
-    }
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      await _databaseService.deleteTransaction(id);
+      return state.requireValue.where((element) => element.id != id).toList();
+    });
   }
 
   Future<void> filterByDateRange(DateTime start, DateTime end) async {
-    _isLoading = true;
-
-    try {
-      final transactions = await databaseService.getTransactionsByDateRange(start, end);
-      state = transactions;
-    } catch (e) {
-      print('❌ Error filtering transactions: $e');
-      rethrow;
-    } finally {
-      _isLoading = false;
-    }
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      return await _databaseService.getTransactionsByDateRange(start, end);
+    });
   }
 }
 
-final transactionProvider = StateNotifierProvider<TransactionNotifier, List<TransactionModel>>((ref) {
-  final databaseService = ref.watch(databaseServiceProvider);
-  return TransactionNotifier(databaseService);
-});
+final transactionProvider = AsyncNotifierProvider<TransactionNotifier, List<TransactionModel>>(TransactionNotifier.new);
 
 final totalIncomeProvider = Provider((ref) {
-  final transaction = ref.watch(filteredTransactionByDateRangeProvider);
-  return transaction
-      .where((element) => element.type == TransactionType.income)
-      .fold(0.0, (previousValue, element) => previousValue + element.amount);
+  final transactionAsync = ref.watch(filteredTransactionByDateRangeProvider);
+  return transactionAsync.when(
+    data:
+        (transactions) => transactions
+            .where((element) => element.type == TransactionType.income)
+            .fold(0.0, (previousValue, curr) => previousValue + curr.amount),
+    loading: () => 0.0,
+    error: (_, _) => 0.0,
+  );
 });
 
 final totalExpenseProvider = Provider((ref) {
-  final transactions = ref.watch(filteredTransactionByDateRangeProvider);
-  return transactions.where((t) => t.type == TransactionType.expense).fold(0.0, (prev, curr) => prev + curr.amount);
+  final transactionsAsync = ref.watch(filteredTransactionByDateRangeProvider);
+  return transactionsAsync.when(
+    data:
+        (transactions) =>
+            transactions.where((t) => t.type == TransactionType.expense).fold(0.0, (prev, curr) => prev + curr.amount),
+    loading: () => 0.0,
+    error: (_, _) => 0.0,
+  );
 });
 
 final balanceProvider = Provider((ref) {
@@ -104,18 +86,14 @@ final balanceProvider = Provider((ref) {
   return income - expense;
 });
 
-final transactionByTypeProvider = Provider.family<List<TransactionModel>, TransactionType>((ref, type) {
-  final transaction = ref.watch(transactionProvider);
-  return transaction.where((element) => element.type == type).toList();
+final transactionByTypeProvider = Provider.family<AsyncValue<List<TransactionModel>>, TransactionType>((ref, type) {
+  final transactionAsync = ref.watch(transactionProvider);
+  return transactionAsync.whenData((transactions) => transactions.where((element) => element.type == type).toList());
 });
 
-final transactionByDateProvider = Provider.family<List<TransactionModel>, DateTime>((ref, date) {
-  final transaction = ref.watch(transactionProvider);
-  return transaction.where((element) => element.date == date).toList();
-});
-
-final transactionsInitialLoadProvider = FutureProvider<void>((ref) async {
-  await ref.read(transactionProvider.notifier).loadTransactions();
+final transactionByDateProvider = Provider.family<AsyncValue<List<TransactionModel>>, DateTime>((ref, date) {
+  final transactionAsync = ref.watch(transactionProvider);
+  return transactionAsync.whenData((value) => value.where((element) => element.date == date).toList());
 });
 
 final currentTransactionByTypeProvider = StateProvider<TransactionType?>((ref) => null);
