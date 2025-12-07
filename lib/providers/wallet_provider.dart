@@ -1,29 +1,79 @@
+import 'dart:async';
+import 'dart:developer';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:mosa/models/wallets.dart';
+import 'package:mosa/providers/transaction_provider.dart';
+import 'package:mosa/services/database_service.dart';
 import 'package:mosa/utils/app_icons.dart';
 
-class SelectedWalletNotifier extends StateNotifier<Wallet?> {
-  SelectedWalletNotifier() : super(Wallet(id: '1', name: 'MB Bank', icon: AppIcons.logoMbBank, balance: 913.024));
+class WalletsNotifier extends AsyncNotifier<List<Wallet>> {
+  DatabaseService get _databaseService => ref.read(databaseServiceProvider);
 
-  void selectWallet(Wallet wallet) {
-    state = wallet;
+  @override
+  FutureOr<List<Wallet>> build() async {
+    return await _databaseService.getAllWallets();
   }
 
-  void resetWallet(Wallet wallet) {
-    state = null;
+  Future<void> insertWallet(Wallet wallet) async {
+    state = const AsyncLoading();
+
+    try {
+      int id = await _databaseService.insertWallet(wallet);
+      final newWallet = wallet.copyWith(id: id);
+      // update state ngay khi thêm wallet
+      state = AsyncData([newWallet, ...state.requireValue]);
+      _refreshWallet();
+    } catch (e) {
+      log('Error when insert wallet $e');
+    }
+  }
+
+  Future<void> _refreshWallet() async {
+    try {
+      final wallets = await _databaseService.getAllWallets();
+      if (state.value != wallets) {
+        state = AsyncData(wallets);
+      }
+    } catch (e) {
+      log('Refresh wallet in background have error ${e.toString()}');
+    }
+  }
+
+  Future<void> updateWallet(Wallet wallet) async {
+    state = const AsyncLoading();
+    try {
+      await _databaseService.updateWallet(wallet);
+      final index = state.requireValue.indexWhere((element) => element == wallet);
+      if (index != -1) {
+        state = AsyncData([...state.requireValue.sublist(0, index), wallet, ...state.requireValue.sublist(index + 1)]);
+      }
+      _refreshWallet();
+    } catch (e) {
+      log('Error when update wallet');
+    }
+  }
+
+  Future<void> deleteWallet(int id) async{
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async{
+      await _databaseService.deleteWallet(id);
+      return state.requireValue.where((element) => element.id != id).toList();
+    },);
   }
 }
 
-final selectedWalletNotifier = StateNotifierProvider<SelectedWalletNotifier, Wallet?>((ref) {
-  return SelectedWalletNotifier();
+final walletProvider = AsyncNotifierProvider<WalletsNotifier, List<Wallet>>(WalletsNotifier.new);
+
+final getWalletByIdProvider = FutureProvider.family<Wallet?, int>((ref, param) async {
+  final db = ref.read(databaseServiceProvider);
+  return db.getWalletById(param);
 });
 
-final walletsProvider = Provider<List<Wallet>>((ref) {
-  return [
-    Wallet(id: '1', name: 'MB Bank', icon: AppIcons.logoMbBank, balance: 913.024),
-    Wallet(id: '2', name: 'Tiền mặt', icon: AppIcons.logoCash, balance: 913.024),
-    Wallet(id: '3', name: 'Momo', icon: AppIcons.logoMomo, balance: 913.024),
-    Wallet(id: '4', name: 'Zalopay', icon: AppIcons.logoZalopay, balance: 913.024),
-  ];
+final defaultWalletProvider = FutureProvider<Wallet?>((ref) {
+  final db = ref.read(databaseServiceProvider);
+  return db.getDefaultWallet();
 });
+
+final selectedWalletProvider = StateProvider<Wallet?>((ref) => null);

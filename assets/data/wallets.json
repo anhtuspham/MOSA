@@ -1,0 +1,54 @@
+[
+  {
+    "id": 1,
+    "name": "Mb bank",
+    "iconPath": "assets/icons/logo_mb_bank.png",
+    "balance": 50000000,
+    "type": "bank",
+    "isDefault": false,
+    "isActive": true,
+    "createAt": "2025-08-01T10:00:00.000Z",
+    "updateAt": "2025-11-01T09:00:00.000Z",
+    "isSynced": false,
+    "syncId": ""
+  },
+  {
+    "id": 2,
+    "name": "Tiền mặt",
+    "iconPath": "assets/icons/money.png",
+    "balance": 26470000,
+    "type": "cash",
+    "isDefault": true,
+    "isActive": true,
+    "createAt": "2025-08-15T10:00:00.000Z",
+    "updateAt": "2025-11-01T09:00:00.000Z",
+    "isSynced": false,
+    "syncId": ""
+  },
+  {
+    "id": 3,
+    "name": "Momo",
+    "iconPath": "assets/icons/logo_momo.png",
+    "balance": 5000000,
+    "type": "ewallet",
+    "isDefault": false,
+    "isActive": true,
+    "createAt": "2025-08-20T14:30:00.000Z",
+    "updateAt": "2025-10-30T16:45:00.000Z",
+    "isSynced": false,
+    "syncId": ""
+  },
+  {
+    "id": 4,
+    "name": "Zalopay",
+    "iconPath": "assets/icons/logo_zalopay.png",
+    "balance": 0,
+    "type": "ewallet",
+    "isDefault": false,
+    "isActive": true,
+    "createAt": "2025-08-25T11:20:00.000Z",
+    "updateAt": "2025-08-25T11:20:00.000Z",
+    "isSynced": false,
+    "syncId": ""
+  }
+]

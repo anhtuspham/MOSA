@@ -12,8 +12,10 @@ import 'package:mosa/providers/transaction_provider.dart';
 import 'package:mosa/providers/wallet_provider.dart';
 import 'package:mosa/router/app_routes.dart';
 import 'package:mosa/utils/date_time_extension.dart';
+import 'package:mosa/utils/number_input_formatter.dart';
 import 'package:mosa/widgets/custom_list_tile.dart';
 import 'package:mosa/widgets/date_time_picker_dialog.dart';
+import 'package:toastification/toastification.dart';
 
 import '../../utils/app_colors.dart';
 
@@ -43,8 +45,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   Future<void> _saveTransaction() async {
     try {
       final selectedCategory = ref.read(selectedCategoryProvider);
-      final transactionNotifier = ref.read(transactionProvider.notifier);
-      final selectedWallet = ref.read(selectedWalletNotifier);
+      final transactionController = ref.read(transactionProvider.notifier);
+      final selectedWallet = ref.read(selectedWalletProvider);
 
       // Validation
       if (_amountController.text.isEmpty) {
@@ -72,20 +74,33 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         note: _noteController.text.isNotEmpty ? _noteController.text : null,
         createAt: DateTime.now(),
         syncId: _generateSyncId(),
-        wallet: selectedWallet?.name ?? 'Tiền mặt',
+        walletId: selectedWallet?.id ?? 1,
       );
 
-      await transactionNotifier.addTransaction(transaction);
+      await transactionController.addTransaction(transaction);
       _clearTransaction();
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Đã lưu giao dịch')));
-        // context.pop();
+        toastification.show(
+          type: ToastificationType.success,
+          style: ToastificationStyle.fillColored,
+          title: Text('Thành công', style: TextStyle(fontWeight: FontWeight.w600)),
+          description: Text('Đã lưu giao dịch', style: TextStyle(fontWeight: FontWeight.w600)),
+          alignment: Alignment.topCenter,
+          autoCloseDuration: Duration(seconds: 3),
+        );
       }
     } catch (e) {
       log('Error saving transaction: $e');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Lỗi khi lưu giao dịch')));
+        toastification.show(
+          type: ToastificationType.error,
+          style: ToastificationStyle.flatColored,
+          title: Text('Thất bại', style: TextStyle(fontWeight: FontWeight.w600)),
+          description: Text('Lỗi khi lưu giao dịch', style: TextStyle(fontWeight: FontWeight.w600)),
+          alignment: Alignment.topCenter,
+          autoCloseDuration: Duration(seconds: 3),
+        );
       }
     }
   }
@@ -99,7 +114,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final selectedWallet = ref.watch(selectedWalletNotifier);
+    final selectedWallet = ref.watch(selectedWalletProvider);
     final selectedCategory = ref.watch(selectedCategoryProvider);
 
     return Container(
@@ -187,14 +202,15 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                                               ),
                                               contentPadding: EdgeInsets.symmetric(horizontal: 4, vertical: 4),
                                             ),
-                                            maxLength: 13,
-                                            maxLengthEnforcement: MaxLengthEnforcement.none,
+                                            maxLength: 15,
+                                            maxLengthEnforcement: MaxLengthEnforcement.enforced,
                                             style: TextStyle(
                                               fontSize: 32,
                                               fontWeight: FontWeight.bold,
                                               color: AppColors.expense,
                                             ),
                                             keyboardType: TextInputType.number,
+                                            inputFormatters: [ThousandSeperatorFormatter(seperator: ',')],
                                           ),
                                         ),
                                       ),
@@ -244,7 +260,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                                   CustomListTile(
                                     leading:
                                         selectedWallet != null
-                                            ? Image.asset(selectedWallet.icon, width: 22)
+                                            ? Image.asset(selectedWallet.iconPath, width: 22)
                                             : Icon(Icons.money),
                                     title: Text(selectedWallet?.name ?? 'Zalopay'),
                                     trailing: Icon(Icons.chevron_right),

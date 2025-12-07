@@ -28,7 +28,7 @@ import '../screens/home/home_screen.dart';
 ///    └─ /edit-transaction/:id → AddTransactionScreen
 
 final goRouter = GoRouter(
-  initialLocation: AppRoutes.overview,
+  initialLocation: AppRoutes.addTransaction,
   debugLogDiagnostics: true,
 
   routes: [

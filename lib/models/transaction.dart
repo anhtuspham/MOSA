@@ -13,7 +13,7 @@ class TransactionModel {
   final DateTime? updateAt;
   final bool isSynced;
   final String syncId;
-  final String wallet;
+  final int walletId;
 
   TransactionModel({
     this.id,
@@ -27,7 +27,7 @@ class TransactionModel {
     this.updateAt,
     this.isSynced = false,
     required this.syncId,
-    required this.wallet,
+    required this.walletId,
   });
 
   factory TransactionModel.fromJson(Map<String, dynamic> json) {
@@ -35,7 +35,7 @@ class TransactionModel {
       title: json['title'] as String,
       amount: (json['amount'] as num).toDouble(),
       categoryId: json['categoryId'] as String,
-      wallet: json['wallet'] as String,
+      walletId: json['walletId'] as int,
       date: DateTime.parse(json['date'] as String),
       type: getTransactionType(json['type'] as String),
       note: json['note'] as String?,
@@ -62,7 +62,7 @@ class TransactionModel {
       updateAt: map['updateAt'] != null ? DateTime.parse(map['updateAt'] as String) : null,
       isSynced: (map['isSynced'] as int?) == 1,
       syncId: map['syncId'],
-      wallet: map['wallet'],
+      walletId: map['walletId'] as int,
     );
   }
 
@@ -79,7 +79,7 @@ class TransactionModel {
       'updateAt': updateAt?.toIso8601String(),
       'isSynced': isSynced ? 1 : 0,
       'syncId': syncId,
-      'wallet': wallet,
+      'walletId': walletId,
     };
   }
 
@@ -95,7 +95,7 @@ class TransactionModel {
     DateTime? updateAt,
     bool? isSynced,
     String? syncId,
-    String? wallet,
+    int? walletId,
   }) {
     return TransactionModel(
       id: id ?? this.id,
@@ -109,7 +109,7 @@ class TransactionModel {
       updateAt: updateAt ?? this.updateAt,
       isSynced: isSynced ?? this.isSynced,
       syncId: syncId ?? this.syncId,
-      wallet: wallet ?? this.wallet,
+      walletId: walletId ?? this.walletId,
     );
   }
 

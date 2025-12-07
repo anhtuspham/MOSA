@@ -26,11 +26,11 @@ class TransactionInPeriodTime extends ConsumerStatefulWidget {
 class _TransactionInPeriodTimeState extends ConsumerState<TransactionInPeriodTime> {
   @override
   Widget build(BuildContext context) {
-    final groupedNotifier = ref.watch(transactionGroupByDateProvider);
-    final totals = ref.watch(totalByDateProvider(widget.date));
+    final transactionGroupState = ref.watch(transactionGroupByDateProvider);
+    final totalState = ref.watch(totalByDateProvider(widget.date));
     final categoryAsync = ref.watch(flattenedCategoryProvider);
 
-    final transactionOfDay = groupedNotifier.whenData((group) => group[widget.date] ?? []);
+    final transactionOfDay = transactionGroupState.whenData((group) => group[widget.date] ?? []);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -48,7 +48,7 @@ class _TransactionInPeriodTimeState extends ConsumerState<TransactionInPeriodTim
                   Text(widget.date.weekdayLabel),
                 ],
               ),
-              totals.when(
+              totalState.when(
                 data:
                     (totalData) => Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
@@ -75,7 +75,7 @@ class _TransactionInPeriodTimeState extends ConsumerState<TransactionInPeriodTim
             data: (transactionsData) {
               return categoryAsync.when(
                 data: (categories) {
-                  final cateogryMap = {for (var category in categories) category.id: category};
+                  final categoryMap = {for (var category in categories) category.id: category};
                   
                   return ListView.builder(
                     itemCount: transactionsData.length,
@@ -83,7 +83,7 @@ class _TransactionInPeriodTimeState extends ConsumerState<TransactionInPeriodTim
                     physics: NeverScrollableScrollPhysics(),
                     itemBuilder: (context, index) {
                       final transaction = transactionsData[index];
-                      final category = cateogryMap[transaction.categoryId];
+                      final category = categoryMap[transaction.categoryId];
                       if (category == null) {
                         return Container(
                           height: 60,
@@ -96,7 +96,7 @@ class _TransactionInPeriodTimeState extends ConsumerState<TransactionInPeriodTim
                         category: category,
                         amount: transaction.amount,
                         note: transaction.note,
-                        wallet: transaction.wallet,
+                        walletId: transaction.walletId,
                       );
                     },
                   );

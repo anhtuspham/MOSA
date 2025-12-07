@@ -46,13 +46,6 @@ class TransactionNotifier extends AsyncNotifier<List<TransactionModel>> {
       return state.requireValue.where((element) => element.id != id).toList();
     });
   }
-
-  Future<void> filterByDateRange(DateTime start, DateTime end) async {
-    state = const AsyncLoading();
-    state = await AsyncValue.guard(() async {
-      return await _databaseService.getTransactionsByDateRange(start, end);
-    });
-  }
 }
 
 final transactionProvider = AsyncNotifierProvider<TransactionNotifier, List<TransactionModel>>(TransactionNotifier.new);
