@@ -24,13 +24,13 @@ class WalletsNotifier extends AsyncNotifier<List<Wallet>> {
       final newWallet = wallet.copyWith(id: id);
       // update state ngay khi thêm wallet
       state = AsyncData([newWallet, ...state.requireValue]);
-      _refreshWallet();
+      refreshWallet();
     } catch (e) {
       log('Error when insert wallet $e');
     }
   }
 
-  Future<void> _refreshWallet() async {
+  Future<void> refreshWallet() async {
     try {
       final wallets = await _databaseService.getAllWallets();
       if (state.value != wallets) {
@@ -49,18 +49,18 @@ class WalletsNotifier extends AsyncNotifier<List<Wallet>> {
       if (index != -1) {
         state = AsyncData([...state.requireValue.sublist(0, index), wallet, ...state.requireValue.sublist(index + 1)]);
       }
-      _refreshWallet();
+      refreshWallet();
     } catch (e) {
       log('Error when update wallet');
     }
   }
 
-  Future<void> deleteWallet(int id) async{
+  Future<void> deleteWallet(int id) async {
     state = const AsyncLoading();
-    state = await AsyncValue.guard(() async{
+    state = await AsyncValue.guard(() async {
       await _databaseService.deleteWallet(id);
       return state.requireValue.where((element) => element.id != id).toList();
-    },);
+    });
   }
 }
 
@@ -76,4 +76,30 @@ final defaultWalletProvider = FutureProvider<Wallet?>((ref) {
   return db.getDefaultWallet();
 });
 
+final effectiveWalletProvider = FutureProvider<Wallet>((ref) async {
+  final selectedWallet = ref.watch(selectedWalletProvider);
+
+  if (selectedWallet != null) {
+    return selectedWallet;
+  }
+
+  final defaultWallet = await ref.watch(defaultWalletProvider.future);
+  if (defaultWallet != null) {
+    return defaultWallet;
+  }
+
+  throw Exception('Không có ví nào để lưu giao dịch');
+});
+
 final selectedWalletProvider = StateProvider<Wallet?>((ref) => null);
+
+final totalBalanceWalletProvider = FutureProvider<double>((ref) async {
+  double total = 0;
+  final wallets = ref.watch(walletProvider);
+  wallets.whenData((data) {
+    for (var element in data) {
+      total += element.balance;
+    }
+  });
+  return total;
+});

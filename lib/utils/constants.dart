@@ -52,4 +52,7 @@ class AppConstants{
   static const String thisMonth = 'Tháng này';
   static const String thisQuarter = 'Quý này';
   static const String thisYear = 'Năm này';
+
+  static const String selectWallet = 'Chọn tài khoản';
+  static const String save = 'Lưu lại';
 }

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:mosa/models/enums.dart';
 import 'package:mosa/providers/date_filter_provider.dart';
+import 'package:mosa/providers/wallet_provider.dart';
 import 'package:mosa/services/database_service.dart';
 
 import '../models/transaction.dart';
@@ -17,11 +18,13 @@ class TransactionNotifier extends AsyncNotifier<List<TransactionModel>> {
   }
 
   DatabaseService get _databaseService => ref.read(databaseServiceProvider);
+  WalletsNotifier get _walletController => ref.read(walletProvider.notifier);
 
   Future<void> addTransaction(TransactionModel transaction) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       final id = await _databaseService.insertTransaction(transaction);
+      await _walletController.refreshWallet();
       final newTransaction = transaction.copyWith(id: id);
       return [newTransaction, ...state.requireValue];
     });
@@ -31,6 +34,7 @@ class TransactionNotifier extends AsyncNotifier<List<TransactionModel>> {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       await _databaseService.updateTransaction(transaction);
+      await _walletController.refreshWallet();
       final index = state.requireValue.indexWhere((element) => element == transaction);
       if (index != -1) {
         return [...state.requireValue.sublist(0, index), transaction, ...state.requireValue.sublist(index + 1)];
@@ -43,6 +47,7 @@ class TransactionNotifier extends AsyncNotifier<List<TransactionModel>> {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       await _databaseService.deleteTransaction(id);
+      await _walletController.refreshWallet();
       return state.requireValue.where((element) => element.id != id).toList();
     });
   }

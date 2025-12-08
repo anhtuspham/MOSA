@@ -101,9 +101,9 @@ class DatabaseService {
       // But for simplicity, we just set all category to NULL for now
       await db.execute('UPDATE ${AppConstants.tableTransactions} SET category = NULL');
 
-      log('✅ Migration to version 2 completed');
+      log('Migration to version 2 completed');
     } catch (e) {
-      log('❌ Migration failed: $e');
+      log('Migration failed: $e');
       rethrow;
     }
   }
@@ -145,9 +145,9 @@ class DatabaseService {
         RENAME TO ${AppConstants.tableTransactions}
       ''');
 
-      log('✅ Migration to version 3 completed');
+      log('Migration to version 3 completed');
     } catch (e) {
-      log('❌ Migration failed: $e');
+      log('Migration failed: $e');
       rethrow;
     }
   }
@@ -202,7 +202,7 @@ class DatabaseService {
 
       // 6. Ensure default wallet exists
       if (defaultWalletId == null) {
-        log('⚠️ No default wallet found, creating one');
+        log('No default wallet found, creating one');
         defaultWalletId = await db.insert('wallets', {
           'name': 'Ví mặc định',
           'iconPath': 'assets/icons/cash.png',
@@ -245,7 +245,7 @@ class DatabaseService {
         final walletId = walletNameToId[walletName] ?? defaultWalletId;
 
         if (walletNameToId[walletName] == null) {
-          log('⚠️ Unmapped wallet: "${transaction['wallet']}" → default wallet');
+          log('Unmapped wallet: "${transaction['wallet']}" → default wallet');
           unmappedCount++;
         }
 
@@ -266,9 +266,9 @@ class DatabaseService {
       await db.execute('CREATE INDEX idx_transaction_walletId ON transactions(walletId)');
       await db.execute('CREATE INDEX idx_transaction_date ON transactions(date)');
 
-      log('✅ Migration to version 4 completed');
+      log('Migration to version 4 completed');
     } catch (e) {
-      log('❌ Migration to version 4 failed: $e');
+      log('Migration to version 4 failed: $e');
       rethrow;
     }
   }
@@ -344,7 +344,7 @@ class DatabaseService {
 
     await _seedWallets(db);
 
-    log('✅ Database created successfully');
+    log('Database created successfully');
   }
 
   // CREATE
@@ -356,12 +356,15 @@ class DatabaseService {
         transaction.toMap(),
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
-      log('✅ Transaction inserted with id: $id');
+
+      await _updateWalletBalance(transaction.walletId);
+
+      log('Transaction inserted with id: $id');
       return id;
     } catch (e) {
       // Database lock issue - reset and retry
       if (e.toString().contains('readonly')) {
-        log('⚠️ Database readonly error, attempting to reset...');
+        log('Database readonly error, attempting to reset...');
         await _resetDatabase();
         return await insertTransaction(transaction); // Retry once
       }
@@ -403,18 +406,29 @@ class DatabaseService {
   // UPDATE
   Future<int> updateTransaction(TransactionModel transaction) async {
     try {
+      // we have 2 case, 1 is update in current wallet, another one is update using another wallet
       final db = await database;
+
+      // get old transaction with old walletId
+      final oldTransaction = await getTransactionById(transaction.id ?? -1);
       final count = await db.update(
         AppConstants.tableTransactions,
         transaction.toMap(),
         where: 'id = ?',
         whereArgs: [transaction.id],
       );
-      log('✅ Transaction updated: $count rows affected');
+
+      // update wallet balance
+      await _updateWalletBalance(transaction.walletId);
+
+      if (oldTransaction != null && oldTransaction.walletId != transaction.walletId) {
+        await _updateWalletBalance(oldTransaction.walletId);
+      }
+      log('Transaction updated: $count rows affected');
       return count;
     } catch (e) {
       if (e.toString().contains('readonly')) {
-        log('⚠️ Database readonly error, attempting to reset...');
+        log('Database readonly error, attempting to reset...');
         await _resetDatabase();
         return await updateTransaction(transaction);
       }
@@ -426,12 +440,19 @@ class DatabaseService {
   Future<int> deleteTransaction(int id) async {
     try {
       final db = await database;
+
+      // find transaction
+      final transaction = await getTransactionById(id);
       final count = await db.delete(AppConstants.tableTransactions, where: 'id = ?', whereArgs: [id]);
-      log('✅ Transaction deleted: $count rows affected');
+
+      if (transaction != null && count > 0) {
+        await _updateWalletBalance(transaction.walletId);
+      }
+
       return count;
     } catch (e) {
       if (e.toString().contains('readonly')) {
-        log('⚠️ Database readonly error, attempting to reset...');
+        log('Database readonly error, attempting to reset...');
         await _resetDatabase();
         return await deleteTransaction(id);
       }
@@ -483,15 +504,15 @@ class DatabaseService {
         await _database!.close();
         _database = null;
       }
-      
+
       // Get the database path and delete the file
       final dbPath = await getDatabasesPath();
       final path = join(dbPath, AppConstants.dbName);
       await deleteDatabase(path);
-      
-      log('✅ Database file deleted successfully. Will be recreated on next access.');
+
+      log('Database file deleted successfully. Will be recreated on next access.');
     } catch (e) {
-      log('❌ Clear database failed: $e');
+      log('Clear database failed: $e');
       rethrow;
     }
   }
@@ -511,9 +532,9 @@ class DatabaseService {
         await insertTransaction(transaction);
       }
 
-      log('✅ Database imported successfully from $assetPath');
+      log('Database imported successfully from $assetPath');
     } catch (e) {
-      log('❌ Import failed: $e');
+      log('Import failed: $e');
       rethrow;
     }
   }
@@ -530,9 +551,9 @@ class DatabaseService {
         await insertTransaction(transaction);
       }
 
-      log('✅ Database imported successfully');
+      log('Database imported successfully');
     } catch (e) {
-      log('❌ Import failed: $e');
+      log('Import failed: $e');
       rethrow;
     }
   }
@@ -570,63 +591,77 @@ class DatabaseService {
     }
   }
 
-  // ==================== WALLET OPERATIONS ====================
+  // ==================== WALLET BALANCE HELPER ====================
 
-/// Get all wallets (active only by default)
-Future<List<Wallet>> getAllWallets({bool includeInactive = false}) async {
-  final db = await database;
-  final List<Map<String, dynamic>> maps = await db.query(
-    AppConstants.tableWallets,
-    where: includeInactive ? null : 'isActive = ?',
-    whereArgs: includeInactive ? null : [1],
-    orderBy: 'isDefault DESC, name ASC',
-  );
+  /// Update wallet balance based on transactions
+  Future<void> _updateWalletBalance(int walletId) async {
+    try {
+      final db = await database;
+      final calculatedBalance = await getWalletBalance(walletId);
 
-  return List.generate(maps.length, (i) => Wallet.fromMap(maps[i]));
-}
+      await db.update(
+        AppConstants.tableWallets,
+        {'balance': calculatedBalance, 'updateAt': DateTime.now().toIso8601String()},
+        where: 'id = ?',
+        whereArgs: [walletId],
+      );
 
-/// Get wallet by ID
-Future<Wallet?> getWalletById(int id) async {
-  final db = await database;
-  final List<Map<String, dynamic>> maps = await db.query(
-    AppConstants.tableWallets,
-    where: 'id = ?',
-    whereArgs: [id],
-  );
-
-  if (maps.isEmpty) return null;
-  return Wallet.fromMap(maps.first);
-}
-
-/// Get default wallet
-Future<Wallet?> getDefaultWallet() async {
-  final db = await database;
-  final List<Map<String, dynamic>> maps = await db.query(
-    AppConstants.tableWallets,
-    where: 'isDefault = ? AND isActive = ?',
-    whereArgs: [1, 1],
-    limit: 1,
-  );
-
-  if (maps.isEmpty) {
-    // Fallback: return first active wallet
-    final allMaps = await db.query(
-      AppConstants.tableWallets,
-      where: 'isActive = ?',
-      whereArgs: [1],
-      limit: 1,
-    );
-    if (allMaps.isEmpty) return null;
-    return Wallet.fromMap(allMaps.first);
+      log('Wallet $walletId balance updated to: $calculatedBalance');
+    } catch (e) {
+      log('Update wallet balance failed: $e');
+      rethrow;
+    }
   }
 
-  return Wallet.fromMap(maps.first);
-}
+  // ==================== WALLET OPERATIONS ====================
 
-/// Calculate wallet balance from transactions
-Future<double> getWalletBalance(int walletId) async {
-  final db = await database;
-  final result = await db.rawQuery('''
+  /// Get all wallets (active only by default)
+  Future<List<Wallet>> getAllWallets({bool includeInactive = false}) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      AppConstants.tableWallets,
+      where: includeInactive ? null : 'isActive = ?',
+      whereArgs: includeInactive ? null : [1],
+      orderBy: 'isDefault DESC, name ASC',
+    );
+
+    return List.generate(maps.length, (i) => Wallet.fromMap(maps[i]));
+  }
+
+  /// Get wallet by ID
+  Future<Wallet?> getWalletById(int id) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(AppConstants.tableWallets, where: 'id = ?', whereArgs: [id]);
+
+    if (maps.isEmpty) return null;
+    return Wallet.fromMap(maps.first);
+  }
+
+  /// Get default wallet
+  Future<Wallet?> getDefaultWallet() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      AppConstants.tableWallets,
+      where: 'isDefault = ? AND isActive = ?',
+      whereArgs: [1, 1],
+      limit: 1,
+    );
+
+    if (maps.isEmpty) {
+      // Fallback: return first active wallet
+      final allMaps = await db.query(AppConstants.tableWallets, where: 'isActive = ?', whereArgs: [1], limit: 1);
+      if (allMaps.isEmpty) return null;
+      return Wallet.fromMap(allMaps.first);
+    }
+
+    return Wallet.fromMap(maps.first);
+  }
+
+  /// Calculate wallet balance from transactions
+  Future<double> getWalletBalance(int walletId) async {
+    final db = await database;
+    final result = await db.rawQuery(
+      '''
     SELECT
       SUM(CASE
         WHEN type IN ('income', 'borrowing') THEN amount
@@ -635,155 +670,145 @@ Future<double> getWalletBalance(int walletId) async {
       END) as balance
     FROM ${AppConstants.tableTransactions}
     WHERE walletId = ?
-  ''', [walletId]);
-
-  return (result.first['balance'] as num?)?.toDouble() ?? 0.0;
-}
-
-/// Insert new wallet
-Future<int> insertWallet(Wallet wallet) async {
-  try {
-    final db = await database;
-    final id = await db.insert(
-      AppConstants.tableWallets,
-      wallet.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
+  ''',
+      [walletId],
     );
-    log('✅ Wallet inserted with id: $id');
-    return id;
-  } catch (e) {
-    log('❌ Insert wallet failed: $e');
-    rethrow;
+
+    return (result.first['balance'] as num?)?.toDouble() ?? 0.0;
   }
-}
 
-/// Update wallet
-Future<int> updateWallet(Wallet wallet) async {
-  try {
-    final db = await database;
-    final count = await db.update(
-      AppConstants.tableWallets,
-      wallet.toMap(),
-      where: 'id = ?',
-      whereArgs: [wallet.id],
-    );
-    log('✅ Wallet updated: $count rows affected');
-    return count;
-  } catch (e) {
-    log('❌ Update wallet failed: $e');
-    rethrow;
-  }
-}
-
-/// Soft delete wallet (set isActive = 0)
-Future<int> deactivateWallet(int id) async {
-  try {
-    final db = await database;
-    final count = await db.update(
-      AppConstants.tableWallets,
-      {'isActive': 0, 'updateAt': DateTime.now().toIso8601String()},
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-    log('✅ Wallet deactivated: $count rows affected');
-    return count;
-  } catch (e) {
-    log('❌ Deactivate wallet failed: $e');
-    rethrow;
-  }
-}
-
-/// Hard delete wallet (only if no transactions exist)
-Future<int> deleteWallet(int id) async {
-  try {
-    final db = await database;
-
-    // Check if wallet has transactions
-    final result = await db.rawQuery(
-      'SELECT COUNT(*) as count FROM ${AppConstants.tableTransactions} WHERE walletId = ?',
-      [id],
-    );
-    final transactionCount = Sqflite.firstIntValue(result) ?? 0;
-
-    if (transactionCount > 0) {
-      throw Exception(
-        'Cannot delete wallet with $transactionCount transaction(s). '
-        'Please deactivate instead or move transactions to another wallet.'
+  /// Insert new wallet
+  Future<int> insertWallet(Wallet wallet) async {
+    try {
+      final db = await database;
+      final id = await db.insert(
+        AppConstants.tableWallets,
+        wallet.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
       );
+      log('Wallet inserted with id: $id');
+      return id;
+    } catch (e) {
+      log('Insert wallet failed: $e');
+      rethrow;
     }
-
-    final count = await db.delete(
-      AppConstants.tableWallets,
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-    log('✅ Wallet deleted: $count rows affected');
-    return count;
-  } catch (e) {
-    log('❌ Delete wallet failed: $e');
-    rethrow;
   }
-}
 
-/// Restore deactivated wallet
-Future<int> activateWallet(int id) async {
-  try {
-    final db = await database;
-    final count = await db.update(
-      AppConstants.tableWallets,
-      {'isActive': 1, 'updateAt': DateTime.now().toIso8601String()},
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-    log('✅ Wallet activated: $count rows affected');
-    return count;
-  } catch (e) {
-    log('❌ Activate wallet failed: $e');
-    rethrow;
+  /// Update wallet
+  Future<int> updateWallet(Wallet wallet) async {
+    try {
+      final db = await database;
+      final count = await db.update(AppConstants.tableWallets, wallet.toMap(), where: 'id = ?', whereArgs: [wallet.id]);
+      log('Wallet updated: $count rows affected');
+      return count;
+    } catch (e) {
+      log('Update wallet failed: $e');
+      rethrow;
+    }
   }
-}
 
-/// Set wallet as default (unsets all others)
-Future<void> setDefaultWallet(int id) async {
-  try {
-    final db = await database;
-
-    // Unset all defaults
-    await db.update(
-      AppConstants.tableWallets,
-      {'isDefault': 0},
-    );
-
-    // Set new default
-    await db.update(
-      AppConstants.tableWallets,
-      {'isDefault': 1, 'updateAt': DateTime.now().toIso8601String()},
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-
-    log('✅ Default wallet set to id: $id');
-  } catch (e) {
-    log('❌ Set default wallet failed: $e');
-    rethrow;
+  /// Soft delete wallet (set isActive = 0)
+  Future<int> deactivateWallet(int id) async {
+    try {
+      final db = await database;
+      final count = await db.update(
+        AppConstants.tableWallets,
+        {'isActive': 0, 'updateAt': DateTime.now().toIso8601String()},
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+      log('Wallet deactivated: $count rows affected');
+      return count;
+    } catch (e) {
+      log('Deactivate wallet failed: $e');
+      rethrow;
+    }
   }
-}
 
-/// Delete wallets table completely (DROP TABLE)
-Future<void> deleteWalletTable() async {
-  try {
-    final db = await database;
-    
-    // Drop the wallets table
-    await db.execute('DROP TABLE IF EXISTS ${AppConstants.tableWallets}');
-    
-    log('✅ Wallets table deleted successfully');
-    
-    // Note: After dropping the table, you'll need to recreate it
-    // by either calling _onCreate or upgrading the database version
-  } catch (e) {
-    log('❌ Delete wallet table failed: $e');
-    rethrow;
+  /// Hard delete wallet (only if no transactions exist)
+  Future<int> deleteWallet(int id) async {
+    try {
+      final db = await database;
+
+      // Check if wallet has transactions
+      final result = await db.rawQuery(
+        'SELECT COUNT(*) as count FROM ${AppConstants.tableTransactions} WHERE walletId = ?',
+        [id],
+      );
+      final transactionCount = Sqflite.firstIntValue(result) ?? 0;
+
+      if (transactionCount > 0) {
+        throw Exception(
+          'Cannot delete wallet with $transactionCount transaction(s). '
+          'Please deactivate instead or move transactions to another wallet.',
+        );
+      }
+
+      final count = await db.delete(AppConstants.tableWallets, where: 'id = ?', whereArgs: [id]);
+      log('Wallet deleted: $count rows affected');
+      return count;
+    } catch (e) {
+      log('Delete wallet failed: $e');
+      rethrow;
+    }
   }
-}
+
+  /// Restore deactivated wallet
+  Future<int> activateWallet(int id) async {
+    try {
+      final db = await database;
+      final count = await db.update(
+        AppConstants.tableWallets,
+        {'isActive': 1, 'updateAt': DateTime.now().toIso8601String()},
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+      log('Wallet activated: $count rows affected');
+      return count;
+    } catch (e) {
+      log('Activate wallet failed: $e');
+      rethrow;
+    }
+  }
+
+  /// Set wallet as default (unsets all others)
+  Future<void> setDefaultWallet(int id) async {
+    try {
+      final db = await database;
+
+      // Unset all defaults
+      await db.update(AppConstants.tableWallets, {'isDefault': 0});
+
+      // Set new default
+      await db.update(
+        AppConstants.tableWallets,
+        {'isDefault': 1, 'updateAt': DateTime.now().toIso8601String()},
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+
+      log('Default wallet set to id: $id');
+    } catch (e) {
+      log('Set default wallet failed: $e');
+      rethrow;
+    }
+  }
+
+  /// Delete wallets table completely (DROP TABLE)
+  Future<void> deleteWalletTable() async {
+    try {
+      final db = await database;
+
+      // Drop the wallets table
+      await db.execute('DROP TABLE IF EXISTS ${AppConstants.tableWallets}');
+
+      log('Wallets table deleted successfully');
+
+      // Note: After dropping the table, you'll need to recreate it
+      // by either calling _onCreate or upgrading the database version
+    } catch (e) {
+      log('Delete wallet table failed: $e');
+      rethrow;
+    }
+  }
 }

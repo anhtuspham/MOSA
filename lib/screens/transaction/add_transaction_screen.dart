@@ -11,10 +11,13 @@ import 'package:mosa/providers/category_provider.dart';
 import 'package:mosa/providers/transaction_provider.dart';
 import 'package:mosa/providers/wallet_provider.dart';
 import 'package:mosa/router/app_routes.dart';
+import 'package:mosa/utils/constants.dart';
 import 'package:mosa/utils/date_time_extension.dart';
 import 'package:mosa/utils/number_input_formatter.dart';
 import 'package:mosa/widgets/custom_list_tile.dart';
 import 'package:mosa/widgets/date_time_picker_dialog.dart';
+import 'package:mosa/widgets/error_widget.dart';
+import 'package:mosa/widgets/loading_widget.dart';
 import 'package:toastification/toastification.dart';
 
 import '../../utils/app_colors.dart';
@@ -46,7 +49,9 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     try {
       final selectedCategory = ref.read(selectedCategoryProvider);
       final transactionController = ref.read(transactionProvider.notifier);
-      final selectedWallet = ref.read(selectedWalletProvider);
+      final effectiveWallet = await ref.read(effectiveWalletProvider.future);
+
+      if (!mounted) return;
 
       // Validation
       if (_amountController.text.isEmpty) {
@@ -74,7 +79,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         note: _noteController.text.isNotEmpty ? _noteController.text : null,
         createAt: DateTime.now(),
         syncId: _generateSyncId(),
-        walletId: selectedWallet?.id ?? 1,
+        walletId: effectiveWallet.id ?? -1,
       );
 
       await transactionController.addTransaction(transaction);
@@ -116,6 +121,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   Widget build(BuildContext context) {
     final selectedWallet = ref.watch(selectedWalletProvider);
     final selectedCategory = ref.watch(selectedCategoryProvider);
+    final defaultWallet = ref.watch(defaultWalletProvider);
+    final effectiveWallet = ref.watch(effectiveWalletProvider);
 
     return Container(
       decoration: BoxDecoration(color: AppColors.primaryBackground),
@@ -257,17 +264,20 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                               decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6)),
                               child: Column(
                                 children: [
-                                  CustomListTile(
-                                    leading:
-                                        selectedWallet != null
-                                            ? Image.asset(selectedWallet.iconPath, width: 22)
-                                            : Icon(Icons.money),
-                                    title: Text(selectedWallet?.name ?? 'Zalopay'),
-                                    trailing: Icon(Icons.chevron_right),
-                                    enable: true,
-                                    onTap: () {
-                                      context.push(AppRoutes.selectWallet);
+                                  effectiveWallet.when(
+                                    data: (walletData) {
+                                      return CustomListTile(
+                                        leading: Image.asset(walletData.iconPath, width: 22),
+                                        title: Text(walletData.name),
+                                        trailing: Icon(Icons.chevron_right),
+                                        enable: true,
+                                        onTap: () {
+                                          context.push(AppRoutes.selectWallet);
+                                        },
+                                      );
                                     },
+                                    error: (error, stackTrace) => ErrorSectionWidget(error: error),
+                                    loading: () => LoadingSectionWidget(),
                                   ),
                                   const SizedBox(height: 8),
                                   CustomListTile(
@@ -339,7 +349,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                         ),
-                        child: Text('Lưu lại'),
+                        child: Text(AppConstants.save),
                       ),
                     ),
                   ],

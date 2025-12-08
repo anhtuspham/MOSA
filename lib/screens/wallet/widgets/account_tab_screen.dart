@@ -1,18 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mosa/providers/wallet_provider.dart';
 import 'package:mosa/utils/app_colors.dart';
 import 'package:mosa/utils/app_icons.dart';
+import 'package:mosa/utils/helpers.dart';
 import 'package:mosa/widgets/custom_list_tile.dart';
+import 'package:mosa/widgets/error_widget.dart';
+import 'package:mosa/widgets/loading_widget.dart';
 
-class AccountTabScreen extends StatefulWidget {
+class AccountTabScreen extends ConsumerStatefulWidget {
   const AccountTabScreen({super.key});
 
   @override
-  State<AccountTabScreen> createState() => _AccountTabScreenState();
+  ConsumerState<AccountTabScreen> createState() => _AccountTabScreenState();
 }
 
-class _AccountTabScreenState extends State<AccountTabScreen> {
+class _AccountTabScreenState extends ConsumerState<AccountTabScreen> {
   @override
   Widget build(BuildContext context) {
+    final totalBalanceState = ref.watch(totalBalanceWalletProvider);
+    final walletState = ref.watch(walletProvider);
+
     return Column(
       children: [
         Container(
@@ -22,7 +30,10 @@ class _AccountTabScreenState extends State<AccountTabScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('Tổng tiền', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-              Text('3.697.530đ', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+              Text(
+                Helpers.formatCurrency(totalBalanceState.value ?? 0),
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+              ),
             ],
           ),
         ),
@@ -31,42 +42,62 @@ class _AccountTabScreenState extends State<AccountTabScreen> {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                CustomListTile(
-                  leading: Image.asset(AppIcons.logoMbBank, width: 30),
-                  title: Text('Mb bank', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-                  subTitle: Text('913.024đ'),
-                  trailing: IconButton(
-                    onPressed: _handleShowBottomSheet,
-                    icon: Icon(Icons.more_vert, color: AppColors.textPrimary),
-                  ),
+                walletState.when(
+                  data: (wallets) {
+                    return Column(
+                      children: List.generate(wallets.length, (index) {
+                        final wallet = wallets[index];
+                        return CustomListTile(
+                          leading: Image.asset(wallet.iconPath, width: 30),
+                          title: Text(wallet.name, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+                          subTitle: Text(Helpers.formatCurrency(wallet.balance)),
+                          trailing: IconButton(
+                            onPressed: _handleShowBottomSheet,
+                            icon: Icon(Icons.more_vert, color: AppColors.textPrimary),
+                          ),
+                        );
+                      }),
+                    );
+                  },
+                  loading: () => LoadingSectionWidget(),
+                  error: (error, stackTrace) => ErrorSectionWidget(error: error),
                 ),
-                CustomListTile(
-                  leading: Image.asset(AppIcons.logoCash, width: 30),
-                  title: Text('Tiền mặt', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-                  subTitle: Text('913.024đ'),
-                  trailing: IconButton(
-                    onPressed: _handleShowBottomSheet,
-                    icon: Icon(Icons.more_vert, color: AppColors.textPrimary),
-                  ),
-                ),
-                CustomListTile(
-                  leading: Image.asset(AppIcons.logoMomo, width: 30),
-                  title: Text('Mb bank', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-                  subTitle: Text('913.024đ'),
-                  trailing: IconButton(
-                    onPressed: _handleShowBottomSheet,
-                    icon: Icon(Icons.more_vert, color: AppColors.textPrimary),
-                  ),
-                ),
-                CustomListTile(
-                  leading: Image.asset(AppIcons.logoZalopay, width: 30),
-                  title: Text('Mb bank', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-                  subTitle: Text('913.024đ'),
-                  trailing: IconButton(
-                    onPressed: _handleShowBottomSheet,
-                    icon: Icon(Icons.more_vert, color: AppColors.textPrimary),
-                  ),
-                ),
+                // CustomListTile(
+                //   leading: Image.asset(AppIcons.logoMbBank, width: 30),
+                //   title: Text('Mb bank', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+                //   subTitle: Text('913.024đ'),
+                //   trailing: IconButton(
+                //     onPressed: _handleShowBottomSheet,
+                //     icon: Icon(Icons.more_vert, color: AppColors.textPrimary),
+                //   ),
+                // ),
+                // CustomListTile(
+                //   leading: Image.asset(AppIcons.logoCash, width: 30),
+                //   title: Text('Tiền mặt', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+                //   subTitle: Text('913.024đ'),
+                //   trailing: IconButton(
+                //     onPressed: _handleShowBottomSheet,
+                //     icon: Icon(Icons.more_vert, color: AppColors.textPrimary),
+                //   ),
+                // ),
+                // CustomListTile(
+                //   leading: Image.asset(AppIcons.logoMomo, width: 30),
+                //   title: Text('Mb bank', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+                //   subTitle: Text('913.024đ'),
+                //   trailing: IconButton(
+                //     onPressed: _handleShowBottomSheet,
+                //     icon: Icon(Icons.more_vert, color: AppColors.textPrimary),
+                //   ),
+                // ),
+                // CustomListTile(
+                //   leading: Image.asset(AppIcons.logoZalopay, width: 30),
+                //   title: Text('Mb bank', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+                //   subTitle: Text('913.024đ'),
+                //   trailing: IconButton(
+                //     onPressed: _handleShowBottomSheet,
+                //     icon: Icon(Icons.more_vert, color: AppColors.textPrimary),
+                //   ),
+                // ),
               ],
             ),
           ),
