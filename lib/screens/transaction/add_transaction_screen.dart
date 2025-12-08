@@ -13,11 +13,14 @@ import 'package:mosa/providers/wallet_provider.dart';
 import 'package:mosa/router/app_routes.dart';
 import 'package:mosa/utils/constants.dart';
 import 'package:mosa/utils/date_time_extension.dart';
-import 'package:mosa/utils/number_input_formatter.dart';
 import 'package:mosa/widgets/custom_list_tile.dart';
 import 'package:mosa/widgets/date_time_picker_dialog.dart';
 import 'package:mosa/widgets/error_widget.dart';
 import 'package:mosa/widgets/loading_widget.dart';
+import 'package:mosa/widgets/section_container.dart';
+import 'package:mosa/widgets/card_section.dart';
+import 'package:mosa/widgets/amount_text_field.dart';
+import 'package:mosa/widgets/media_action_bar.dart';
 import 'package:toastification/toastification.dart';
 
 import '../../utils/app_colors.dart';
@@ -37,6 +40,21 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
   String _generateSyncId() {
     return DateTime.now().millisecondsSinceEpoch.toString() + math.Random().nextInt(1000).toString();
+  }
+
+  Color getAmountInputColor(){
+    switch(_selectedType.value){
+      case TransactionType.expense:
+        return AppColors.expense;
+      case TransactionType.income:
+        return AppColors.income;
+      case TransactionType.lend:
+        return AppColors.expense;
+      case TransactionType.borrowing:
+        return AppColors.income;
+      case TransactionType.transfer:
+        return AppColors.primary;
+    }
   }
 
   void _clearTransaction() async {
@@ -119,245 +137,215 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final selectedWallet = ref.watch(selectedWalletProvider);
-    final selectedCategory = ref.watch(selectedCategoryProvider);
-    final defaultWallet = ref.watch(defaultWalletProvider);
-    final effectiveWallet = ref.watch(effectiveWalletProvider);
-
-    return Container(
-      decoration: BoxDecoration(color: AppColors.primaryBackground),
-      child: Padding(
-        padding: const EdgeInsets.only(top: 20),
-        child: Scaffold(
-          appBar: AppBar(
-            backgroundColor: AppColors.primaryBackground,
-            leading: Icon(Icons.history),
-            centerTitle: true,
-            title: Container(
-              decoration: BoxDecoration(
-                border: Border.all(width: 2, color: AppColors.lightBorder),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              alignment: Alignment.center,
-              constraints: BoxConstraints(maxWidth: 180),
-              child: DropdownButtonFormField(
-                decoration: InputDecoration(
-                  floatingLabelBehavior: FloatingLabelBehavior.never,
-                  floatingLabelAlignment: FloatingLabelAlignment.center,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 4),
-                  border: OutlineInputBorder(borderSide: BorderSide.none),
-                ),
-                isExpanded: true,
-                alignment: Alignment.center,
-                initialValue: _selectedType.value,
-                items: [
-                  DropdownMenuItem(value: TransactionType.expense, child: Text('Chi tiền')),
-                  DropdownMenuItem(value: TransactionType.income, child: Text('Thu tiền')),
-                  DropdownMenuItem(value: TransactionType.lend, child: Text('Cho vay')),
-                  DropdownMenuItem(value: TransactionType.borrowing, child: Text('Vay mượn')),
-                  DropdownMenuItem(value: TransactionType.transfer, child: Text('Chuyển khoản')),
-                ],
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() {
-                      _selectedType.value = value;
-                      ref.read(currentTransactionByTypeProvider.notifier).state = _selectedType.value;
-                      _clearTransaction();
-                    });
-                  }
-                },
-              ),
+    return Padding(
+      padding: const EdgeInsets.only(top: 20),
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: AppColors.primaryBackground,
+          leading: Icon(Icons.history),
+          centerTitle: true,
+          title: Container(
+            decoration: BoxDecoration(
+              border: Border.all(width: 2, color: AppColors.lightBorder),
+              borderRadius: BorderRadius.circular(8),
             ),
-            actions: [IconButton(onPressed: _saveTransaction, icon: Icon(Icons.check))],
+            alignment: Alignment.center,
+            constraints: BoxConstraints(maxWidth: 180),
+            child: transactionTypeDropdown()
           ),
-          body: Container(
-            decoration: BoxDecoration(color: AppColors.primaryBackground),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 18),
-            child: ValueListenableBuilder(
-              valueListenable: _selectedType,
-              builder: (context, value, child) {
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6)),
-                              child: Column(
-                                children: [
-                                  Text('Số tiền'),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Flexible(
-                                        child: IntrinsicWidth(
-                                          child: TextField(
-                                            controller: _amountController,
-                                            textAlign: TextAlign.right,
-                                            decoration: InputDecoration(
-                                              counterText: '',
-                                              isDense: true,
-                                              border: InputBorder.none,
-                                              hintText: '0',
-                                              hintStyle: TextStyle(
-                                                fontSize: 32,
-                                                fontWeight: FontWeight.bold,
-                                                color: AppColors.expense.withValues(alpha: 0.9),
-                                              ),
-                                              contentPadding: EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-                                            ),
-                                            maxLength: 15,
-                                            maxLengthEnforcement: MaxLengthEnforcement.enforced,
-                                            style: TextStyle(
-                                              fontSize: 32,
-                                              fontWeight: FontWeight.bold,
-                                              color: AppColors.expense,
-                                            ),
-                                            keyboardType: TextInputType.number,
-                                            inputFormatters: [ThousandSeperatorFormatter(seperator: ',')],
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        'đ',
-                                        style: TextStyle(
-                                          fontSize: 32,
-                                          fontWeight: FontWeight.bold,
-                                          color: AppColors.expense,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            Container(
-                              padding: const EdgeInsets.symmetric(vertical: 4),
-                              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6)),
-                              child: Column(
-                                children: [
-                                  CustomListTile(
-                                    leading:
-                                        selectedCategory != null
-                                            ? selectedCategory.getIcon()
-                                            : Icon(Icons.add_circle_rounded),
-                                    title: Text(selectedCategory != null ? (selectedCategory.name) : 'Chọn hạng mục'),
-                                    enable: true,
-                                    trailing: Row(
-                                      children: [Text('Tất cả'), const SizedBox(width: 12), Icon(Icons.chevron_right)],
-                                    ),
-                                    onTap: () {
-                                      context.push(AppRoutes.categoryList);
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            Container(
-                              padding: const EdgeInsets.symmetric(vertical: 4),
-                              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6)),
-                              child: Column(
-                                children: [
-                                  effectiveWallet.when(
-                                    data: (walletData) {
-                                      return CustomListTile(
-                                        leading: Image.asset(walletData.iconPath, width: 22),
-                                        title: Text(walletData.name),
-                                        trailing: Icon(Icons.chevron_right),
-                                        enable: true,
-                                        onTap: () {
-                                          context.push(AppRoutes.selectWallet);
-                                        },
-                                      );
-                                    },
-                                    error: (error, stackTrace) => ErrorSectionWidget(error: error),
-                                    loading: () => LoadingSectionWidget(),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  CustomListTile(
-                                    leading: Icon(Icons.calendar_month_outlined),
-                                    title: Text('${_selectedDateTime.weekdayLabel} - ${_selectedDateTime.ddMMyyy}'),
-                                    trailing: Text(_selectedDateTime.hhMM),
-                                    enable: true,
-                                    onTap: () async {
-                                      final selected = await showDateTimePicker(context: context) ?? DateTime.now();
-                                      setState(() {
-                                        _selectedDateTime = selected;
-                                      });
-                                    },
-                                  ),
-                                  CustomListTile(
-                                    leading: Icon(Icons.notes_sharp),
-                                    title: TextField(
-                                      controller: _noteController,
-                                      decoration: InputDecoration(
-                                        hintText: 'Diễn giải',
-                                        hintStyle: TextStyle(fontSize: 14, color: AppColors.textHint),
-                                        contentPadding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                        border: OutlineInputBorder(borderSide: BorderSide.none),
-                                      ),
-                                      style: TextStyle(fontSize: 14),
-                                      maxLines: 1,
-                                    ),
-                                    onTap: null,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6)),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Expanded(child: Icon(Icons.mic_none_sharp)),
-                                  Container(
-                                    color: AppColors.borderLight,
-                                    width: 1,
-                                    height: 50,
-                                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                                  ),
-                                  Expanded(child: Icon(Icons.image_outlined)),
-                                  Container(
-                                    color: AppColors.borderLight,
-                                    width: 1,
-                                    height: 50,
-                                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                                  ),
-                                  Expanded(child: Icon(Icons.camera_alt_outlined)),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
+          actions: [IconButton(onPressed: _saveTransaction, icon: Icon(Icons.check))],
+        ),
+        body: SectionContainer(
+          child: ValueListenableBuilder(
+            valueListenable: _selectedType,
+            builder: (context, value, child) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          amountInputSection(),
+                          const SizedBox(height: 12),
+                          categorySelectorSection(),
+                          const SizedBox(height: 12),
+                          walletAndDetailSection(),
+                          const SizedBox(height: 12),
+                          mediaActionSection(),
+                        ],
                       ),
                     ),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: _saveTransaction,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.buttonPrimary,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                        ),
-                        child: Text(AppConstants.save),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
+                  ),
+                  saveButtonSection(),
+                ],
+              );
+            },
           ),
         ),
+      ),
+    );
+  }
+
+  Widget transactionTypeDropdown(){
+    return DropdownButtonFormField(
+      decoration: InputDecoration(
+        floatingLabelBehavior: FloatingLabelBehavior.never,
+        floatingLabelAlignment: FloatingLabelAlignment.center,
+        contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 4),
+        border: OutlineInputBorder(borderSide: BorderSide.none),
+      ),
+      isExpanded: true,
+      alignment: Alignment.center,
+      initialValue: _selectedType.value,
+      items: [
+        DropdownMenuItem(value: TransactionType.expense, child: Text('Chi tiền')),
+        DropdownMenuItem(value: TransactionType.income, child: Text('Thu tiền')),
+        DropdownMenuItem(value: TransactionType.lend, child: Text('Cho vay')),
+        DropdownMenuItem(value: TransactionType.borrowing, child: Text('Đi vay')),
+        DropdownMenuItem(value: TransactionType.transfer, child: Text('Chuyển khoản')),
+      ],
+      onChanged: (value) {
+        if (value != null) {
+          setState(() {
+            _selectedType.value = value;
+            ref.read(currentTransactionByTypeProvider.notifier).state = _selectedType.value;
+            _clearTransaction();
+          });
+        }
+      },
+    );
+  }
+
+  Widget amountInputSection() {
+    return CardSection(
+      child: Column(
+        children: [
+          Text('Số tiền'),
+          AmountTextField(controller: _amountController, amountColor: getAmountInputColor()),
+        ],
+      ),
+    );
+  }
+
+  Widget categorySelectorSection() {
+    final selectedCategory = ref.watch(selectedCategoryProvider);
+    return CardSection(
+      child: Column(
+        children: [
+          CustomListTile(
+            leading:
+            selectedCategory != null
+                ? selectedCategory.getIcon()
+                : Icon(Icons.add_circle_rounded),
+            title: Text(selectedCategory != null ? (selectedCategory.name) : 'Chọn hạng mục'),
+            enable: true,
+            trailing: Row(
+              children: [Text('Tất cả'), const SizedBox(width: 12), Icon(Icons.chevron_right)],
+            ),
+            onTap: () {
+              context.push(AppRoutes.categoryList);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget walletSelectorSection() {
+    final effectiveWallet = ref.watch(effectiveWalletProvider);
+    return effectiveWallet.when(
+      data: (walletData) {
+        return CustomListTile(
+          leading: Image.asset(walletData.iconPath, width: 22),
+          title: Text(walletData.name),
+          trailing: Icon(Icons.chevron_right),
+          enable: true,
+          onTap: () {
+            context.push(AppRoutes.selectWallet);
+          },
+        );
+      },
+      error: (error, stackTrace) => ErrorSectionWidget(error: error),
+      loading: () => LoadingSectionWidget(),
+    );
+  }
+
+  Widget dateTimeSelectorSection() {
+    return CustomListTile(
+      leading: Icon(Icons.calendar_month_outlined),
+      title: Text('${_selectedDateTime.weekdayLabel} - ${_selectedDateTime.ddMMyyy}'),
+      trailing: Text(_selectedDateTime.hhMM),
+      enable: true,
+      onTap: () async {
+        final selected = await showDateTimePicker(context: context) ?? DateTime.now();
+        setState(() {
+          _selectedDateTime = selected;
+        });
+      },
+    );
+  }
+
+  Widget noteSelectorSection() {
+    return CustomListTile(
+      leading: Icon(Icons.notes_sharp),
+      title: TextField(
+        controller: _noteController,
+        decoration: InputDecoration(
+          hintText: 'Diễn giải',
+          hintStyle: TextStyle(fontSize: 14, color: AppColors.textHint),
+          contentPadding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          border: OutlineInputBorder(borderSide: BorderSide.none),
+        ),
+        style: TextStyle(fontSize: 14),
+        maxLines: 1,
+      ),
+      onTap: null,
+    );
+  }
+
+  Widget walletAndDetailSection(){
+    return CardSection(
+      child: Column(
+        children: [
+          walletSelectorSection(),
+          const SizedBox(height: 8),
+          dateTimeSelectorSection(),
+          noteSelectorSection(),
+        ],
+      ),
+    );
+  }
+
+  Widget mediaActionSection(){
+    return CardSection(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      child: MediaActionBar(
+        onMicTap: () {
+          // TODO: Implement voice recording
+        },
+        onImageTap: () {
+          // TODO: Implement image selection
+        },
+        onCameraTap: () {
+          // TODO: Implement camera capture
+        },
+      ),
+    );
+  }
+
+  Widget saveButtonSection() {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: _saveTransaction,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.buttonPrimary,
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+        child: Text(AppConstants.save),
       ),
     );
   }

@@ -62,42 +62,6 @@ class _AccountTabScreenState extends ConsumerState<AccountTabScreen> {
                   loading: () => LoadingSectionWidget(),
                   error: (error, stackTrace) => ErrorSectionWidget(error: error),
                 ),
-                // CustomListTile(
-                //   leading: Image.asset(AppIcons.logoMbBank, width: 30),
-                //   title: Text('Mb bank', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-                //   subTitle: Text('913.024đ'),
-                //   trailing: IconButton(
-                //     onPressed: _handleShowBottomSheet,
-                //     icon: Icon(Icons.more_vert, color: AppColors.textPrimary),
-                //   ),
-                // ),
-                // CustomListTile(
-                //   leading: Image.asset(AppIcons.logoCash, width: 30),
-                //   title: Text('Tiền mặt', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-                //   subTitle: Text('913.024đ'),
-                //   trailing: IconButton(
-                //     onPressed: _handleShowBottomSheet,
-                //     icon: Icon(Icons.more_vert, color: AppColors.textPrimary),
-                //   ),
-                // ),
-                // CustomListTile(
-                //   leading: Image.asset(AppIcons.logoMomo, width: 30),
-                //   title: Text('Mb bank', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-                //   subTitle: Text('913.024đ'),
-                //   trailing: IconButton(
-                //     onPressed: _handleShowBottomSheet,
-                //     icon: Icon(Icons.more_vert, color: AppColors.textPrimary),
-                //   ),
-                // ),
-                // CustomListTile(
-                //   leading: Image.asset(AppIcons.logoZalopay, width: 30),
-                //   title: Text('Mb bank', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-                //   subTitle: Text('913.024đ'),
-                //   trailing: IconButton(
-                //     onPressed: _handleShowBottomSheet,
-                //     icon: Icon(Icons.more_vert, color: AppColors.textPrimary),
-                //   ),
-                // ),
               ],
             ),
           ),
