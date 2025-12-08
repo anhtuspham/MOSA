@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:intl/intl.dart';
 import 'package:mosa/utils/constants.dart';
 
@@ -41,9 +43,12 @@ extension DateTimeExtension on DateTime {
 
   String get weekdayLabel {
     final now = DateTime.now();
-    final diffDays = now.difference(this).inDays;
+    final today = DateTime(now.year, now.month, now.day);
+    final thisDate = DateTime(year, month, day);
+    final diffDays = today.difference(thisDate).inDays;
 
     switch(diffDays){
+      case -1: return AppConstants.tomorrow;
       case 0: return AppConstants.today;
       case 1: return AppConstants.yesterday;
       default: return weekdayName;

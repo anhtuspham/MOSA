@@ -17,7 +17,7 @@ class DateRangeUtils {
         final monday = getMondayOfWeek(currentDate);
         return DateTimeRange(
           start: DateTime(monday.year, monday.month, monday.day),
-          end: DateTime(currentDate.year, currentDate.month, currentDate.day),
+          end: DateTime(currentDate.year, currentDate.month, monday.day + 7).subtract(Duration(seconds: 1)),
         );
       case DateRangeFilter.month:
         return DateTimeRange(
@@ -36,12 +36,5 @@ class DateRangeUtils {
           end: DateTime(currentDate.year + 1, 1, 1).subtract(Duration(seconds: 1)),
         );
     }
-  }
-
-  static List<T> filterByDateRange<T>(List<T> items, DateTime start, DateTime end, DateTime Function(T) dateGetter) {
-    return items.where((item) {
-      final date = dateGetter(item);
-      return date.isAfter(start) && date.isBefore(end);
-    }).toList();
   }
 }
