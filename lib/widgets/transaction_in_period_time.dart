@@ -8,9 +8,11 @@ import 'package:mosa/widgets/error_widget.dart';
 import 'package:mosa/widgets/loading_widget.dart';
 import 'package:mosa/widgets/transaction_item.dart';
 
+import '../models/enums.dart';
 import '../providers/date_filter_provider.dart';
 import '../utils/app_colors.dart';
 import '../utils/date_time_extension.dart';
+import '../utils/utils.dart';
 
 /// Ghi chép thu chi trong 1 đơn vị thời gian
 class TransactionInPeriodTime extends ConsumerStatefulWidget {
@@ -60,12 +62,12 @@ class _TransactionInPeriodTimeState extends ConsumerState<TransactionInPeriodTim
               if (totalData.income > 0)
                 Text(
                   Helpers.formatCurrency(totalData.income),
-                  style: TextStyle(color: AppColors.income, fontSize: 14),
+                  style: TextStyle(color: getTransactionTypeColor(type: TransactionType.income), fontSize: 14),
                 ),
               if (totalData.expense > 0)
                 Text(
                   Helpers.formatCurrency(totalData.expense),
-                  style: TextStyle(color: AppColors.expense, fontSize: 14),
+                  style: TextStyle(color: getTransactionTypeColor(type: TransactionType.expense), fontSize: 14),
                 ),
             ],
           ),
@@ -104,9 +106,7 @@ class _TransactionInPeriodTimeState extends ConsumerState<TransactionInPeriodTim
                 }
                 return TransactionItem(
                   category: category,
-                  amount: transaction.amount,
-                  note: transaction.note,
-                  walletId: transaction.walletId,
+                  transaction: transaction,
                 );
               },
             );

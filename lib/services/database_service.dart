@@ -9,6 +9,7 @@ import '../models/transaction.dart';
 import '../models/enums.dart';
 import '../services/category_service.dart';
 import '../utils/constants.dart';
+import '../utils/utils.dart';
 
 class DatabaseService {
   static Database? _database;
@@ -359,7 +360,7 @@ class DatabaseService {
 
       await _updateWalletBalance(transaction.walletId);
 
-      log('Transaction inserted with id: $id');
+      log('Transaction inserted with id: $id ${transaction.title}');
       return id;
     } catch (e) {
       // Database lock issue - reset and retry
@@ -566,7 +567,7 @@ class DatabaseService {
       categoryId: json['categoryId'] as String,
       walletId: json['walletId'] as int,
       date: DateTime.parse(json['date'] as String),
-      type: _getTransactionType(json['type'] as String),
+      type: getTransactionType(json['type'] as String),
       note: json['note'] as String?,
       createAt: DateTime.now(),
       updateAt: DateTime.now(),
@@ -576,20 +577,7 @@ class DatabaseService {
   }
 
   // Helper function to convert category type string to TransactionType enum
-  TransactionType _getTransactionType(String type) {
-    switch (type.toLowerCase()) {
-      case 'income':
-        return TransactionType.income;
-      case 'expense':
-        return TransactionType.expense;
-      case 'lend':
-        return TransactionType.lend;
-      case 'borrowing':
-        return TransactionType.borrowing;
-      default:
-        return TransactionType.expense;
-    }
-  }
+
 
   // ==================== WALLET BALANCE HELPER ====================
 
@@ -664,8 +652,8 @@ class DatabaseService {
       '''
     SELECT
       SUM(CASE
-        WHEN type IN ('income', 'borrowing') THEN amount
-        WHEN type IN ('expense', 'lend') THEN -amount
+        WHEN type IN ('income', 'borrowing', 'transferIn') THEN amount
+        WHEN type IN ('expense', 'lend', 'transferOut') THEN -amount
         ELSE 0
       END) as balance
     FROM ${AppConstants.tableTransactions}

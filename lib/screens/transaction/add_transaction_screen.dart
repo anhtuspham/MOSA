@@ -1,5 +1,4 @@
 import 'dart:developer';
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,6 +10,7 @@ import 'package:mosa/providers/category_provider.dart';
 import 'package:mosa/providers/transaction_provider.dart';
 import 'package:mosa/providers/wallet_provider.dart';
 import 'package:mosa/router/app_routes.dart';
+import 'package:mosa/utils/app_icons.dart';
 import 'package:mosa/utils/constants.dart';
 import 'package:mosa/utils/date_time_extension.dart';
 import 'package:mosa/widgets/custom_list_tile.dart';
@@ -24,6 +24,7 @@ import 'package:mosa/widgets/media_action_bar.dart';
 import 'package:toastification/toastification.dart';
 
 import '../../utils/app_colors.dart';
+import '../../utils/utils.dart';
 
 class AddTransactionScreen extends ConsumerStatefulWidget {
   const AddTransactionScreen({super.key});
@@ -38,23 +39,41 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   final TextEditingController _noteController = TextEditingController();
   late DateTime _selectedDateTime = DateTime.now();
 
-  String _generateSyncId() {
-    return DateTime.now().millisecondsSinceEpoch.toString() + math.Random().nextInt(1000).toString();
+  @override
+  void dispose() {
+    _amountController.dispose();
+    _noteController.dispose();
+    super.dispose();
   }
 
-  Color getAmountInputColor(){
-    switch(_selectedType.value){
-      case TransactionType.expense:
-        return AppColors.expense;
-      case TransactionType.income:
-        return AppColors.income;
-      case TransactionType.lend:
-        return AppColors.expense;
-      case TransactionType.borrowing:
-        return AppColors.income;
-      case TransactionType.transfer:
-        return AppColors.primary;
-    }
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 20),
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: AppColors.primaryBackground,
+          leading: Icon(Icons.history),
+          centerTitle: true,
+          title: Container(
+            decoration: BoxDecoration(
+              border: Border.all(width: 2, color: AppColors.lightBorder),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            alignment: Alignment.center,
+            constraints: BoxConstraints(maxWidth: 180),
+            child: transactionTypeDropdown(),
+          ),
+          actions: [IconButton(onPressed: _saveTransaction, icon: Icon(Icons.check))],
+        ),
+        body: SectionContainer(
+          child: ValueListenableBuilder(
+            valueListenable: _selectedType,
+            builder: (context, value, child) => detailTransactionSection(transactionType: _selectedType.value),
+          ),
+        ),
+      ),
+    );
   }
 
   void _clearTransaction() async {
@@ -68,6 +87,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       final selectedCategory = ref.read(selectedCategoryProvider);
       final transactionController = ref.read(transactionProvider.notifier);
       final effectiveWallet = await ref.read(effectiveWalletProvider.future);
+      final transferOutWalletState = ref.watch(transferOutWalletProvider);
+      final transferInWalletState = ref.watch(transferInWalletProvider);
 
       if (!mounted) return;
 
@@ -77,30 +98,61 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         return;
       }
 
-      if (selectedCategory == null) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Vui lòng chọn hạng mục')));
-        return;
-      }
-
       final amount = double.tryParse(_amountController.text.replaceAll(',', ''));
       if (amount == null || amount <= 0) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Số tiền không hợp lệ')));
         return;
       }
 
-      final transaction = TransactionModel(
-        title: selectedCategory.name,
-        amount: amount,
-        date: _selectedDateTime,
-        type: _selectedType.value,
-        categoryId: selectedCategory.id,
-        note: _noteController.text.isNotEmpty ? _noteController.text : null,
-        createAt: DateTime.now(),
-        syncId: _generateSyncId(),
-        walletId: effectiveWallet.id ?? -1,
-      );
+      if(_selectedType.value == TransactionType.transfer){
+        final transactionOut = TransactionModel(
+          title: 'Chuyển khoản đến ${transferInWalletState?.name ?? 'Chưa chọn'}', // sử dụng transferIn để gửi title
+          // nơi chuyển đến
+          amount: amount,
+          date: _selectedDateTime,
+          type: TransactionType.transferOut,
+          categoryId: 'transfer',
+          note: _noteController.text.isNotEmpty ? _noteController.text : null,
+          createAt: DateTime.now(),
+          syncId: generateSyncId(),
+          walletId: transferOutWalletState?.id ?? -1,
+        );
 
-      await transactionController.addTransaction(transaction);
+        final transactionIn = TransactionModel(
+          title: 'Nhận chuyển khoản từ ${transferOutWalletState?.name ?? 'Chưa chọn'}',
+          amount: amount,
+          date: _selectedDateTime,
+          type: TransactionType.transferIn,
+          categoryId: 'transfer',
+          note: _noteController.text.isNotEmpty ? _noteController.text : null,
+          createAt: DateTime.now(),
+          syncId: generateSyncId(),
+          walletId: transferInWalletState?.id ?? -1,
+        );
+
+        await transactionController.addTransaction(transactionOut);
+        await transactionController.addTransaction(transactionIn);
+
+      } else {
+        if (selectedCategory == null) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Vui lòng chọn hạng mục')));
+          return;
+        }
+
+        final transaction = TransactionModel(
+          title: selectedCategory.name,
+          amount: amount,
+          date: _selectedDateTime,
+          type: _selectedType.value,
+          categoryId: selectedCategory.id,
+          note: _noteController.text.isNotEmpty ? _noteController.text : null,
+          createAt: DateTime.now(),
+          syncId: generateSyncId(),
+          walletId: effectiveWallet.id ?? -1,
+        );
+
+        await transactionController.addTransaction(transaction);
+      }
       _clearTransaction();
 
       if (mounted) {
@@ -128,66 +180,78 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     }
   }
 
-  @override
-  void dispose() {
-    _amountController.dispose();
-    _noteController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 20),
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: AppColors.primaryBackground,
-          leading: Icon(Icons.history),
-          centerTitle: true,
-          title: Container(
-            decoration: BoxDecoration(
-              border: Border.all(width: 2, color: AppColors.lightBorder),
-              borderRadius: BorderRadius.circular(8),
+  Widget detailTransactionSection({TransactionType transactionType = TransactionType.expense}) {
+    switch (transactionType) {
+      case TransactionType.transfer:
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    amountInputSection(),
+                    const SizedBox(height: 12),
+                    transactionTypeSection(title: 'Từ tài khoản', isTransferOut: true),
+                    transactionTypeSection(title: 'Đến tài khoản', isTransferOut: false),
+                    const SizedBox(height: 12),
+                    dateTimeSelectorSection(),
+                    noteSelectorSection(),
+                  ],
+                ),
+              ),
             ),
-            alignment: Alignment.center,
-            constraints: BoxConstraints(maxWidth: 180),
-            child: transactionTypeDropdown()
-          ),
-          actions: [IconButton(onPressed: _saveTransaction, icon: Icon(Icons.check))],
-        ),
-        body: SectionContainer(
-          child: ValueListenableBuilder(
-            valueListenable: _selectedType,
-            builder: (context, value, child) {
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          amountInputSection(),
-                          const SizedBox(height: 12),
-                          categorySelectorSection(),
-                          const SizedBox(height: 12),
-                          walletAndDetailSection(),
-                          const SizedBox(height: 12),
-                          mediaActionSection(),
-                        ],
-                      ),
-                    ),
-                  ),
-                  saveButtonSection(),
-                ],
-              );
-            },
-          ),
-        ),
-      ),
-    );
+            saveButtonSection(),
+          ],
+        );
+      case TransactionType.adjustBalance:
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    amountInputSection(),
+                    const SizedBox(height: 12),
+                    transactionTypeSection(title: 'Từ tài khoản', isTransferOut: true),
+                    transactionTypeSection(title: 'Đến tài khoản'),
+                    const SizedBox(height: 12),
+                    dateTimeSelectorSection(),
+                    noteSelectorSection(),
+                  ],
+                ),
+              ),
+            ),
+            saveButtonSection(),
+          ],
+        );
+      default:
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    amountInputSection(),
+                    const SizedBox(height: 12),
+                    categorySelectorSection(),
+                    const SizedBox(height: 12),
+                    walletAndDetailSection(),
+                    const SizedBox(height: 12),
+                    mediaActionSection(),
+                  ],
+                ),
+              ),
+            ),
+            saveButtonSection(),
+          ],
+        );
+    }
   }
 
-  Widget transactionTypeDropdown(){
+  Widget transactionTypeDropdown() {
     return DropdownButtonFormField(
       decoration: InputDecoration(
         floatingLabelBehavior: FloatingLabelBehavior.never,
@@ -204,6 +268,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         DropdownMenuItem(value: TransactionType.lend, child: Text('Cho vay')),
         DropdownMenuItem(value: TransactionType.borrowing, child: Text('Đi vay')),
         DropdownMenuItem(value: TransactionType.transfer, child: Text('Chuyển khoản')),
+        DropdownMenuItem(value: TransactionType.adjustBalance, child: Text('Điều chỉnh số dư')),
       ],
       onChanged: (value) {
         if (value != null) {
@@ -220,10 +285,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   Widget amountInputSection() {
     return CardSection(
       child: Column(
-        children: [
-          Text('Số tiền'),
-          AmountTextField(controller: _amountController, amountColor: getAmountInputColor()),
-        ],
+        children: [Text('Số tiền'), AmountTextField(controller: _amountController, amountColor:
+        getTransactionTypeColor(type: _selectedType.value))],
       ),
     );
   }
@@ -234,15 +297,10 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       child: Column(
         children: [
           CustomListTile(
-            leading:
-            selectedCategory != null
-                ? selectedCategory.getIcon()
-                : Icon(Icons.add_circle_rounded),
+            leading: selectedCategory != null ? selectedCategory.getIcon() : Icon(Icons.add_circle_rounded),
             title: Text(selectedCategory != null ? (selectedCategory.name) : 'Chọn hạng mục'),
             enable: true,
-            trailing: Row(
-              children: [Text('Tất cả'), const SizedBox(width: 12), Icon(Icons.chevron_right)],
-            ),
+            trailing: Row(children: [Text('Tất cả'), const SizedBox(width: 12), Icon(Icons.chevron_right)]),
             onTap: () {
               context.push(AppRoutes.categoryList);
             },
@@ -304,7 +362,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     );
   }
 
-  Widget walletAndDetailSection(){
+  Widget walletAndDetailSection() {
     return CardSection(
       child: Column(
         children: [
@@ -317,7 +375,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     );
   }
 
-  Widget mediaActionSection(){
+  Widget mediaActionSection() {
     return CardSection(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       child: MediaActionBar(
@@ -330,6 +388,30 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         onCameraTap: () {
           // TODO: Implement camera capture
         },
+      ),
+    );
+  }
+
+  Widget transactionTypeSection({required String title, bool isTransferOut = false}) {
+    final wallet = isTransferOut ? ref.watch(transferOutWalletProvider) : ref.watch(transferInWalletProvider);
+    final route = isTransferOut ? AppRoutes.selectTransferOutWallet : AppRoutes.selectTransferInWallet;
+
+    return CardSection(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+            child: Text(title, style: TextStyle(color: AppColors.textSecondary)),
+          ),
+          CustomListTile(
+            leading: Image.asset(wallet?.iconPath ?? AppIcons.plusIcon, width: 22),
+            title: Text(wallet?.name ?? 'Chọn tài khoản'),
+            trailing: Icon(Icons.chevron_right),
+            enable: true,
+            onTap: () => context.push(route),
+          ),
+        ],
       ),
     );
   }

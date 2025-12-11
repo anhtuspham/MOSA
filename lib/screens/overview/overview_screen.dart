@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mosa/models/enums.dart';
 import 'package:mosa/providers/date_filter_provider.dart';
 import 'package:mosa/providers/transaction_provider.dart';
 import 'package:mosa/utils/constants.dart';
 import 'package:mosa/utils/helpers.dart';
+import 'package:mosa/utils/utils.dart';
 import 'package:mosa/widgets/transaction_in_period_time.dart';
 
 import '../../utils/app_colors.dart';
@@ -104,7 +106,11 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
                 Text('Tổng thu', style: TextStyle(fontWeight: FontWeight.bold)),
                 Text(
                   Helpers.formatCurrency(totalIncome),
-                  style: TextStyle(color: AppColors.income, fontSize: 18, fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                    color: getTransactionTypeColor(type: TransactionType.income),
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ],
             ),
@@ -121,7 +127,11 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
                 Text('Tổng chi', style: TextStyle(fontWeight: FontWeight.bold)),
                 Text(
                   Helpers.formatCurrency(totalExpense),
-                  style: TextStyle(color: AppColors.expense, fontSize: 18, fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                    color: getTransactionTypeColor(type: TransactionType.expense),
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ],
             ),

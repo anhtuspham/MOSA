@@ -259,5 +259,13 @@
     "iconType": "material",
     "iconPath": "paid",
     "color": "#FFC107"
+  },
+  {
+    "id": "transfer",
+    "name": "Chuyển khoản",
+    "type": "transfer",
+    "iconType": "material",
+    "iconPath": "autorenew",
+    "color": "#52B2FF"
   }
 ]

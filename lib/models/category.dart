@@ -110,6 +110,9 @@ class Category {
       'gavel': Icons.gavel,
       'check_circle': Icons.check_circle,
       'paid': Icons.paid,
+
+      // transfer
+      'autorenew': Icons.autorenew
     };
 
     return iconMap[iconName] ?? Icons.help;

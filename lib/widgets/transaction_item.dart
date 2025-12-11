@@ -3,23 +3,23 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mosa/models/category.dart';
 import 'package:mosa/models/enums.dart';
+import 'package:mosa/models/transaction.dart';
 import 'package:mosa/providers/wallet_provider.dart';
 import 'package:mosa/utils/helpers.dart';
+import 'package:mosa/utils/utils.dart';
 import 'package:mosa/widgets/error_widget.dart';
 import 'package:mosa/widgets/loading_widget.dart';
 import '../utils/app_colors.dart';
 
 class TransactionItem extends ConsumerWidget {
   final Category category;
-  final String? note;
-  final double amount;
-  final int walletId;
+  final TransactionModel transaction;
 
-  const TransactionItem({super.key, required this.category, this.note, required this.amount, required this.walletId});
+  const TransactionItem({super.key, required this.category, required this.transaction});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final walletController = ref.watch(getWalletByIdProvider(walletId));
+    final walletController = ref.watch(getWalletByIdProvider(transaction.walletId));
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
@@ -33,8 +33,9 @@ class TransactionItem extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(category.name),
-                if (note != null) Text(note!, style: TextStyle(fontSize: 10.sp, color: AppColors.textSecondary)),
+                Text(transaction.title),
+                if (transaction.note != null)
+                  Text(transaction.note!, style: TextStyle(fontSize: 10.sp, color: AppColors.textSecondary)),
               ],
             ),
           ),
@@ -42,10 +43,10 @@ class TransactionItem extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                Helpers.formatCurrency(amount),
+                Helpers.formatCurrency(transaction.amount),
                 style: TextStyle(
                   fontSize: 16.sp,
-                  color: category.type == 'income' ? AppColors.income : AppColors.expense,
+                  color: getTransactionTypeColor(type: getTransactionType(category.type)),
                 ),
               ),
               walletController.when(

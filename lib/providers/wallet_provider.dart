@@ -76,6 +76,11 @@ final defaultWalletProvider = FutureProvider<Wallet?>((ref) {
   return db.getDefaultWallet();
 });
 
+final selectedWalletProvider = StateProvider<Wallet?>((ref) => null);
+
+final transferOutWalletProvider = StateProvider<Wallet?>((ref) => null);
+final transferInWalletProvider = StateProvider<Wallet?>((ref) => null);
+
 final effectiveWalletProvider = FutureProvider<Wallet>((ref) async {
   final selectedWallet = ref.watch(selectedWalletProvider);
 
@@ -90,8 +95,6 @@ final effectiveWalletProvider = FutureProvider<Wallet>((ref) async {
 
   throw Exception('Không có ví nào để lưu giao dịch');
 });
-
-final selectedWalletProvider = StateProvider<Wallet?>((ref) => null);
 
 final totalBalanceWalletProvider = FutureProvider<double>((ref) async {
   double total = 0;

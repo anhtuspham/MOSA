@@ -7,7 +7,7 @@ class TransactionModel {
   final double amount;
   final DateTime date;
   final TransactionType type;
-  final String categoryId;
+  final String? categoryId;
   final String? note;
   final DateTime createAt;
   final DateTime? updateAt;
@@ -21,7 +21,7 @@ class TransactionModel {
     required this.amount,
     required this.date,
     required this.type,
-    required this.categoryId,
+    this.categoryId,
     this.note,
     required this.createAt,
     this.updateAt,
@@ -56,7 +56,7 @@ class TransactionModel {
         (e) => e.toString().split('.').last == map['type'],
         orElse: () => TransactionType.expense,
       ),
-      categoryId: map['categoryId'],
+      categoryId: map['categoryId'] ?? '',
       note: map['note'] as String?,
       createAt: DateTime.parse(map['createAt'] as String),
       updateAt: map['updateAt'] != null ? DateTime.parse(map['updateAt'] as String) : null,

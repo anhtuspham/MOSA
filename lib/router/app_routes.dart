@@ -43,6 +43,8 @@ abstract class AppRoutes {
 
   // ==== SELECT WALLET ====
   static const String selectWallet = '/selectWallet';
+  static const String selectTransferOutWallet = '/selectTransferToWallet';
+  static const String selectTransferInWallet = '/selectTransferInWallet';
 
   // ===== PHASE 2: GROUP FEATURES (PREPARED) =====
   static const String createGroup = '/create-group';
