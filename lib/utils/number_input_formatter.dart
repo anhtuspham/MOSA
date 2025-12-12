@@ -11,7 +11,7 @@ class ThousandSeperatorFormatter extends TextInputFormatter {
       return newValue;
     }
 
-    String numbericOnly = newValue.text.replaceAll(',', '');
+    String numbericOnly = newValue.text.replaceAll(seperator, '');
 
     if (!RegExp(r'^\d+$').hasMatch(numbericOnly)) {
       return oldValue;

@@ -24,6 +24,8 @@ import 'package:mosa/widgets/media_action_bar.dart';
 import 'package:toastification/toastification.dart';
 
 import '../../utils/app_colors.dart';
+import '../../utils/helpers.dart';
+import '../../utils/number_input_formatter.dart';
 import '../../utils/utils.dart';
 
 class AddTransactionScreen extends ConsumerStatefulWidget {
@@ -37,12 +39,14 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   late final ValueNotifier<TransactionType> _selectedType = ValueNotifier<TransactionType>(TransactionType.expense);
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _noteController = TextEditingController();
+  final TextEditingController _actualBalanceController = TextEditingController();
   late DateTime _selectedDateTime = DateTime.now();
 
   @override
   void dispose() {
     _amountController.dispose();
     _noteController.dispose();
+    _actualBalanceController.dispose();
     super.dispose();
   }
 
@@ -79,6 +83,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   void _clearTransaction() async {
     _amountController.clear();
     _noteController.clear();
+    _actualBalanceController.clear();
     ref.read(selectedCategoryProvider.notifier).selectCategory(null);
   }
 
@@ -104,9 +109,10 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         return;
       }
 
-      if(_selectedType.value == TransactionType.transfer){
+      if (_selectedType.value == TransactionType.transfer) {
         final transactionOut = TransactionModel(
-          title: 'Chuyển khoản đến ${transferInWalletState?.name ?? 'Chưa chọn'}', // sử dụng transferIn để gửi title
+          title: 'Chuyển khoản đến ${transferInWalletState?.name ?? 'Chưa chọn'}',
+          // sử dụng transferIn để gửi title
           // nơi chuyển đến
           amount: amount,
           date: _selectedDateTime,
@@ -132,7 +138,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
         await transactionController.addTransaction(transactionOut);
         await transactionController.addTransaction(transactionIn);
-
       } else {
         if (selectedCategory == null) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Vui lòng chọn hạng mục')));
@@ -212,10 +217,9 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    amountInputSection(),
+                    walletSelectorSection(),
                     const SizedBox(height: 12),
-                    transactionTypeSection(title: 'Từ tài khoản', isTransferOut: true),
-                    transactionTypeSection(title: 'Đến tài khoản'),
+                    adjustTransactionBalanceSection(),
                     const SizedBox(height: 12),
                     dateTimeSelectorSection(),
                     noteSelectorSection(),
@@ -285,8 +289,79 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   Widget amountInputSection() {
     return CardSection(
       child: Column(
-        children: [Text('Số tiền'), AmountTextField(controller: _amountController, amountColor:
-        getTransactionTypeColor(type: _selectedType.value))],
+        children: [
+          Text('Số tiền'),
+          AmountTextField(
+            controller: _amountController,
+            amountColor: getTransactionTypeColor(type: _selectedType.value),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget adjustTransactionBalanceSection() {
+    final effectiveWallet = ref.watch(effectiveWalletProvider);
+    return CardSection(
+      child: Column(
+        children: [
+          effectiveWallet.when(
+            data: (data) {
+              return CustomListTile(
+                title: Text('Số dư trên tài khoản'),
+                trailing: Text(Helpers.formatCurrency(data.balance)),
+              );
+            },
+            error: (error, stackTrace) => ErrorSectionWidget(error: error),
+            loading: () => LoadingSectionWidget(),
+          ),
+          const SizedBox(height: 12),
+          CustomListTile(
+            title: Text('Số dư thực tế'),
+            trailing: SizedBox(
+              width: 200,
+              child: TextField(
+                controller: _actualBalanceController,
+                decoration: InputDecoration(
+                  counterText: '',
+                  border: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.borderLight)),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 4),
+                  hintText: 'Nhập số dư thực tế',
+                  hintStyle: TextStyle(fontSize: 12, color: AppColors.textHint),
+                  suffix: Text(
+                    'đ',
+                    style: TextStyle(color: AppColors.textPrimary, fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
+                ),
+                maxLength: 16,
+
+                textAlign: TextAlign.right,
+                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                inputFormatters: [ThousandSeperatorFormatter(seperator: '.')],
+              ),
+            ),
+          ),
+          ValueListenableBuilder(
+            valueListenable: _actualBalanceController,
+            builder: (context, value, child) {
+              return effectiveWallet.when(
+                data: (data) {
+                  final actualBalance = double.tryParse(_actualBalanceController.text.replaceAll(',', '')) ?? 0;
+                  final different = actualBalance - data.balance;
+                  return CustomListTile(
+                    title: Text(different > 0 ? 'Đã thu' : 'Đã chi'),
+                    trailing: Text(
+                      Helpers.formatCurrency(different),
+                      style: TextStyle(color: different > 0 ? AppColors.income : AppColors.expense),
+                    ),
+                  );
+                },
+                error: (error, stackTrace) => ErrorSectionWidget(error: error),
+                loading: () => LoadingSectionWidget(),
+              );
+            },
+          ),
+        ],
       ),
     );
   }
@@ -392,7 +467,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     );
   }
 
-  Widget transactionTypeSection({required String title, bool isTransferOut = false}) {
+  Widget transactionTypeSection({String? title, bool isTransferOut = false}) {
     final wallet = isTransferOut ? ref.watch(transferOutWalletProvider) : ref.watch(transferInWalletProvider);
     final route = isTransferOut ? AppRoutes.selectTransferOutWallet : AppRoutes.selectTransferInWallet;
 
@@ -400,10 +475,11 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-            child: Text(title, style: TextStyle(color: AppColors.textSecondary)),
-          ),
+          if (title != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+              child: Text(title, style: TextStyle(color: AppColors.textSecondary)),
+            ),
           CustomListTile(
             leading: Image.asset(wallet?.iconPath ?? AppIcons.plusIcon, width: 22),
             title: Text(wallet?.name ?? 'Chọn tài khoản'),
