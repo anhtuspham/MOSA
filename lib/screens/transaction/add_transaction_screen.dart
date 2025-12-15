@@ -1,7 +1,6 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mosa/models/enums.dart';
@@ -21,6 +20,7 @@ import 'package:mosa/widgets/section_container.dart';
 import 'package:mosa/widgets/card_section.dart';
 import 'package:mosa/widgets/amount_text_field.dart';
 import 'package:mosa/widgets/media_action_bar.dart';
+import 'package:mosa/widgets/tab_bar_scaffold.dart';
 import 'package:toastification/toastification.dart';
 
 import '../../utils/app_colors.dart';
@@ -54,22 +54,20 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: 20),
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: AppColors.primaryBackground,
-          leading: Icon(Icons.history),
-          centerTitle: true,
-          title: Container(
-            decoration: BoxDecoration(
-              border: Border.all(width: 2, color: AppColors.lightBorder),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            alignment: Alignment.center,
-            constraints: BoxConstraints(maxWidth: 180),
-            child: transactionTypeDropdown(),
+      child: TabBarScaffold(
+        title: Container(
+          decoration: BoxDecoration(
+            border: Border.all(width: 2, color: AppColors.lightBorder),
+            borderRadius: BorderRadius.circular(8),
           ),
-          actions: [IconButton(onPressed: _saveTransaction, icon: Icon(Icons.check))],
+          alignment: Alignment.center,
+          constraints: BoxConstraints(maxWidth: 180),
+          child: transactionTypeDropdown(),
         ),
+        centerTitle: true,
+        leading: Icon(Icons.history),
+        actions: [IconButton(onPressed: _saveTransaction, icon: Icon(Icons.check))],
+        appBarBackgroundColor: AppColors.primaryBackground,
         body: SectionContainer(
           child: ValueListenableBuilder(
             valueListenable: _selectedType,

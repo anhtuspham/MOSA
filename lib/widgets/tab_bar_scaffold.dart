@@ -42,7 +42,7 @@ class TabBarScaffold extends StatefulWidget {
   /// List of Tab widgets to display in the TabBar
   ///
   /// Example: `[Tab(text: 'Tab 1'), Tab(text: 'Tab 2')]`
-  final List<Widget> tabs;
+  final List<Widget>? tabs;
 
   /// The main content widget, typically a [TabBarView]
   ///
@@ -57,6 +57,8 @@ class TabBarScaffold extends StatefulWidget {
   /// with the controller already injected. This is the recommended approach.
   /// If both [body] and [children] are provided, [children] takes precedence.
   final List<Widget>? children;
+
+  final bool? centerTitle;
 
   /// Configuration object for TabBar styling and behavior
   ///
@@ -94,9 +96,10 @@ class TabBarScaffold extends StatefulWidget {
   const TabBarScaffold({
     super.key,
     required this.title,
-    required this.tabs,
+    this.tabs,
     this.body,
     this.children,
+    this.centerTitle = false,
     this.leading,
     this.actions,
     this.tabBarConfig,
@@ -105,7 +108,7 @@ class TabBarScaffold extends StatefulWidget {
     this.initialIndex = 0,
     this.elevation = true,
     this.appBarHeight,
-    this.floatingActionButton
+    this.floatingActionButton,
   }) : assert(body != null || children != null, 'Either body or children must be provided');
 
   @override
@@ -119,17 +122,19 @@ class _TabBarScaffoldState extends State<TabBarScaffold> with TickerProviderStat
   @override
   void initState() {
     super.initState();
-    _tabBarConfig = widget.tabBarConfig ?? TabBarConfig.defaultConfig();
-    _tabController = TabController(length: widget.tabs.length, initialIndex: widget.initialIndex, vsync: this);
-    _tabController.addListener(_onTabChanged);
+    if (widget.tabs != null && widget.tabs!.isNotEmpty) {
+      _tabBarConfig = widget.tabBarConfig ?? TabBarConfig.defaultConfig();
+      _tabController = TabController(length: widget.tabs!.length, initialIndex: widget.initialIndex, vsync: this);
+      _tabController.addListener(_onTabChanged);
+    }
   }
 
   @override
   void didUpdateWidget(TabBarScaffold oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.tabs.length != oldWidget.tabs.length) {
+    if ((widget.tabs != null && widget.tabs!.isNotEmpty) && widget.tabs!.length != oldWidget.tabs!.length) {
       _tabController.dispose();
-      _tabController = TabController(length: widget.tabs.length, initialIndex: widget.initialIndex, vsync: this);
+      _tabController = TabController(length: widget.tabs!.length, initialIndex: widget.initialIndex, vsync: this);
       _tabController.addListener(_onTabChanged);
     }
   }
@@ -140,8 +145,10 @@ class _TabBarScaffoldState extends State<TabBarScaffold> with TickerProviderStat
 
   @override
   void dispose() {
-    _tabController.removeListener(_onTabChanged);
-    _tabController.dispose();
+    if (widget.tabs != null && widget.tabs!.isNotEmpty) {
+      _tabController.removeListener(_onTabChanged);
+      _tabController.dispose();
+    }
     super.dispose();
   }
 
@@ -156,7 +163,7 @@ class _TabBarScaffoldState extends State<TabBarScaffold> with TickerProviderStat
       unselectedLabelStyle: _tabBarConfig.unselectedLabelStyle,
       labelPadding: _tabBarConfig.labelPadding,
       physics: _tabBarConfig.physics,
-      tabs: widget.tabs,
+      tabs: widget.tabs ?? [],
     );
   }
 
@@ -181,7 +188,11 @@ class _TabBarScaffoldState extends State<TabBarScaffold> with TickerProviderStat
         backgroundColor: widget.appBarBackgroundColor ?? Theme.of(context).colorScheme.inversePrimary,
         elevation: widget.elevation ? null : 0,
         toolbarHeight: widget.appBarHeight,
-        bottom: PreferredSize(preferredSize: Size.fromHeight(kToolbarHeight), child: _buildTabBar()),
+        bottom:
+            (widget.tabs != null && widget.tabs!.isNotEmpty)
+                ? PreferredSize(preferredSize: Size.fromHeight(kToolbarHeight), child: _buildTabBar())
+                : null,
+        centerTitle: widget.centerTitle,
       ),
       body: _buildBody(),
       floatingActionButton: widget.floatingActionButton,

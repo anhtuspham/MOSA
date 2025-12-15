@@ -12,6 +12,7 @@ abstract class AppRoutes {
 
   // ===== BRANCH 2: WALLET / TÀI KHOẢN =====
   static const String wallet = '/wallet';
+  static const String addWallet = '/wallet/add';
 
   // ===== BRANCH 3: HISTORY / LỊCH SỬ =====
   static const String history = '/history';

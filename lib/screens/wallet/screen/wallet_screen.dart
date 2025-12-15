@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:mosa/router/app_routes.dart';
 import 'package:mosa/screens/wallet/widgets/account_tab_screen.dart';
 import 'package:mosa/screens/wallet/widgets/accumulated_tab_screen.dart';
 import 'package:mosa/utils/app_colors.dart';
@@ -18,7 +20,7 @@ class WalletShellScreen extends StatelessWidget {
       tabs: const [Tab(text: 'Tài khoản'), Tab(text: 'Sổ tiết kiệm'), Tab(text: 'Tích lũy')],
       appBarBackgroundColor: AppColors.background,
       floatingActionButton: FloatingActionButton(
-        onPressed: null,
+        onPressed: () => context.push(AppRoutes.addWallet),
         shape: CircleBorder(),
         backgroundColor: AppColors.buttonPrimary,
         foregroundColor: AppColors.textWhite,
