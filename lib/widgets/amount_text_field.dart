@@ -52,7 +52,7 @@ class AmountTextField extends StatelessWidget {
                 color: effectiveAmountColor,
               ),
               keyboardType: TextInputType.number,
-              inputFormatters: [ThousandSeperatorFormatter(seperator: ',')],
+              inputFormatters: [ThousandSeparatorFormatter(separator: ',')],
             ),
           ),
         ),

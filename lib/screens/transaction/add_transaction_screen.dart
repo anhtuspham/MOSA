@@ -302,67 +302,64 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
   Widget adjustTransactionBalanceSection() {
     final effectiveWallet = ref.watch(effectiveWalletProvider);
-    return CardSection(
-      child: Column(
-        children: [
-          effectiveWallet.when(
-            data: (data) {
-              return CustomListTile(
+    return effectiveWallet.when(
+      data: (wallet) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _actualBalanceController.text = Helpers.formatNumber(wallet.balance);
+        });
+
+        return CardSection(
+          child: Column(
+            children: [
+              CustomListTile(
                 title: Text('Số dư trên tài khoản'),
-                trailing: Text(Helpers.formatCurrency(data.balance)),
-              );
-            },
-            error: (error, stackTrace) => ErrorSectionWidget(error: error),
-            loading: () => LoadingSectionWidget(),
-          ),
-          const SizedBox(height: 12),
-          CustomListTile(
-            title: Text('Số dư thực tế'),
-            trailing: SizedBox(
-              width: 200,
-              child: TextField(
-                controller: _actualBalanceController,
-                decoration: InputDecoration(
-                  counterText: '',
-                  border: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.borderLight)),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 4),
-                  hintText: 'Nhập số dư thực tế',
-                  hintStyle: TextStyle(fontSize: 12, color: AppColors.textHint),
-                  suffix: Text(
-                    'đ',
-                    style: TextStyle(color: AppColors.textPrimary, fontSize: 16, fontWeight: FontWeight.w600),
+                trailing: Text(Helpers.formatCurrency(wallet.balance)),
+              ),
+              const SizedBox(height: 12),
+              CustomListTile(
+                title: Text('Số dư thực tế'),
+                trailing: SizedBox(
+                  width: 200,
+                  child: TextField(
+                    controller: _actualBalanceController,
+                    decoration: InputDecoration(
+                      counterText: '',
+                      border: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.borderLight)),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 4),
+                      hintText: 'Nhập số dư thực tế',
+                      hintStyle: TextStyle(fontSize: 12, color: AppColors.textHint),
+                      suffix: Text(
+                        'đ',
+                        style: TextStyle(color: AppColors.textPrimary, fontSize: 16, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    maxLength: 16,
+                    textAlign: TextAlign.right,
+                    keyboardType: TextInputType.numberWithOptions(decimal: true),
+                    inputFormatters: [ThousandSeparatorFormatter(separator: '.')],
                   ),
                 ),
-                maxLength: 16,
-
-                textAlign: TextAlign.right,
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
-                inputFormatters: [ThousandSeperatorFormatter(seperator: '.')],
               ),
-            ),
-          ),
-          ValueListenableBuilder(
-            valueListenable: _actualBalanceController,
-            builder: (context, value, child) {
-              return effectiveWallet.when(
-                data: (data) {
-                  final actualBalance = double.tryParse(_actualBalanceController.text.replaceAll(',', '')) ?? 0;
-                  final different = actualBalance - data.balance;
+              ValueListenableBuilder(
+                valueListenable: _actualBalanceController,
+                builder: (context, value, child) {
+                  final actualBalance = double.tryParse(_actualBalanceController.text.replaceAll('.', '')) ?? 0;
+                  final different = actualBalance - wallet.balance;
                   return CustomListTile(
                     title: Text(different > 0 ? 'Đã thu' : 'Đã chi'),
                     trailing: Text(
                       Helpers.formatCurrency(different),
-                      style: TextStyle(color: different > 0 ? AppColors.income : AppColors.expense),
+                      style: TextStyle(color: different > 0 ? AppColors.income : AppColors.expense, fontSize: 18),
                     ),
                   );
                 },
-                error: (error, stackTrace) => ErrorSectionWidget(error: error),
-                loading: () => LoadingSectionWidget(),
-              );
-            },
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
+      error: (error, stackTrace) => ErrorSectionWidget(error: error),
+      loading: () => LoadingSectionWidget(),
     );
   }
 

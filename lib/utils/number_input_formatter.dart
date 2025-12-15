@@ -1,9 +1,9 @@
 import 'package:flutter/services.dart';
 
-class ThousandSeperatorFormatter extends TextInputFormatter {
-  final String seperator;
+class ThousandSeparatorFormatter extends TextInputFormatter {
+  final String separator;
 
-  ThousandSeperatorFormatter({this.seperator = ','});
+  ThousandSeparatorFormatter({this.separator = ','});
 
   @override
   TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
@@ -11,18 +11,18 @@ class ThousandSeperatorFormatter extends TextInputFormatter {
       return newValue;
     }
 
-    String numbericOnly = newValue.text.replaceAll(seperator, '');
+    String numericOnly = newValue.text.replaceAll(separator, '');
 
-    if (!RegExp(r'^\d+$').hasMatch(numbericOnly)) {
+    if (!RegExp(r'^\d+$').hasMatch(numericOnly)) {
       return oldValue;
     }
 
     String formatted = '';
-    for (int i = 0; i < numbericOnly.length; i++) {
-      if (i > 0 && (numbericOnly.length - i) % 3 == 0) {
-        formatted += seperator;
+    for (int i = 0; i < numericOnly.length; i++) {
+      if (i > 0 && (numericOnly.length - i) % 3 == 0) {
+        formatted += separator;
       }
-      formatted += numbericOnly[i];
+      formatted += numericOnly[i];
     }
 
     return TextEditingValue(text: formatted, selection: TextSelection.collapsed(offset: formatted.length));
