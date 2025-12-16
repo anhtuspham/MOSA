@@ -14,7 +14,7 @@ class WalletShellScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TabBarScaffold(
+    return CommonScaffold(
       title: const Text('Tài khoản', style: TextStyle(fontWeight: FontWeight.w500)),
       actions: const [Icon(Icons.search), SizedBox(width: 10), Icon(Icons.sort_rounded)],
       tabs: const [Tab(text: 'Tài khoản'), Tab(text: 'Sổ tiết kiệm'), Tab(text: 'Tích lũy')],

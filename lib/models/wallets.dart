@@ -5,7 +5,7 @@ class Wallet {
   final String name;
   final String iconPath;
   final double balance;
-  final String type;        // 'cash', 'bank', 'ewallet', 'credit_card'
+  final TypeWallet typeWallet;        // 'cash', 'bank', 'ewallet', 'credit_card'
   final bool isDefault;
   final bool isActive;
   final DateTime createAt;
@@ -18,7 +18,7 @@ class Wallet {
     required this.name,
     this.iconPath = AppIcons.logoCash,
     required this.balance,
-    this.type = 'cash',
+    required this.typeWallet,
     this.isDefault = false,
     this.isActive = true,
     required this.createAt,
@@ -32,7 +32,7 @@ class Wallet {
       name: json['name'] as String,
       iconPath: json['iconPath'] as String? ?? AppIcons.logoCash,
       balance: (json['balance'] as num).toDouble(),
-      type: json['type'] as String? ?? 'cash',
+      typeWallet: json['typeWallet'] as TypeWallet? ?? TypeWallet(),
       isDefault: json['isDefault'] as bool? ?? false,
       isActive: json['isActive'] as bool? ?? true,
       createAt: DateTime.now(),
@@ -48,7 +48,7 @@ class Wallet {
       name: map['name'] as String,
       iconPath: map['iconPath'] as String? ?? AppIcons.logoCash,
       balance: (map['balance'] as num).toDouble(),
-      type: map['type'] as String? ?? 'cash',
+      typeWallet: map['typeWallet'] as TypeWallet? ?? TypeWallet(),
       isDefault: (map['isDefault'] as int?) == 1,
       isActive: (map['isActive'] as int?) == 1,
       createAt: DateTime.parse(map['createAt'] as String),
@@ -66,7 +66,7 @@ class Wallet {
       'name': name,
       'iconPath': iconPath,
       'balance': balance,
-      'type': type,
+      'typeWallet': typeWallet,
       'isDefault': isDefault ? 1 : 0,
       'isActive': isActive ? 1 : 0,
       'createAt': createAt.toIso8601String(),
@@ -81,7 +81,7 @@ class Wallet {
     String? name,
     String? iconPath,
     double? balance,
-    String? type,
+    TypeWallet? typeWallet,
     bool? isDefault,
     bool? isActive,
     DateTime? createAt,
@@ -94,7 +94,7 @@ class Wallet {
       name: name ?? this.name,
       iconPath: iconPath ?? this.iconPath,
       balance: balance ?? this.balance,
-      type: type ?? this.type,
+      typeWallet: typeWallet ?? this.typeWallet,
       isDefault: isDefault ?? this.isDefault,
       isActive: isActive ?? this.isActive,
       createAt: createAt ?? this.createAt,
@@ -104,8 +104,56 @@ class Wallet {
     );
   }
 
-  @override
-  String toString() {
-    return 'Wallet(id: $id, name: $name, balance: $balance, type: $type, isDefault: $isDefault, isActive: $isActive)';
+  // @override
+  // String toString() {
+  //   return 'Wallet(id: $id, name: $name, balance: $balance, type: $typeWallet, isDefault: $isDefault, isActive: $isActive)';
+  // }
+}
+
+class TypeWallet{
+  final int? id;
+  final String? name;
+  final String? iconPath;
+
+  TypeWallet({
+    this.id,
+    this.name,
+    this.iconPath,
+  });
+
+  factory TypeWallet.fromJson(Map<String, dynamic> json) {
+    return TypeWallet(
+      id: json['id'] as int,
+      name: json['name'] as String,
+      iconPath: json['iconPath'] as String? ?? AppIcons.logoCash,
+    );
+  }
+
+  factory TypeWallet.fromMap(Map<String, dynamic> map) {
+    return TypeWallet(
+      id: map['id'] as int?,
+      name: map['name'] as String,
+      iconPath: map['iconPath'] as String? ?? AppIcons.logoCash,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'iconPath': iconPath
+    };
+  }
+
+  TypeWallet copyWith({
+    int? id,
+    String? name,
+    String? iconPath
+  }) {
+    return TypeWallet(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      iconPath: iconPath ?? this.iconPath,
+    );
   }
 }

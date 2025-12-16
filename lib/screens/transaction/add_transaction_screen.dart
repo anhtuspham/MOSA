@@ -14,6 +14,7 @@ import 'package:mosa/utils/constants.dart';
 import 'package:mosa/utils/date_time_extension.dart';
 import 'package:mosa/widgets/custom_list_tile.dart';
 import 'package:mosa/widgets/date_time_picker_dialog.dart';
+import 'package:mosa/widgets/date_time_selector_section.dart';
 import 'package:mosa/widgets/error_widget.dart';
 import 'package:mosa/widgets/loading_widget.dart';
 import 'package:mosa/widgets/section_container.dart';
@@ -27,6 +28,7 @@ import '../../utils/app_colors.dart';
 import '../../utils/helpers.dart';
 import '../../utils/number_input_formatter.dart';
 import '../../utils/utils.dart';
+import '../../widgets/note_selector_section.dart';
 
 class AddTransactionScreen extends ConsumerStatefulWidget {
   const AddTransactionScreen({super.key});
@@ -54,12 +56,9 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: 20),
-      child: TabBarScaffold(
+      child: CommonScaffold(
         title: Container(
-          decoration: BoxDecoration(
-            border: Border.all(width: 2, color: AppColors.lightBorder),
-            borderRadius: BorderRadius.circular(8),
-          ),
+          decoration: BoxDecoration(border: Border.all(width: 2, color: AppColors.lightBorder), borderRadius: BorderRadius.circular(8)),
           alignment: Alignment.center,
           constraints: BoxConstraints(maxWidth: 180),
           child: transactionTypeDropdown(),
@@ -198,8 +197,15 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                     transactionTypeSection(title: 'Từ tài khoản', isTransferOut: true),
                     transactionTypeSection(title: 'Đến tài khoản', isTransferOut: false),
                     const SizedBox(height: 12),
-                    dateTimeSelectorSection(),
-                    noteSelectorSection(),
+                    DateTimeSelectorSection(
+                      selectedDateTime: _selectedDateTime,
+                      onDateTimeChanged: (newDateTime) {
+                        setState(() {
+                          _selectedDateTime = newDateTime;
+                        });
+                      },
+                    ),
+                    TextSelectorSection(controller: _noteController, leading: Icon(Icons.notes_sharp), hintText: 'Diễn giải'),
                   ],
                 ),
               ),
@@ -219,8 +225,15 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                     const SizedBox(height: 12),
                     adjustTransactionBalanceSection(),
                     const SizedBox(height: 12),
-                    dateTimeSelectorSection(),
-                    noteSelectorSection(),
+                    DateTimeSelectorSection(
+                      selectedDateTime: _selectedDateTime,
+                      onDateTimeChanged: (newDateTime) {
+                        setState(() {
+                          _selectedDateTime = newDateTime;
+                        });
+                      },
+                    ),
+                    TextSelectorSection(controller: _noteController, leading: Icon(Icons.notes_sharp), hintText: 'Diễn giải'),
                   ],
                 ),
               ),
@@ -289,10 +302,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       child: Column(
         children: [
           Text('Số tiền'),
-          AmountTextField(
-            controller: _amountController,
-            amountColor: getTransactionTypeColor(type: _selectedType.value),
-          ),
+          AmountTextField(controller: _amountController, amountColor: getTransactionTypeColor(type: _selectedType.value)),
         ],
       ),
     );
@@ -309,10 +319,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         return CardSection(
           child: Column(
             children: [
-              CustomListTile(
-                title: Text('Số dư trên tài khoản'),
-                trailing: Text(Helpers.formatCurrency(wallet.balance)),
-              ),
+              CustomListTile(title: Text('Số dư trên tài khoản'), trailing: Text(Helpers.formatCurrency(wallet.balance))),
               const SizedBox(height: 12),
               CustomListTile(
                 title: Text('Số dư thực tế'),
@@ -326,10 +333,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                       contentPadding: const EdgeInsets.symmetric(vertical: 4),
                       hintText: 'Nhập số dư thực tế',
                       hintStyle: TextStyle(fontSize: 12, color: AppColors.textHint),
-                      suffix: Text(
-                        'đ',
-                        style: TextStyle(color: AppColors.textPrimary, fontSize: 16, fontWeight: FontWeight.w600),
-                      ),
+                      suffix: Text('đ', style: TextStyle(color: AppColors.textPrimary, fontSize: 16, fontWeight: FontWeight.w600)),
                     ),
                     maxLength: 16,
                     textAlign: TextAlign.right,
@@ -399,47 +403,21 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     );
   }
 
-  Widget dateTimeSelectorSection() {
-    return CustomListTile(
-      leading: Icon(Icons.calendar_month_outlined),
-      title: Text('${_selectedDateTime.weekdayLabel} - ${_selectedDateTime.ddMMyyy}'),
-      trailing: Text(_selectedDateTime.hhMM),
-      enable: true,
-      onTap: () async {
-        final selected = await showDateTimePicker(context: context) ?? DateTime.now();
-        setState(() {
-          _selectedDateTime = selected;
-        });
-      },
-    );
-  }
-
-  Widget noteSelectorSection() {
-    return CustomListTile(
-      leading: Icon(Icons.notes_sharp),
-      title: TextField(
-        controller: _noteController,
-        decoration: InputDecoration(
-          hintText: 'Diễn giải',
-          hintStyle: TextStyle(fontSize: 14, color: AppColors.textHint),
-          contentPadding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-          border: OutlineInputBorder(borderSide: BorderSide.none),
-        ),
-        style: TextStyle(fontSize: 14),
-        maxLines: 1,
-      ),
-      onTap: null,
-    );
-  }
-
   Widget walletAndDetailSection() {
     return CardSection(
       child: Column(
         children: [
           walletSelectorSection(),
           const SizedBox(height: 8),
-          dateTimeSelectorSection(),
-          noteSelectorSection(),
+          DateTimeSelectorSection(
+            selectedDateTime: _selectedDateTime,
+            onDateTimeChanged: (newDateTime) {
+              setState(() {
+                _selectedDateTime = newDateTime;
+              });
+            },
+          ),
+          TextSelectorSection(controller: _noteController, leading: Icon(Icons.notes_sharp), hintText: 'Diễn giải'),
         ],
       ),
     );

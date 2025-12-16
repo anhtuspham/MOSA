@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "name": "Tiền mặt",
+    "iconPath": "assets/icons/money.png"
+  },
+  {
+    "id": 2,
+    "name": "Tài khoản ngân hàng",
+    "iconPath": "assets/icons/bank.png"
+  },
+  {
+    "id": 3,
+    "name": "Ví điện tử",
+    "iconPath": "assets/icons/ewallet.png"
+  },
+  {
+    "id": 4,
+    "name": "Thẻ tín dụng",
+    "iconPath": "assets/icons/credit_card.png"
+  }
+]

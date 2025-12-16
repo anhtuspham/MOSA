@@ -33,7 +33,7 @@ class _CategoryScreenState extends ConsumerState<CategoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return TabBarScaffold(
+    return CommonScaffold(
       title: const Text('Chọn hạng mục'),
       leading: IconButton(
         onPressed: () {

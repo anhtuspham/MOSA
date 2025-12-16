@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:mosa/models/wallets.dart';
 import 'package:mosa/providers/transaction_provider.dart';
 import 'package:mosa/services/database_service.dart';
+import 'package:mosa/services/type_wallet_service.dart';
 import 'package:mosa/utils/app_icons.dart';
 
 class WalletsNotifier extends AsyncNotifier<List<Wallet>> {
@@ -105,4 +106,13 @@ final totalBalanceWalletProvider = FutureProvider<double>((ref) async {
     }
   });
   return total;
+});
+
+final typeWalletProvider = FutureProvider<List<TypeWallet>>((ref) {
+  return TypeWalletService.loadTypeWallets();
+});
+
+final selectedTypeWalletProvider = StateProvider<TypeWallet?>((ref) {
+  final typeWallets = ref.watch(typeWalletProvider);
+  return typeWallets.whenData((wallet) => wallet.isNotEmpty ? wallet.first : null).value;
 });

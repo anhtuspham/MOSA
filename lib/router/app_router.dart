@@ -8,9 +8,11 @@ import 'package:mosa/screens/shell_scaffold/shell_scaffold_screen.dart';
 import 'package:mosa/screens/stats/screen/stats_screen.dart';
 import 'package:mosa/screens/transaction/add_transaction_screen.dart';
 import 'package:mosa/screens/wallet/screen/add_wallet_screen.dart';
+import 'package:mosa/screens/wallet/screen/select_bank_screen.dart';
 import 'package:mosa/screens/wallet/screen/select_transfer_from_wallet_screen.dart';
 import 'package:mosa/screens/wallet/screen/select_transfer_to_wallet_screen.dart';
 import 'package:mosa/screens/wallet/screen/select_wallet_screen.dart';
+import 'package:mosa/screens/wallet/screen/select_type_wallet_screen.dart';
 import 'package:mosa/screens/wallet/screen/wallet_screen.dart';
 
 import '../screens/home/home_screen.dart';
@@ -49,25 +51,6 @@ final goRouter = GoRouter(
               path: AppRoutes.wallet,
               name: 'wallet',
               builder: (context, state) => WalletShellScreen(),
-              routes: [
-                GoRoute(
-                  path: '/add',
-                  name: 'add-wallet',
-                  pageBuilder:
-                      (context, state) => CustomTransitionPage(
-                        child: AddWalletScreen(),
-                        transitionDuration: const Duration(milliseconds: 900),
-                        reverseTransitionDuration: const Duration(milliseconds: 700),
-                        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                          final curveAnimation = CurvedAnimation(parent: animation, curve: Curves.easeInOut);
-                          return SlideTransition(
-                            position: Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero).animate(curveAnimation),
-                            child: child,
-                          );
-                        },
-                      ),
-                ),
-              ],
             ),
           ],
         ),
@@ -103,6 +86,33 @@ final goRouter = GoRouter(
       path: AppRoutes.selectTransferInWallet,
       name: 'selectTransferInWallet',
       builder: (context, state) => SelectTransferInWalletScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.addWallet,
+      name: 'add-wallet',
+      pageBuilder:
+          (context, state) => CustomTransitionPage(
+        child: AddWalletScreen(),
+        transitionDuration: const Duration(milliseconds: 450),
+        reverseTransitionDuration: const Duration(milliseconds: 300),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          final curveAnimation = CurvedAnimation(parent: animation, curve: Curves.easeOut);
+          return SlideTransition(
+            position: Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero).animate(curveAnimation),
+            child: child,
+          );
+        },
+      ),
+    ),
+    GoRoute(
+      path: AppRoutes.typeWalletList,
+      name: 'typeWalletList',
+      builder: (context, state) => SelectTypeWalletScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.bankList,
+      name: 'bankList',
+      builder: (context, state) => SelectBankScreen(),
     ),
   ],
   errorBuilder: (context, state) {

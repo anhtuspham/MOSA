@@ -2,7 +2,7 @@
   {
     "id": 1,
     "name": "Mb bank",
-    "iconPath": "assets/icons/logo_mb_bank.png",
+    "iconPath": "assets/icons/mb_bank.png",
     "balance": 50000000,
     "type": "bank",
     "isDefault": false,

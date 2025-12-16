@@ -2,98 +2,123 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mosa/config/tab_bar_config.dart';
 
-/// A reusable scaffold widget that combines AppBar with TabBar functionality.
+/// A scaffold widget that provides a consistent structure for screens with optional tab navigation.
 ///
-/// [TabBarScaffold] provides a convenient way to create a screen with:
-/// - A customizable AppBar (title, leading widget, actions)
-/// - A TabBar with multiple tabs
-/// - A body that syncs with the selected tab
+/// [CommonScaffold] can be used in two modes:
+/// 1. **With tabs**: Combines AppBar and TabBar for multi-view navigation
+/// 2. **Without tabs**: Provides a standard scaffold with just AppBar and body
 ///
-/// The widget uses [DefaultTabController] internally to manage tab state,
-/// and supports flexible customization through [TabBarConfig].
+/// Features:
+/// - Customizable AppBar with title, leading widget, and action buttons
+/// - Optional TabBar with configurable styling through [TabBarConfig]
+/// - Automatic TabController management when tabs are present
+/// - Support for both manual body control and automatic TabBarView creation
+/// - Tab change callbacks for analytics or data loading
+/// - Flexible enough to work as a regular scaffold when tabs aren't needed
 ///
-/// **Example Usage:**
+/// Example without tabs (regular scaffold):
 /// ```dart
 /// TabBarScaffold(
-///   title: Text('My Tabs'),
+///   title: Text('Profile'),
+///   body: ProfileScreen(),
+/// )
+/// ```
+///
+/// Example with automatic TabBarView:
+/// ```dart
+/// TabBarScaffold(
+///   title: Text('Dashboard'),
 ///   tabs: [
-///     Tab(text: 'Tab 1'),
-///     Tab(text: 'Tab 2'),
+///     Tab(text: 'Overview'),
+///     Tab(text: 'Analytics'),
 ///   ],
-///   tabBarConfig: TabBarConfig.defaultConfig(),
+///   children: [
+///     OverviewScreen(),
+///     AnalyticsScreen(),
+///   ],
+/// )
+/// ```
+///
+/// Example with manual TabBarView:
+/// ```dart
+/// TabBarScaffold(
+///   title: Text('Reports'),
+///   tabs: [
+///     Tab(text: 'Daily'),
+///     Tab(text: 'Monthly'),
+///   ],
 ///   body: TabBarView(
 ///     children: [
-///       FirstTabContent(),
-///       SecondTabContent(),
+///       DailyReport(),
+///       MonthlyReport(),
 ///     ],
 ///   ),
 /// )
 /// ```
-class TabBarScaffold extends StatefulWidget {
-  /// The title widget displayed in the AppBar
+class CommonScaffold extends StatefulWidget {
+  /// The primary title widget displayed in the center or start of the AppBar.
+  /// Typically a [Text] widget with the screen name.
   final Widget title;
 
-  /// Optional leading widget for the AppBar (usually a back button)
+  /// Widget displayed at the start of the AppBar before the title.
+  /// Commonly used for back buttons, drawer menu icons, or custom navigation.
   final Widget? leading;
 
-  /// Optional action buttons displayed in the AppBar trailing position
+  /// Action widgets displayed at the end of the AppBar.
+  /// Commonly used for search, settings, or overflow menu buttons.
   final List<Widget>? actions;
 
-  /// List of Tab widgets to display in the TabBar
-  ///
-  /// Example: `[Tab(text: 'Tab 1'), Tab(text: 'Tab 2')]`
+  /// Tab widgets that define the navigation options.
+  /// Each tab typically contains text, an icon, or both.
+  /// When null or empty, the scaffold displays without a TabBar.
+  /// The number of tabs must match the number of children in the body when using tabs.
   final List<Widget>? tabs;
 
-  /// The main content widget, typically a [TabBarView]
-  ///
-  /// This widget should contain children that match the number of tabs.
-  /// **Important:** If using [TabBarView], pass `controller: _tabController` to it.
-  /// Alternatively, use the [children] parameter for automatic TabBarView building.
+  /// Custom body widget for advanced use cases.
+  /// When provided, you're responsible for managing the TabBarView and controller.
+  /// For simpler usage, prefer the [children] parameter instead.
   final Widget? body;
 
-  /// List of widgets to display in the tabs (auto-builds TabBarView)
-  ///
-  /// If provided, [TabBarScaffold] will automatically create a [TabBarView]
-  /// with the controller already injected. This is the recommended approach.
-  /// If both [body] and [children] are provided, [children] takes precedence.
+  /// Content widgets for each tab.
+  /// When provided with tabs, automatically creates a managed TabBarView.
+  /// This is the recommended approach for most tab-based use cases.
+  /// The number of children must match the number of tabs.
+  /// Ignored when tabs are not provided.
   final List<Widget>? children;
 
   final bool? centerTitle;
 
-  /// Configuration object for TabBar styling and behavior
-  ///
-  /// Use [TabBarConfig] to customize indicator color, text styles, etc.
-  /// Defaults to [TabBarConfig.defaultConfig()] if not provided.
+  /// Styling configuration for the TabBar.
+  /// Controls indicator appearance, text styles, padding, and physics.
+  /// If not provided, uses default theme-based configuration.
   final TabBarConfig? tabBarConfig;
 
-  /// Optional background color for the AppBar
-  ///
-  /// If not specified, uses the theme's [inversePrimary] color.
+  /// Background color of the AppBar.
+  /// Defaults to theme's inversePrimary color if not specified.
   final Color? appBarBackgroundColor;
 
-  /// Callback triggered when the active tab changes
-  ///
-  /// Useful for tracking tab switches or triggering data loading.
-  /// The callback receives the index of the newly selected tab.
+  /// Called when the user selects a different tab.
+  /// Receives the index of the newly selected tab.
+  /// Useful for analytics tracking or lazy data loading.
   final ValueChanged<int>? onTabChanged;
 
-  /// The initial tab index to display
-  ///
-  /// Defaults to 0 (first tab).
+  /// Index of the tab to display initially.
+  /// Must be valid within the range of available tabs.
   final int initialIndex;
 
-  /// Whether the AppBar should be elevated (shadow effect)
+  /// Controls the shadow elevation of the AppBar.
+  /// Set to false for a flat appearance.
   final bool elevation;
 
-  /// Custom height for the AppBar
-  ///
-  /// If null, uses the standard AppBar height.
+  /// Override the default AppBar height.
+  /// Useful for creating more compact or spacious headers.
   final double? appBarHeight;
 
-  // Custom floatAtion button in bottom bar
+  /// Floating action button displayed over the content.
+  /// Typically used for primary actions like 'Add' or 'Create'.
   final FloatingActionButton? floatingActionButton;
 
-  const TabBarScaffold({
+  CommonScaffold({
     super.key,
     required this.title,
     this.tabs,
@@ -109,33 +134,62 @@ class TabBarScaffold extends StatefulWidget {
     this.elevation = true,
     this.appBarHeight,
     this.floatingActionButton,
-  }) : assert(body != null || children != null, 'Either body or children must be provided');
+  }) : assert(
+          body != null || children != null,
+          'Either body or children must be provided',
+        ),
+        assert(
+          tabs == null || tabs.isEmpty || (children != null && children.length == tabs.length) || body != null,
+          'When using tabs, either provide children with matching length or a custom body',
+        );
 
   @override
-  State<TabBarScaffold> createState() => _TabBarScaffoldState();
+  State<CommonScaffold> createState() => _CommonScaffoldState();
 }
 
-class _TabBarScaffoldState extends State<TabBarScaffold> with TickerProviderStateMixin {
+class _CommonScaffoldState extends State<CommonScaffold> with TickerProviderStateMixin {
   late TabController _tabController;
   late TabBarConfig _tabBarConfig;
 
   @override
   void initState() {
     super.initState();
-    if (widget.tabs != null && widget.tabs!.isNotEmpty) {
+    _initializeTabController();
+  }
+
+  void _initializeTabController() {
+    if (_hasTabs) {
       _tabBarConfig = widget.tabBarConfig ?? TabBarConfig.defaultConfig();
-      _tabController = TabController(length: widget.tabs!.length, initialIndex: widget.initialIndex, vsync: this);
+      _tabController = TabController(
+        length: widget.tabs!.length,
+        initialIndex: widget.initialIndex,
+        vsync: this,
+      );
       _tabController.addListener(_onTabChanged);
     }
   }
 
+  bool get _hasTabs => widget.tabs != null && widget.tabs!.isNotEmpty;
+
   @override
-  void didUpdateWidget(TabBarScaffold oldWidget) {
+  void didUpdateWidget(CommonScaffold oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if ((widget.tabs != null && widget.tabs!.isNotEmpty) && widget.tabs!.length != oldWidget.tabs!.length) {
+    
+    // Handle transition between tabs and no-tabs states
+    final hadTabs = oldWidget.tabs != null && oldWidget.tabs!.isNotEmpty;
+    
+    if (_hasTabs && hadTabs && widget.tabs!.length != oldWidget.tabs!.length) {
+      // Tab count changed - recreate controller
+      _tabController.removeListener(_onTabChanged);
       _tabController.dispose();
-      _tabController = TabController(length: widget.tabs!.length, initialIndex: widget.initialIndex, vsync: this);
-      _tabController.addListener(_onTabChanged);
+      _initializeTabController();
+    } else if (_hasTabs && !hadTabs) {
+      // Switched from no tabs to having tabs
+      _initializeTabController();
+    } else if (!_hasTabs && hadTabs) {
+      // Switched from having tabs to no tabs
+      _tabController.removeListener(_onTabChanged);
+      _tabController.dispose();
     }
   }
 
@@ -145,15 +199,15 @@ class _TabBarScaffoldState extends State<TabBarScaffold> with TickerProviderStat
 
   @override
   void dispose() {
-    if (widget.tabs != null && widget.tabs!.isNotEmpty) {
+    if (_hasTabs) {
       _tabController.removeListener(_onTabChanged);
       _tabController.dispose();
     }
     super.dispose();
   }
 
-  /// Builds the TabBar widget with configuration
-  Widget _buildTabBar() {
+  /// Creates a styled TabBar using the provided configuration.
+  Widget _buildStyledTabBar() {
     return TabBar(
       controller: _tabController,
       indicatorColor: _tabBarConfig.indicatorColor,
@@ -163,13 +217,18 @@ class _TabBarScaffoldState extends State<TabBarScaffold> with TickerProviderStat
       unselectedLabelStyle: _tabBarConfig.unselectedLabelStyle,
       labelPadding: _tabBarConfig.labelPadding,
       physics: _tabBarConfig.physics,
-      tabs: widget.tabs ?? [],
+      tabs: widget.tabs!,
     );
   }
 
-  /// Build the body content - auto-build TabBarView if children provided
-  Widget _buildBody() {
-    // If children provided, auto-build TabBarView with controller
+  /// Constructs the main content area, either from children or custom body.
+  Widget _buildTabContent() {
+    // If no tabs, just return the body directly
+    if (!_hasTabs) {
+      return widget.body ?? (widget.children?.first ?? const SizedBox.shrink());
+    }
+    
+    // If children provided with tabs, auto-build TabBarView with controller
     if (widget.children != null) {
       return TabBarView(controller: _tabController, children: widget.children!);
     }
@@ -188,18 +247,20 @@ class _TabBarScaffoldState extends State<TabBarScaffold> with TickerProviderStat
         backgroundColor: widget.appBarBackgroundColor ?? Theme.of(context).colorScheme.inversePrimary,
         elevation: widget.elevation ? null : 0,
         toolbarHeight: widget.appBarHeight,
-        bottom:
-            (widget.tabs != null && widget.tabs!.isNotEmpty)
-                ? PreferredSize(preferredSize: Size.fromHeight(kToolbarHeight), child: _buildTabBar())
-                : null,
+        bottom: _hasTabs
+            ? PreferredSize(
+                preferredSize: Size.fromHeight(kToolbarHeight),
+                child: _buildStyledTabBar(),
+              )
+            : null,
         centerTitle: widget.centerTitle,
       ),
-      body: _buildBody(),
+      body: _buildTabContent(),
       floatingActionButton: widget.floatingActionButton,
     );
   }
 }
 
-/// Backward compatibility alias for migration
-/// @deprecated Use [TabBarScaffold] instead
-typedef CustomTabAppBar = TabBarScaffold;
+/// Legacy alias maintained for backward compatibility.
+/// @deprecated Since v2.0 - Use [CommonScaffold] directly.
+typedef CustomTabAppBar = CommonScaffold;
