@@ -10,13 +10,13 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Clear database to start fresh - this now deletes the entire database file
-  await DatabaseService().clearDatabase();
+  // await DatabaseService().clearDatabase();
 
   // The database will be created automatically on first access
   // with tables and seeded wallets from onCreate callback
   
   // Optionally import transactions if needed:
-  await DatabaseService().importTransactionsFromAssets('assets/data/transactions.json');
+  // await DatabaseService().importTransactionsFromAssets('assets/data/transactions.json');
 
   runApp(ProviderScope(child: const MyApp()));
 }

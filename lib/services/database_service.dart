@@ -42,254 +42,86 @@ class DatabaseService {
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     log('📦 Database upgraded from version $oldVersion to $newVersion');
-
-    if (oldVersion < 2) {
-      await _migrateToVersion2(db);
-    }
-    if (oldVersion < 3) {
-      await _migrateToVersion3(db);
-    }
-    if (oldVersion < 4) {
-      await _migrateToVersion4(db);
-    }
+    // For clean upgrade, drop all tables and recreate
+    await _recreateDatabase(db);
   }
 
-  Future<void> _migrateToVersion2(Database db) async {
-    log('Migrating to version 2: category name → categoryId');
-
+  Future<void> _recreateDatabase(Database db) async {
+    log('🔄 Recreating database with latest schema');
+    
     try {
-      // 1. Add categoryId column
-      await db.execute('ALTER TABLE ${AppConstants.tableTransactions} ADD COLUMN categoryId TEXT');
-
-      // 2. Load categories to create name → id mapping
-      final categories = await CategoryService.loadCategories();
-      final categoryMap = <String, String>{};
-
-      for (final category in categories) {
-        categoryMap[category.name] = category.id;
-      }
-
-      // 3. Get all transactions
-      final transactions = await db.query(AppConstants.tableTransactions);
-
-      // 4. Update each transaction with categoryId
-      for (final transaction in transactions) {
-        final categoryName = transaction['category'] as String?;
-        final categoryId = categoryName != null ? categoryMap[categoryName] : null;
-
-        if (categoryId != null) {
-          await db.update(
-            AppConstants.tableTransactions,
-            {'categoryId': categoryId},
-            where: 'id = ?',
-            whereArgs: [transaction['id']],
-          );
-        } else {
-          // If no matching category found, use a default or create one
-          log('No category found for: $categoryName');
-          await db.update(
-            AppConstants.tableTransactions,
-            {'categoryId': 'default-category'},
-            where: 'id = ?',
-            whereArgs: [transaction['id']],
-          );
-        }
-      }
-
-      // 5. Make category column nullable (so we can use categoryId only)
-      log('📝 Making category column nullable...');
-      // SQLite doesn't support ALTER COLUMN directly, so we need to recreate the table
-      // But for simplicity, we just set all category to NULL for now
-      await db.execute('UPDATE ${AppConstants.tableTransactions} SET category = NULL');
-
-      log('Migration to version 2 completed');
+      // Drop all existing tables
+      await db.execute('DROP TABLE IF EXISTS ${AppConstants.tableTransactions}');
+      await db.execute('DROP TABLE IF EXISTS ${AppConstants.tableWallets}');
+      await db.execute('DROP TABLE IF EXISTS ${AppConstants.tableTypeWallets}');
+      
+      // Recreate with latest schema
+      await _createLatestSchema(db);
+      
+      log('Database recreated successfully');
     } catch (e) {
-      log('Migration failed: $e');
+      log('Database recreation failed: $e');
       rethrow;
     }
   }
 
-  Future<void> _migrateToVersion3(Database db) async {
-    log('🔄 Migrating to version 3: Recreate transactions table with nullable category');
+  Future<void> _seedTypeWallets(Database db) async {
+    final count = Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM ${AppConstants.tableTypeWallets}'));
 
-    try {
-      // 1. Create a new table with nullable category column
-      await db.execute('''
-        CREATE TABLE ${AppConstants.tableTransactions}_new (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          title TEXT NOT NULL,
-          amount REAL NOT NULL,
-          categoryId TEXT,
-          wallet TEXT NOT NULL,
-          date TEXT NOT NULL,
-          type TEXT NOT NULL,
-          note TEXT,
-          createAt TEXT NOT NULL,
-          updateAt TEXT,
-          isSynced BOOLEAN NOT NULL DEFAULT FALSE,
-          syncId TEXT NOT NULL
-        )
-      ''');
-
-      // 2. Copy data from old table to new table
-      await db.execute('''
-        INSERT INTO ${AppConstants.tableTransactions}_new
-        SELECT * FROM ${AppConstants.tableTransactions}
-      ''');
-
-      // 3. Drop old table
-      await db.execute('DROP TABLE ${AppConstants.tableTransactions}');
-
-      // 4. Rename new table to original name
-      await db.execute('''
-        ALTER TABLE ${AppConstants.tableTransactions}_new
-        RENAME TO ${AppConstants.tableTransactions}
-      ''');
-
-      log('Migration to version 3 completed');
-    } catch (e) {
-      log('Migration failed: $e');
-      rethrow;
+    if (count! > 0) {
+      log('Type wallets existed, skip');
+      return;
     }
-  }
 
-  Future<void> _migrateToVersion4(Database db) async {
-    log('🔄 Migrating to version 4: Add wallets table and update transactions');
+    // Seed default type wallets
+    final typeWallets = [
+      {'id': 1, 'name': 'Tiền mặt', 'iconPath': 'assets/icons/cash.png'},
+      {'id': 2, 'name': 'Ngân hàng', 'iconPath': 'assets/icons/bank.png'},
+      {'id': 3, 'name': 'Ví điện tử', 'iconPath': 'assets/icons/ewallet.png'},
+      {'id': 4, 'name': 'Thẻ tín dụng', 'iconPath': 'assets/icons/credit_card.png'},
+    ];
 
-    try {
-      // 1. Enable foreign keys
-      await db.execute('PRAGMA foreign_keys = ON');
-
-      // 2. Create wallets table
-      await db.execute('''
-      CREATE TABLE wallets (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL UNIQUE,
-        iconPath TEXT NOT NULL,
-        balance REAL NOT NULL DEFAULT 0,
-        type TEXT NOT NULL,
-        isDefault INTEGER NOT NULL DEFAULT 0,
-        isActive INTEGER NOT NULL DEFAULT 1,
-        createAt TEXT NOT NULL,
-        updateAt TEXT,
-        isSynced INTEGER NOT NULL DEFAULT 0,
-        syncId TEXT NOT NULL,
-        CHECK (type IN ('cash', 'bank', 'ewallet', 'credit_card'))
-      )
-    ''');
-
-      // 3. Create indexes
-      await db.execute('CREATE INDEX idx_wallet_name ON wallets(name)');
-      await db.execute('CREATE INDEX idx_wallet_type ON wallets(type)');
-      await db.execute('CREATE INDEX idx_wallet_default ON wallets(isDefault)');
-      await db.execute('CREATE INDEX idx_wallet_active ON wallets(isActive)');
-
-      // 4. Seed wallets from JSON
-      await _seedWallets(db);
-
-      // 5. Build wallet name → id mapping
-      final walletMaps = await db.query('wallets');
-      final walletNameToId = <String, int>{};
-      int? defaultWalletId;
-
-      for (final map in walletMaps) {
-        final name = (map['name'] as String).toLowerCase().trim();
-        final id = map['id'] as int;
-        walletNameToId[name] = id;
-        if ((map['isDefault'] as int) == 1) {
-          defaultWalletId = id;
-        }
-      }
-
-      // 6. Ensure default wallet exists
-      if (defaultWalletId == null) {
-        log('No default wallet found, creating one');
-        defaultWalletId = await db.insert('wallets', {
-          'name': 'Ví mặc định',
-          'iconPath': 'assets/icons/cash.png',
-          'balance': 0,
-          'type': 'cash',
-          'isDefault': 1,
-          'isActive': 1,
-          'createAt': DateTime.now().toIso8601String(),
-          'isSynced': 0,
-          'syncId': DateTime.now().millisecondsSinceEpoch.toString(),
-        });
-        walletNameToId['ví mặc định'] = defaultWalletId;
-      }
-
-      // 7. Create new transactions table with walletId
-      await db.execute('''
-      CREATE TABLE transactions_new (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT NOT NULL,
-        amount REAL NOT NULL,
-        categoryId TEXT,
-        walletId INTEGER NOT NULL,
-        date TEXT NOT NULL,
-        type TEXT NOT NULL,
-        note TEXT,
-        createAt TEXT NOT NULL,
-        updateAt TEXT,
-        isSynced INTEGER NOT NULL DEFAULT 0,
-        syncId TEXT NOT NULL,
-        FOREIGN KEY (walletId) REFERENCES wallets(id) ON DELETE RESTRICT
-      )
-    ''');
-
-      // 8. Copy transactions with wallet name → walletId mapping
-      final oldTransactions = await db.query('transactions');
-      int unmappedCount = 0;
-
-      for (final transaction in oldTransactions) {
-        final walletName = (transaction['wallet'] as String).toLowerCase().trim();
-        final walletId = walletNameToId[walletName] ?? defaultWalletId;
-
-        if (walletNameToId[walletName] == null) {
-          log('Unmapped wallet: "${transaction['wallet']}" → default wallet');
-          unmappedCount++;
-        }
-
-        final newTransaction = Map<String, dynamic>.from(transaction);
-        newTransaction.remove('wallet');
-        newTransaction['walletId'] = walletId;
-
-        await db.insert('transactions_new', newTransaction);
-      }
-
-      log('📊 Migration stats: ${oldTransactions.length} transactions, $unmappedCount unmapped');
-
-      // 9. Drop old table and rename
-      await db.execute('DROP TABLE transactions');
-      await db.execute('ALTER TABLE transactions_new RENAME TO transactions');
-
-      // 10. Create transaction indexes
-      await db.execute('CREATE INDEX idx_transaction_walletId ON transactions(walletId)');
-      await db.execute('CREATE INDEX idx_transaction_date ON transactions(date)');
-
-      log('Migration to version 4 completed');
-    } catch (e) {
-      log('Migration to version 4 failed: $e');
-      rethrow;
+    for (var data in typeWallets) {
+      await db.insert(AppConstants.tableTypeWallets, data);
     }
+    log('Type wallets seeded');
   }
 
   Future<void> _seedWallets(Database db) async {
-    final count = Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM wallets'));
+    final count = Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM ${AppConstants.tableWallets}'));
 
     if (count! > 0) {
       log('Wallets existed, skip');
       return;
     }
 
-    final jsonString = await rootBundle.loadString('assets/data/wallets.json');
-    final List<dynamic> jsonData = jsonDecode(jsonString);
+    // Check if wallets.json exists, if not create default wallet
+    try {
+      final jsonString = await rootBundle.loadString('assets/data/wallets.json');
+      final List<dynamic> jsonData = jsonDecode(jsonString);
 
-    for (var data in jsonData) {
-      final wallet = Wallet.fromJson(data);
-      await db.insert(AppConstants.tableWallets, wallet.toMap());
+      for (var data in jsonData) {
+        // Update JSON to use typeWalletId instead of typeWallet
+        data['typeWalletId'] = data['typeWalletId'] ?? 1; // Default to cash
+        final wallet = Wallet.fromJson(data);
+        await db.insert(AppConstants.tableWallets, wallet.toMap());
+      }
+      log('Wallets seeded from JSON');
+    } catch (e) {
+      // If JSON doesn't exist, create default wallet
+      await db.insert(AppConstants.tableWallets, {
+        'name': 'Ví mặc định',
+        'iconPath': 'assets/icons/cash.png',
+        'balance': 0,
+        'typeWalletId': 1, // Cash type
+        'isDefault': 1,
+        'isActive': 1,
+        'createAt': DateTime.now().toIso8601String(),
+        'isSynced': 0,
+        'syncId': DateTime.now().millisecondsSinceEpoch.toString(),
+      });
+      log('Default wallet created');
     }
-    log('Wallets seeded');
   }
 
   Future<void> _onDowngrade(Database db, int oldVersion, int newVersion) async {
@@ -297,26 +129,42 @@ class DatabaseService {
   }
 
   Future<void> _onCreate(Database db, int version) async {
+    await _createLatestSchema(db);
+    log('Database created successfully');
+  }
+
+  Future<void> _createLatestSchema(Database db) async {
     // Enable foreign keys
     await db.execute('PRAGMA foreign_keys = ON');
 
+    // Create type_wallets table
     await db.execute('''
-      CREATE TABLE ${AppConstants.tableWallets}(
+      CREATE TABLE ${AppConstants.tableTypeWallets} (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL UNIQUE,
+        iconPath TEXT NOT NULL
+      )
+    ''');
+
+    // Create wallets table with typeWalletId
+    await db.execute('''
+      CREATE TABLE ${AppConstants.tableWallets} (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL UNIQUE,
         iconPath TEXT NOT NULL,
         balance REAL NOT NULL DEFAULT 0,
-        type TEXT NOT NULL,
+        typeWalletId INTEGER NOT NULL,
         isDefault INTEGER NOT NULL DEFAULT 0,
         isActive INTEGER NOT NULL DEFAULT 1,
         createAt TEXT NOT NULL,
         updateAt TEXT,
         isSynced INTEGER NOT NULL DEFAULT 0,
         syncId TEXT NOT NULL,
-        CHECK (type IN ('cash', 'bank', 'ewallet', 'credit_card'))
+        FOREIGN KEY (typeWalletId) REFERENCES ${AppConstants.tableTypeWallets}(id) ON DELETE RESTRICT
       )
     ''');
 
+    // Create transactions table
     await db.execute('''
       CREATE TABLE ${AppConstants.tableTransactions} (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -331,21 +179,22 @@ class DatabaseService {
         updateAt TEXT,
         isSynced INTEGER NOT NULL DEFAULT 0,
         syncId TEXT NOT NULL,
-        FOREIGN KEY (walletId) REFERENCES wallets(id) ON DELETE RESTRICT
+        FOREIGN KEY (walletId) REFERENCES ${AppConstants.tableWallets}(id) ON DELETE RESTRICT
       )
     ''');
 
-    // create indexes for fast lookup
-    await db.execute('CREATE INDEX idx_wallet_name ON wallets(name)');
-    await db.execute('CREATE INDEX idx_wallet_type ON wallets(type)');
-    await db.execute('CREATE INDEX idx_wallet_default ON wallets(isDefault)');
-    await db.execute('CREATE INDEX idx_wallet_active ON wallets(isActive)');
-    await db.execute('CREATE INDEX idx_transaction_walletId ON transactions(walletId)');
-    await db.execute('CREATE INDEX idx_transaction_date ON transactions(date)');
+    // Create indexes for fast lookup
+    await db.execute('CREATE INDEX idx_type_wallet_name ON ${AppConstants.tableTypeWallets}(name)');
+    await db.execute('CREATE INDEX idx_wallet_name ON ${AppConstants.tableWallets}(name)');
+    await db.execute('CREATE INDEX idx_wallet_typeWalletId ON ${AppConstants.tableWallets}(typeWalletId)');
+    await db.execute('CREATE INDEX idx_wallet_default ON ${AppConstants.tableWallets}(isDefault)');
+    await db.execute('CREATE INDEX idx_wallet_active ON ${AppConstants.tableWallets}(isActive)');
+    await db.execute('CREATE INDEX idx_transaction_walletId ON ${AppConstants.tableTransactions}(walletId)');
+    await db.execute('CREATE INDEX idx_transaction_date ON ${AppConstants.tableTransactions}(date)');
 
+    // Seed default data
+    await _seedTypeWallets(db);
     await _seedWallets(db);
-
-    log('Database created successfully');
   }
 
   // CREATE
@@ -796,6 +645,49 @@ class DatabaseService {
       // by either calling _onCreate or upgrading the database version
     } catch (e) {
       log('Delete wallet table failed: $e');
+      rethrow;
+    }
+  }
+
+  // ==================== TYPE WALLET OPERATIONS ====================
+
+  /// Get all type wallets
+  Future<List<TypeWallet>> getAllTypeWallets() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      AppConstants.tableTypeWallets,
+      orderBy: 'id ASC',
+    );
+
+    return List.generate(maps.length, (i) => TypeWallet.fromMap(maps[i]));
+  }
+
+  /// Get type wallet by ID
+  Future<TypeWallet?> getTypeWalletById(int id) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      AppConstants.tableTypeWallets,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+
+    if (maps.isEmpty) return null;
+    return TypeWallet.fromMap(maps.first);
+  }
+
+  /// Insert new type wallet
+  Future<int> insertTypeWallet(TypeWallet typeWallet) async {
+    try {
+      final db = await database;
+      final id = await db.insert(
+        AppConstants.tableTypeWallets,
+        typeWallet.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+      log('Type wallet inserted with id: $id');
+      return id;
+    } catch (e) {
+      log('Insert type wallet failed: $e');
       rethrow;
     }
   }

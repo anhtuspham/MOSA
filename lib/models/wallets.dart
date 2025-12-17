@@ -5,7 +5,7 @@ class Wallet {
   final String name;
   final String iconPath;
   final double balance;
-  final TypeWallet typeWallet;        // 'cash', 'bank', 'ewallet', 'credit_card'
+  final int typeWalletId;              // Foreign key to TypeWallet table
   final bool isDefault;
   final bool isActive;
   final DateTime createAt;
@@ -18,7 +18,7 @@ class Wallet {
     required this.name,
     this.iconPath = AppIcons.logoCash,
     required this.balance,
-    required this.typeWallet,
+    required this.typeWalletId,
     this.isDefault = false,
     this.isActive = true,
     required this.createAt,
@@ -32,7 +32,7 @@ class Wallet {
       name: json['name'] as String,
       iconPath: json['iconPath'] as String? ?? AppIcons.logoCash,
       balance: (json['balance'] as num).toDouble(),
-      typeWallet: json['typeWallet'] as TypeWallet? ?? TypeWallet(),
+      typeWalletId: json['typeWalletId'] as int? ?? 1,
       isDefault: json['isDefault'] as bool? ?? false,
       isActive: json['isActive'] as bool? ?? true,
       createAt: DateTime.now(),
@@ -48,7 +48,7 @@ class Wallet {
       name: map['name'] as String,
       iconPath: map['iconPath'] as String? ?? AppIcons.logoCash,
       balance: (map['balance'] as num).toDouble(),
-      typeWallet: map['typeWallet'] as TypeWallet? ?? TypeWallet(),
+      typeWalletId: map['typeWalletId'] as int? ?? 1,
       isDefault: (map['isDefault'] as int?) == 1,
       isActive: (map['isActive'] as int?) == 1,
       createAt: DateTime.parse(map['createAt'] as String),
@@ -66,7 +66,7 @@ class Wallet {
       'name': name,
       'iconPath': iconPath,
       'balance': balance,
-      'typeWallet': typeWallet,
+      'typeWalletId': typeWalletId,
       'isDefault': isDefault ? 1 : 0,
       'isActive': isActive ? 1 : 0,
       'createAt': createAt.toIso8601String(),
@@ -81,7 +81,7 @@ class Wallet {
     String? name,
     String? iconPath,
     double? balance,
-    TypeWallet? typeWallet,
+    int? typeWalletId,
     bool? isDefault,
     bool? isActive,
     DateTime? createAt,
@@ -94,7 +94,7 @@ class Wallet {
       name: name ?? this.name,
       iconPath: iconPath ?? this.iconPath,
       balance: balance ?? this.balance,
-      typeWallet: typeWallet ?? this.typeWallet,
+      typeWalletId: typeWalletId ?? this.typeWalletId,
       isDefault: isDefault ?? this.isDefault,
       isActive: isActive ?? this.isActive,
       createAt: createAt ?? this.createAt,
