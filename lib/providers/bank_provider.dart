@@ -6,6 +6,6 @@ import '../services/bank_service.dart';
 
 final bankListProvider = FutureProvider<List<Bank>>((ref) {
   return BankService.loadBank();
-},);
+});
 
 final selectedBankProvider = StateProvider<Bank?>((ref) => null);

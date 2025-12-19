@@ -59,7 +59,10 @@ class TransactionModel {
       categoryId: map['categoryId'] ?? '',
       note: map['note'] as String?,
       createAt: DateTime.parse(map['createAt'] as String),
-      updateAt: map['updateAt'] != null ? DateTime.parse(map['updateAt'] as String) : null,
+      updateAt:
+          map['updateAt'] != null
+              ? DateTime.parse(map['updateAt'] as String)
+              : null,
       isSynced: (map['isSynced'] as int?) == 1,
       syncId: map['syncId'],
       walletId: map['walletId'] as int,

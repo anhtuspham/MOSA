@@ -16,44 +16,59 @@ import 'package:mosa/utils/transaction_utils.dart';
 /// - year: Lọc theo năm hiện tại
 enum DateRangeFilter { week, month, quarter, year }
 
-final dateRangeFilterProvider = StateProvider<DateRangeFilter>((ref) => DateRangeFilter.month);
+final dateRangeFilterProvider = StateProvider<DateRangeFilter>(
+  (ref) => DateRangeFilter.month,
+);
 
 final _getDateRangeProvider = Provider<DateTimeRange>((ref) {
   final filter = ref.watch(dateRangeFilterProvider);
   return DateRangeUtils.getRange(filter);
 });
 
-final filteredTransactionByDateRangeProvider = Provider<AsyncValue<List<TransactionModel>>>((ref) {
-  final transactions = ref.watch(transactionProvider);
-  final dateRange = ref.watch(_getDateRangeProvider);
+final filteredTransactionByDateRangeProvider =
+    Provider<AsyncValue<List<TransactionModel>>>((ref) {
+      final transactions = ref.watch(transactionProvider);
+      final dateRange = ref.watch(_getDateRangeProvider);
 
-  final filtered = transactions.whenData(
-    (transaction) =>
-        transaction.where((element) {
-          return element.date.isAfter(dateRange.start) && element.date.isBefore(dateRange.end);
-        }).toList(),
-  );
+      final filtered = transactions.whenData(
+        (transaction) =>
+            transaction.where((element) {
+              return element.date.isAfter(dateRange.start) &&
+                  element.date.isBefore(dateRange.end);
+            }).toList(),
+      );
 
-  filtered.whenData((filterData) {
-    filterData.sort((a, b) => b.date.compareTo(a.date));
-    return filterData;
-  });
-  return filtered;
-});
+      filtered.whenData((filterData) {
+        filterData.sort((a, b) => b.date.compareTo(a.date));
+        return filterData;
+      });
+      return filtered;
+    });
 
-final transactionGroupByDateProvider = Provider<AsyncValue<Map<DateTime, List<TransactionModel>>>>((ref) {
-  final transactionAsync = ref.watch(filteredTransactionByDateRangeProvider);
+final transactionGroupByDateProvider =
+    Provider<AsyncValue<Map<DateTime, List<TransactionModel>>>>((ref) {
+      final transactionAsync = ref.watch(
+        filteredTransactionByDateRangeProvider,
+      );
 
-  return transactionAsync.whenData((transactions) {
-    return CollectionUtils.groupByAndSort(transactions, (t) => DateRangeUtils.dateOnly(t.date), descending: true);
-  });
-});
+      return transactionAsync.whenData((transactions) {
+        return CollectionUtils.groupByAndSort(
+          transactions,
+          (t) => DateRangeUtils.dateOnly(t.date),
+          descending: true,
+        );
+      });
+    });
 
-final totalByDateProvider = Provider.family<AsyncValue<({double income, double expense})>, DateTime>((ref, date) {
-  final groupedAsync = ref.watch(transactionGroupByDateProvider);
-  return groupedAsync.whenData((grouped) {
-    final transactions = grouped[date] ?? [];
+final totalByDateProvider =
+    Provider.family<AsyncValue<({double income, double expense})>, DateTime>((
+      ref,
+      date,
+    ) {
+      final groupedAsync = ref.watch(transactionGroupByDateProvider);
+      return groupedAsync.whenData((grouped) {
+        final transactions = grouped[date] ?? [];
 
-    return TransactionAggregator.calculatorTotals(transactions);
-  });
-});
+        return TransactionAggregator.calculatorTotals(transactions);
+      });
+    });

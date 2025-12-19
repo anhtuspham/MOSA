@@ -1,13 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class AppConstants{
+class AppConstants {
   static const String typeIncome = 'income';
   static const String typeOutCome = 'outcome';
 
   static const double scaleTextFactor = 1.5;
 
-  static const Color incomeColor = Color(0xFF4CAF50); // Màu xanh lá cho thu nhập
+  static const Color incomeColor = Color(
+    0xFF4CAF50,
+  ); // Màu xanh lá cho thu nhập
   static const Color expenseColor = Color(0xFFF44336); // Màu đỏ cho chi tiêu
 
   static const Map<String, Color> categoryColors = {

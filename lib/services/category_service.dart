@@ -7,7 +7,9 @@ import 'package:mosa/models/category.dart';
 class CategoryService {
   static Future<List<Category>> loadCategories() async {
     try {
-      final jsonString = await rootBundle.loadString('assets/data/categories.json');
+      final jsonString = await rootBundle.loadString(
+        'assets/data/categories.json',
+      );
       final List<dynamic> jsonList = jsonDecode(jsonString);
 
       return jsonList.map((e) => Category.fromJson(e)).toList();

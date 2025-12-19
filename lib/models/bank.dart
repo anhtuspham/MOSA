@@ -5,11 +5,7 @@ class Bank {
   final String name;
   final String iconPath;
 
-  Bank({
-    this.id,
-    required this.name,
-    required this.iconPath,
-  });
+  Bank({this.id, required this.name, required this.iconPath});
 
   factory Bank.fromJson(Map<String, dynamic> json) {
     return Bank(
@@ -28,18 +24,10 @@ class Bank {
   }
 
   Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'name': name,
-      'iconPath': iconPath,
-    };
+    return {'id': id, 'name': name, 'iconPath': iconPath};
   }
 
-  Bank copyWith({
-    int? id,
-    String? name,
-    String? iconPath,
-  }) {
+  Bank copyWith({int? id, String? name, String? iconPath}) {
     return Bank(
       id: id ?? this.id,
       name: name ?? this.name,

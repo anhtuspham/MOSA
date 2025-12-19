@@ -9,7 +9,10 @@ class ErrorSectionWidget extends StatelessWidget {
     return Container(
       height: 60,
       margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(color: Colors.red[100], borderRadius: BorderRadius.circular(10)),
+      decoration: BoxDecoration(
+        color: Colors.red[100],
+        borderRadius: BorderRadius.circular(10),
+      ),
       child: Center(child: Text('Error: ${error.toString()}')),
     );
   }

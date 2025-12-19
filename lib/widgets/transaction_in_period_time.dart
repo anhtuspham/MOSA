@@ -19,13 +19,19 @@ class TransactionInPeriodTime extends ConsumerStatefulWidget {
   final String typeDate;
   final DateTime date;
 
-  const TransactionInPeriodTime({super.key, this.typeDate = 'day', required this.date});
+  const TransactionInPeriodTime({
+    super.key,
+    this.typeDate = 'day',
+    required this.date,
+  });
 
   @override
-  ConsumerState<TransactionInPeriodTime> createState() => _TransactionInPeriodTimeState();
+  ConsumerState<TransactionInPeriodTime> createState() =>
+      _TransactionInPeriodTimeState();
 }
 
-class _TransactionInPeriodTimeState extends ConsumerState<TransactionInPeriodTime> {
+class _TransactionInPeriodTimeState
+    extends ConsumerState<TransactionInPeriodTime> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -42,7 +48,7 @@ class _TransactionInPeriodTimeState extends ConsumerState<TransactionInPeriodTim
     );
   }
 
-  Widget dateHeaderSection(){
+  Widget dateHeaderSection() {
     final totalState = ref.watch(totalByDateProvider(widget.date));
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -50,27 +56,40 @@ class _TransactionInPeriodTimeState extends ConsumerState<TransactionInPeriodTim
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(convertDateTimeToString(widget.date), style: TextStyle(fontWeight: FontWeight.bold)),
+            Text(
+              convertDateTimeToString(widget.date),
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
             Text(widget.date.weekdayLabel),
           ],
         ),
         totalState.when(
           data:
               (totalData) => Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              if (totalData.income > 0)
-                Text(
-                  Helpers.formatCurrency(totalData.income),
-                  style: TextStyle(color: getTransactionTypeColor(type: TransactionType.income), fontSize: 14),
-                ),
-              if (totalData.expense > 0)
-                Text(
-                  Helpers.formatCurrency(totalData.expense),
-                  style: TextStyle(color: getTransactionTypeColor(type: TransactionType.expense), fontSize: 14),
-                ),
-            ],
-          ),
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  if (totalData.income > 0)
+                    Text(
+                      Helpers.formatCurrency(totalData.income),
+                      style: TextStyle(
+                        color: getTransactionTypeColor(
+                          type: TransactionType.income,
+                        ),
+                        fontSize: 14,
+                      ),
+                    ),
+                  if (totalData.expense > 0)
+                    Text(
+                      Helpers.formatCurrency(totalData.expense),
+                      style: TextStyle(
+                        color: getTransactionTypeColor(
+                          type: TransactionType.expense,
+                        ),
+                        fontSize: 14,
+                      ),
+                    ),
+                ],
+              ),
           loading: () => CircularProgressIndicator(),
           error: (_, _) => Center(child: Text('Error')),
         ),
@@ -81,13 +100,17 @@ class _TransactionInPeriodTimeState extends ConsumerState<TransactionInPeriodTim
   Widget transactionListSection() {
     final transactionGroupState = ref.watch(transactionGroupByDateProvider);
     final categoryState = ref.watch(flattenedCategoryProvider);
-    final transactionOfDay = transactionGroupState.whenData((group) => group[widget.date] ?? []);
+    final transactionOfDay = transactionGroupState.whenData(
+      (group) => group[widget.date] ?? [],
+    );
 
     return transactionOfDay.when(
       data: (transactionsData) {
         return categoryState.when(
           data: (categories) {
-            final categoryMap = {for (var category in categories) category.id: category};
+            final categoryMap = {
+              for (var category in categories) category.id: category,
+            };
 
             return ListView.builder(
               itemCount: transactionsData.length,
@@ -100,7 +123,10 @@ class _TransactionInPeriodTimeState extends ConsumerState<TransactionInPeriodTim
                   return Container(
                     height: 60,
                     margin: const EdgeInsets.only(bottom: 12),
-                    decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(10)),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                     child: const Center(child: Text('Category not found')),
                   );
                 }

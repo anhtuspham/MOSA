@@ -25,8 +25,14 @@ class _SelectWalletScreenState extends ConsumerState<SelectWalletScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppConstants.selectWallet, style: TextStyle(fontWeight: FontWeight.w600)),
-        leading: IconButton(onPressed: () => context.pop(), icon: Icon(Icons.arrow_back)),
+        title: Text(
+          AppConstants.selectWallet,
+          style: TextStyle(fontWeight: FontWeight.w600),
+        ),
+        leading: IconButton(
+          onPressed: () => context.pop(),
+          icon: Icon(Icons.arrow_back),
+        ),
         actions: [Icon(Icons.search)],
         elevation: 5,
         actionsPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -41,11 +47,20 @@ class _SelectWalletScreenState extends ConsumerState<SelectWalletScreen> {
 
               return CustomListTile(
                 leading: Image.asset(wallet.iconPath, width: 30),
-                title: Text(wallet.name, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+                title: Text(
+                  wallet.name,
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                ),
                 subTitle: Text(Helpers.formatCurrency(wallet.balance)),
-                backgroundColor: isSelected ? AppColors.lightBackGroundColor : null,
+                backgroundColor:
+                    isSelected ? AppColors.lightBackGroundColor : null,
                 trailing:
-                    isSelected ? IconButton(onPressed: null, icon: Icon(Icons.check, color: AppColors.primary)) : null,
+                    isSelected
+                        ? IconButton(
+                          onPressed: null,
+                          icon: Icon(Icons.check, color: AppColors.primary),
+                        )
+                        : null,
                 enable: true,
                 onTap: () {
                   ref.read(selectedWalletProvider.notifier).state = wallet;

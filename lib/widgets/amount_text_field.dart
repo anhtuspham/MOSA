@@ -22,7 +22,7 @@ class AmountTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final effectiveAmountColor = amountColor ?? AppColors.expense;
-    
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -42,7 +42,10 @@ class AmountTextField extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                   color: effectiveAmountColor.withValues(alpha: 0.9),
                 ),
-                contentPadding: EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 4,
+                  vertical: 4,
+                ),
               ),
               maxLength: 15,
               maxLengthEnforcement: MaxLengthEnforcement.enforced,

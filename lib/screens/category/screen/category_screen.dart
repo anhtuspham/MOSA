@@ -42,9 +42,17 @@ class _CategoryScreenState extends ConsumerState<CategoryScreen> {
         icon: const Icon(Icons.arrow_back),
       ),
       initialIndex: initialIndexValue(),
-      actions: const [Icon(Icons.edit_note_sharp), SizedBox(width: 12), Icon(Icons.filter_list)],
+      actions: const [
+        Icon(Icons.edit_note_sharp),
+        SizedBox(width: 12),
+        Icon(Icons.filter_list),
+      ],
       appBarBackgroundColor: AppColors.background,
-      tabs: const [Tab(child: Text('Chi tiền')), Tab(child: Text('Thu tiền')), Tab(child: Text('Vay nợ'))],
+      tabs: const [
+        Tab(child: Text('Chi tiền')),
+        Tab(child: Text('Thu tiền')),
+        Tab(child: Text('Vay nợ')),
+      ],
       children: [
         CategoryTab(categoryType: 'expense'),
         CategoryTab(categoryType: 'income'),

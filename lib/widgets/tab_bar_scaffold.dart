@@ -135,19 +135,23 @@ class CommonScaffold extends StatefulWidget {
     this.appBarHeight,
     this.floatingActionButton,
   }) : assert(
-          body != null || children != null,
-          'Either body or children must be provided',
-        ),
-        assert(
-          tabs == null || tabs.isEmpty || (children != null && children.length == tabs.length) || body != null,
-          'When using tabs, either provide children with matching length or a custom body',
-        );
+         body != null || children != null,
+         'Either body or children must be provided',
+       ),
+       assert(
+         tabs == null ||
+             tabs.isEmpty ||
+             (children != null && children.length == tabs.length) ||
+             body != null,
+         'When using tabs, either provide children with matching length or a custom body',
+       );
 
   @override
   State<CommonScaffold> createState() => _CommonScaffoldState();
 }
 
-class _CommonScaffoldState extends State<CommonScaffold> with TickerProviderStateMixin {
+class _CommonScaffoldState extends State<CommonScaffold>
+    with TickerProviderStateMixin {
   late TabController _tabController;
   late TabBarConfig _tabBarConfig;
 
@@ -174,10 +178,10 @@ class _CommonScaffoldState extends State<CommonScaffold> with TickerProviderStat
   @override
   void didUpdateWidget(CommonScaffold oldWidget) {
     super.didUpdateWidget(oldWidget);
-    
+
     // Handle transition between tabs and no-tabs states
     final hadTabs = oldWidget.tabs != null && oldWidget.tabs!.isNotEmpty;
-    
+
     if (_hasTabs && hadTabs && widget.tabs!.length != oldWidget.tabs!.length) {
       // Tab count changed - recreate controller
       _tabController.removeListener(_onTabChanged);
@@ -227,7 +231,7 @@ class _CommonScaffoldState extends State<CommonScaffold> with TickerProviderStat
     if (!_hasTabs) {
       return widget.body ?? (widget.children?.first ?? const SizedBox.shrink());
     }
-    
+
     // If children provided with tabs, auto-build TabBarView with controller
     if (widget.children != null) {
       return TabBarView(controller: _tabController, children: widget.children!);
@@ -244,15 +248,18 @@ class _CommonScaffoldState extends State<CommonScaffold> with TickerProviderStat
         leading: widget.leading,
         actions: widget.actions,
         actionsPadding: EdgeInsets.symmetric(horizontal: 12.w),
-        backgroundColor: widget.appBarBackgroundColor ?? Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor:
+            widget.appBarBackgroundColor ??
+            Theme.of(context).colorScheme.inversePrimary,
         elevation: widget.elevation ? null : 0,
         toolbarHeight: widget.appBarHeight,
-        bottom: _hasTabs
-            ? PreferredSize(
-                preferredSize: Size.fromHeight(kToolbarHeight),
-                child: _buildStyledTabBar(),
-              )
-            : null,
+        bottom:
+            _hasTabs
+                ? PreferredSize(
+                  preferredSize: Size.fromHeight(kToolbarHeight),
+                  child: _buildStyledTabBar(),
+                )
+                : null,
         centerTitle: widget.centerTitle,
       ),
       body: _buildTabContent(),

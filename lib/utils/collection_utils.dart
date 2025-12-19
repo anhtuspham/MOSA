@@ -1,6 +1,9 @@
 class CollectionUtils {
   /// Generic grouping by key
-  static Map<K, List<V>> groupBy<K, V>(Iterable<V> items, K Function(V) keySelector) {
+  static Map<K, List<V>> groupBy<K, V>(
+    Iterable<V> items,
+    K Function(V) keySelector,
+  ) {
     final grouped = <K, List<V>>{};
     for (var item in items) {
       final key = keySelector(item);
@@ -16,7 +19,9 @@ class CollectionUtils {
     bool descending = false,
   }) {
     final grouped = groupBy(items, keySelector);
-    final sortedKeys = grouped.keys.toList()..sort((a, b) => descending ? b.compareTo(a) : a.compareTo(b));
+    final sortedKeys =
+        grouped.keys.toList()
+          ..sort((a, b) => descending ? b.compareTo(a) : a.compareTo(b));
     return Map.fromEntries(sortedKeys.map((e) => MapEntry(e, grouped[e]!)));
   }
 

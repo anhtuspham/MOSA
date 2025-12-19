@@ -46,9 +46,15 @@ class WalletsNotifier extends AsyncNotifier<List<Wallet>> {
     state = const AsyncLoading();
     try {
       await _databaseService.updateWallet(wallet);
-      final index = state.requireValue.indexWhere((element) => element == wallet);
+      final index = state.requireValue.indexWhere(
+        (element) => element == wallet,
+      );
       if (index != -1) {
-        state = AsyncData([...state.requireValue.sublist(0, index), wallet, ...state.requireValue.sublist(index + 1)]);
+        state = AsyncData([
+          ...state.requireValue.sublist(0, index),
+          wallet,
+          ...state.requireValue.sublist(index + 1),
+        ]);
       }
       refreshWallet();
     } catch (e) {
@@ -65,9 +71,14 @@ class WalletsNotifier extends AsyncNotifier<List<Wallet>> {
   }
 }
 
-final walletProvider = AsyncNotifierProvider<WalletsNotifier, List<Wallet>>(WalletsNotifier.new);
+final walletProvider = AsyncNotifierProvider<WalletsNotifier, List<Wallet>>(
+  WalletsNotifier.new,
+);
 
-final getWalletByIdProvider = FutureProvider.family<Wallet?, int>((ref, param) async {
+final getWalletByIdProvider = FutureProvider.family<Wallet?, int>((
+  ref,
+  param,
+) async {
   final db = ref.read(databaseServiceProvider);
   return db.getWalletById(param);
 });
@@ -114,5 +125,50 @@ final typeWalletProvider = FutureProvider<List<TypeWallet>>((ref) {
 
 final selectedTypeWalletProvider = StateProvider<TypeWallet?>((ref) {
   final typeWallets = ref.watch(typeWalletProvider);
-  return typeWallets.whenData((wallet) => wallet.isNotEmpty ? wallet.first : null).value;
+  return typeWallets
+      .whenData((wallet) => wallet.isNotEmpty ? wallet.first : null)
+      .value;
 });
+
+
+class TypeWalletNotifier extends AsyncNotifier<List<TypeWallet>>{
+  DatabaseService get _databaseService => ref.read(databaseServiceProvider);
+
+  @override
+  FutureOr<List<TypeWallet>> build() {
+    return TypeWalletService.loadTypeWallets();
+  }
+
+  Future<void> refreshTypeWallet() async{
+    try{
+      final typeWallets = await _databaseService.getAllTypeWallets();
+      if(typeWallets != state.value){
+        state = AsyncData(typeWallets);
+      }
+    }catch(e){
+      log('Error when refresh type wallet $e');
+    }
+  }
+
+  Future<void> addTypeWallet(TypeWallet tp) async{
+    state = const AsyncLoading();
+    try{
+      int id = await _databaseService.insertTypeWallet(tp);
+      final newTypeWallet = tp.copyWith(id: id);
+      state = AsyncData([newTypeWallet, ...state.requireValue]);
+      refreshTypeWallet();
+    } catch(e){
+      log('Error when add type wallet $e');
+    }
+  }
+
+  Future<void> deleteTypeWallet(int id) async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      await _databaseService.deleteTypeWallet(id);
+      return state.requireValue.where((element) => element.id != id).toList();
+    });
+  }
+}
+
+final typeWalletNotifier = AsyncNotifierProvider<TypeWalletNotifier, List<TypeWallet>>(TypeWalletNotifier.new);

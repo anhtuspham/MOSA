@@ -1,4 +1,4 @@
-class AppIcons{
+class AppIcons {
   static const String statisticIcon = 'assets/icons/bar-chart.png';
   static const String logoMbBank = 'assets/icons/mb_bank.png';
   static const String logoCash = 'assets/icons/money.png';

@@ -39,11 +39,20 @@ final goRouter = GoRouter(
   routes: [
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
-        return ShellScaffoldScreen(navigationShell: navigationShell, child: navigationShell);
+        return ShellScaffoldScreen(
+          navigationShell: navigationShell,
+          child: navigationShell,
+        );
       },
       branches: [
         StatefulShellBranch(
-          routes: [GoRoute(path: AppRoutes.overview, name: 'overview', builder: (context, state) => HomeScreen())],
+          routes: [
+            GoRoute(
+              path: AppRoutes.overview,
+              name: 'overview',
+              builder: (context, state) => HomeScreen(),
+            ),
+          ],
         ),
         StatefulShellBranch(
           routes: [
@@ -64,19 +73,41 @@ final goRouter = GoRouter(
           ],
         ),
         StatefulShellBranch(
-          routes: [GoRoute(path: AppRoutes.stats, name: 'stats', builder: (context, state) => StatsShellScreen())],
+          routes: [
+            GoRoute(
+              path: AppRoutes.stats,
+              name: 'stats',
+              builder: (context, state) => StatsShellScreen(),
+            ),
+          ],
         ),
         StatefulShellBranch(
           routes: [
-            GoRoute(path: AppRoutes.settings, name: 'setting', builder: (context, state) => SettingsShellScreen()),
+            GoRoute(
+              path: AppRoutes.settings,
+              name: 'setting',
+              builder: (context, state) => SettingsShellScreen(),
+            ),
           ],
         ),
       ],
     ),
 
-    GoRoute(path: AppRoutes.login, name: 'login', builder: (context, state) => LoginScreen()),
-    GoRoute(path: AppRoutes.categoryList, name: 'categoryList', builder: (context, state) => CategoryScreen()),
-    GoRoute(path: AppRoutes.selectWallet, name: 'selectWallet', builder: (context, state) => SelectWalletScreen()),
+    GoRoute(
+      path: AppRoutes.login,
+      name: 'login',
+      builder: (context, state) => LoginScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.categoryList,
+      name: 'categoryList',
+      builder: (context, state) => CategoryScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.selectWallet,
+      name: 'selectWallet',
+      builder: (context, state) => SelectWalletScreen(),
+    ),
     GoRoute(
       path: AppRoutes.selectTransferOutWallet,
       name: 'selectTransferOutWallet',
@@ -92,17 +123,28 @@ final goRouter = GoRouter(
       name: 'add-wallet',
       pageBuilder:
           (context, state) => CustomTransitionPage(
-        child: AddWalletScreen(),
-        transitionDuration: const Duration(milliseconds: 450),
-        reverseTransitionDuration: const Duration(milliseconds: 300),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          final curveAnimation = CurvedAnimation(parent: animation, curve: Curves.easeOut);
-          return SlideTransition(
-            position: Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero).animate(curveAnimation),
-            child: child,
-          );
-        },
-      ),
+            child: AddWalletScreen(),
+            transitionDuration: const Duration(milliseconds: 450),
+            reverseTransitionDuration: const Duration(milliseconds: 300),
+            transitionsBuilder: (
+              context,
+              animation,
+              secondaryAnimation,
+              child,
+            ) {
+              final curveAnimation = CurvedAnimation(
+                parent: animation,
+                curve: Curves.easeOut,
+              );
+              return SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0, 1),
+                  end: Offset.zero,
+                ).animate(curveAnimation),
+                child: child,
+              );
+            },
+          ),
     ),
     GoRoute(
       path: AppRoutes.typeWalletList,
@@ -124,9 +166,15 @@ final goRouter = GoRouter(
           children: [
             Text('Router không tồn tại'),
             const SizedBox(height: 12),
-            Text('Path: ${state.uri} không tồn tại. Vui lòng kiểm tra lại', style: TextStyle(color: Colors.grey)),
+            Text(
+              'Path: ${state.uri} không tồn tại. Vui lòng kiểm tra lại',
+              style: TextStyle(color: Colors.grey),
+            ),
             const SizedBox(height: 32),
-            ElevatedButton(onPressed: () => context.go(AppRoutes.overview), child: Text('Quay về trang chủ')),
+            ElevatedButton(
+              onPressed: () => context.go(AppRoutes.overview),
+              child: Text('Quay về trang chủ'),
+            ),
           ],
         ),
       ),

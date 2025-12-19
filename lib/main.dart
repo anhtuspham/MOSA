@@ -14,7 +14,7 @@ void main() async {
 
   // The database will be created automatically on first access
   // with tables and seeded wallets from onCreate callback
-  
+
   // Optionally import transactions if needed:
   // await DatabaseService().importTransactionsFromAssets('assets/data/transactions.json');
 
@@ -32,7 +32,8 @@ class MyApp extends StatelessWidget {
       splitScreenMode: true,
       child: ToastificationWrapper(
         config: ToastificationConfig(
-          marginBuilder: (context, alignment) => EdgeInsets.fromLTRB(0, 16, 0, 110),
+          marginBuilder:
+              (context, alignment) => EdgeInsets.fromLTRB(0, 16, 0, 110),
           alignment: Alignment.center,
           itemWidth: 440,
           animationDuration: Duration(milliseconds: 500),

@@ -10,30 +10,48 @@ class DateRangeUtils {
     return date.subtract(Duration(days: date.weekday - 1));
   }
 
-  static DateTimeRange<DateTime> getRange(DateRangeFilter filter, [DateTime? now]) {
+  static DateTimeRange<DateTime> getRange(
+    DateRangeFilter filter, [
+    DateTime? now,
+  ]) {
     final currentDate = now ?? DateTime.now();
     switch (filter) {
       case DateRangeFilter.week:
         final monday = getMondayOfWeek(currentDate);
         return DateTimeRange(
           start: DateTime(monday.year, monday.month, monday.day),
-          end: DateTime(currentDate.year, currentDate.month, monday.day + 7).subtract(Duration(seconds: 1)),
+          end: DateTime(
+            currentDate.year,
+            currentDate.month,
+            monday.day + 7,
+          ).subtract(Duration(seconds: 1)),
         );
       case DateRangeFilter.month:
         return DateTimeRange(
           start: DateTime(currentDate.year, currentDate.month, 1),
-          end: DateTime(currentDate.year, currentDate.month + 1, 1).subtract(Duration(seconds: 1)),
+          end: DateTime(
+            currentDate.year,
+            currentDate.month + 1,
+            1,
+          ).subtract(Duration(seconds: 1)),
         );
       case DateRangeFilter.quarter:
         final quarter = (currentDate.month - 1) ~/ 3;
         return DateTimeRange(
           start: DateTime(currentDate.year, quarter * 3 + 1, 1),
-          end: DateTime(currentDate.year, quarter * 3 + 4).subtract(Duration(seconds: 1)),
+          end: DateTime(
+            currentDate.year,
+            quarter * 3 + 4,
+          ).subtract(Duration(seconds: 1)),
         );
       case DateRangeFilter.year:
         return DateTimeRange(
           start: DateTime(currentDate.year, 1, 1),
-          end: DateTime(currentDate.year + 1, 1, 1).subtract(Duration(seconds: 1)),
+          end: DateTime(
+            currentDate.year + 1,
+            1,
+            1,
+          ).subtract(Duration(seconds: 1)),
         );
     }
   }

@@ -9,7 +9,9 @@ import 'package:mosa/services/database_service.dart';
 
 import '../models/transaction.dart';
 
-final databaseServiceProvider = Provider<DatabaseService>((ref) => DatabaseService());
+final databaseServiceProvider = Provider<DatabaseService>(
+  (ref) => DatabaseService(),
+);
 
 class TransactionNotifier extends AsyncNotifier<List<TransactionModel>> {
   @override
@@ -35,9 +37,15 @@ class TransactionNotifier extends AsyncNotifier<List<TransactionModel>> {
     state = await AsyncValue.guard(() async {
       await _databaseService.updateTransaction(transaction);
       await _walletController.refreshWallet();
-      final index = state.requireValue.indexWhere((element) => element == transaction);
+      final index = state.requireValue.indexWhere(
+        (element) => element == transaction,
+      );
       if (index != -1) {
-        return [...state.requireValue.sublist(0, index), transaction, ...state.requireValue.sublist(index + 1)];
+        return [
+          ...state.requireValue.sublist(0, index),
+          transaction,
+          ...state.requireValue.sublist(index + 1),
+        ];
       }
       return state.requireValue;
     });
@@ -53,7 +61,10 @@ class TransactionNotifier extends AsyncNotifier<List<TransactionModel>> {
   }
 }
 
-final transactionProvider = AsyncNotifierProvider<TransactionNotifier, List<TransactionModel>>(TransactionNotifier.new);
+final transactionProvider =
+    AsyncNotifierProvider<TransactionNotifier, List<TransactionModel>>(
+      TransactionNotifier.new,
+    );
 
 final totalIncomeProvider = Provider((ref) {
   final transactionAsync = ref.watch(filteredTransactionByDateRangeProvider);
@@ -71,8 +82,9 @@ final totalExpenseProvider = Provider((ref) {
   final transactionsAsync = ref.watch(filteredTransactionByDateRangeProvider);
   return transactionsAsync.when(
     data:
-        (transactions) =>
-            transactions.where((t) => t.type == TransactionType.expense).fold(0.0, (prev, curr) => prev + curr.amount),
+        (transactions) => transactions
+            .where((t) => t.type == TransactionType.expense)
+            .fold(0.0, (prev, curr) => prev + curr.amount),
     loading: () => 0.0,
     error: (_, _) => 0.0,
   );
@@ -84,14 +96,26 @@ final balanceProvider = Provider((ref) {
   return income - expense;
 });
 
-final transactionByTypeProvider = Provider.family<AsyncValue<List<TransactionModel>>, TransactionType>((ref, type) {
-  final transactionAsync = ref.watch(transactionProvider);
-  return transactionAsync.whenData((transactions) => transactions.where((element) => element.type == type).toList());
-});
+final transactionByTypeProvider =
+    Provider.family<AsyncValue<List<TransactionModel>>, TransactionType>((
+      ref,
+      type,
+    ) {
+      final transactionAsync = ref.watch(transactionProvider);
+      return transactionAsync.whenData(
+        (transactions) =>
+            transactions.where((element) => element.type == type).toList(),
+      );
+    });
 
-final transactionByDateProvider = Provider.family<AsyncValue<List<TransactionModel>>, DateTime>((ref, date) {
-  final transactionAsync = ref.watch(transactionProvider);
-  return transactionAsync.whenData((value) => value.where((element) => element.date == date).toList());
-});
+final transactionByDateProvider =
+    Provider.family<AsyncValue<List<TransactionModel>>, DateTime>((ref, date) {
+      final transactionAsync = ref.watch(transactionProvider);
+      return transactionAsync.whenData(
+        (value) => value.where((element) => element.date == date).toList(),
+      );
+    });
 
-final currentTransactionByTypeProvider = StateProvider<TransactionType?>((ref) => null);
+final currentTransactionByTypeProvider = StateProvider<TransactionType?>(
+  (ref) => null,
+);

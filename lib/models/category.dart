@@ -40,7 +40,11 @@ class Category {
       color: json['color'] as String?,
       parentId: json["parentId"] != null ? json['parentId'] : null,
       children:
-          json['children'] != null ? (json['children'] as List<dynamic>).map((e) => Category.fromJson(e)).toList() : [],
+          json['children'] != null
+              ? (json['children'] as List<dynamic>)
+                  .map((e) => Category.fromJson(e))
+                  .toList()
+              : [],
     );
   }
 
@@ -58,7 +62,10 @@ class Category {
   }
 
   Widget getIcon({double size = 24}) {
-    final color = this.color != null ? Color(int.parse('0xFF${this.color!.substring(1)}')) : Colors.grey;
+    final color =
+        this.color != null
+            ? Color(int.parse('0xFF${this.color!.substring(1)}'))
+            : Colors.grey;
 
     if (iconType == 'custom') {
       return Image.asset(iconPath, width: size, height: size, color: color);
@@ -112,7 +119,7 @@ class Category {
       'paid': Icons.paid,
 
       // transfer
-      'autorenew': Icons.autorenew
+      'autorenew': Icons.autorenew,
     };
 
     return iconMap[iconName] ?? Icons.help;

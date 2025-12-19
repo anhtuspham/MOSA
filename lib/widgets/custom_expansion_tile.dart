@@ -5,19 +5,24 @@ class CustomExpansionTile extends StatelessWidget {
   final bool? initialExpand;
   final Widget header;
   final List<Widget> children;
-  const CustomExpansionTile({super.key, this.initialExpand, required this.header, required this.children});
+  const CustomExpansionTile({
+    super.key,
+    this.initialExpand,
+    required this.header,
+    required this.children,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        color: AppColors.background
-      ),
+      decoration: BoxDecoration(color: AppColors.background),
       margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 3),
       child: ExpansionTile(
         initiallyExpanded: initialExpand ?? false,
         title: header,
-        shape: OutlineInputBorder(borderSide: BorderSide(color: Colors.transparent)),
+        shape: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.transparent),
+        ),
         backgroundColor: AppColors.background,
         expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
         dense: true,

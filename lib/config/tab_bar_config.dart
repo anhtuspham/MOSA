@@ -44,16 +44,18 @@ class TabBarConfig {
     this.physics,
     this.labelPadding,
     this.disabledIndicatorColor,
-  })  : labelStyle = labelStyle ??
-            const TextStyle(
-              color: AppColors.textHighlight,
-              fontWeight: FontWeight.bold,
-            ),
-        unselectedLabelStyle = unselectedLabelStyle ??
-            const TextStyle(
-              color: AppColors.textPrimary,
-              fontWeight: FontWeight.w500,
-            );
+  }) : labelStyle =
+           labelStyle ??
+           const TextStyle(
+             color: AppColors.textHighlight,
+             fontWeight: FontWeight.bold,
+           ),
+       unselectedLabelStyle =
+           unselectedLabelStyle ??
+           const TextStyle(
+             color: AppColors.textPrimary,
+             fontWeight: FontWeight.w500,
+           );
 
   /// Default TabBar configuration - matches current app styling
   factory TabBarConfig.defaultConfig() {
@@ -130,7 +132,8 @@ class TabBarConfig {
       indicatorWeight: indicatorWeight ?? this.indicatorWeight,
       physics: physics ?? this.physics,
       labelPadding: labelPadding ?? this.labelPadding,
-      disabledIndicatorColor: disabledIndicatorColor ?? this.disabledIndicatorColor,
+      disabledIndicatorColor:
+          disabledIndicatorColor ?? this.disabledIndicatorColor,
     );
   }
 }

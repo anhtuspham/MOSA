@@ -6,15 +6,20 @@ class LatestMonthStatisticWidget extends StatefulWidget {
   const LatestMonthStatisticWidget({super.key});
 
   @override
-  State<LatestMonthStatisticWidget> createState() => _LatestMonthStatisticWidgetState();
+  State<LatestMonthStatisticWidget> createState() =>
+      _LatestMonthStatisticWidgetState();
 }
 
-class _LatestMonthStatisticWidgetState extends State<LatestMonthStatisticWidget> {
+class _LatestMonthStatisticWidgetState
+    extends State<LatestMonthStatisticWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(color: AppColors.background, borderRadius: BorderRadius.circular(6)),
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        borderRadius: BorderRadius.circular(6),
+      ),
       child: InkWell(
         onTap: () {},
         child: Column(
@@ -25,18 +30,29 @@ class _LatestMonthStatisticWidgetState extends State<LatestMonthStatisticWidget>
                 RichText(
                   text: TextSpan(
                     text: 'Tình hình thu chi\n',
-                    style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textPrimary, fontSize: 16),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                      fontSize: 16,
+                    ),
                     children: [
                       TextSpan(
                         text: '5 tháng gần nhất',
-                        style: TextStyle(fontWeight: FontWeight.w400, color: AppColors.textPrimary, fontSize: 14),
+                        style: TextStyle(
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.textPrimary,
+                          fontSize: 14,
+                        ),
                       ),
                     ],
                   ),
                 ),
                 TextButton(
                   onPressed: null,
-                  child: Text('Xem chi tiết', style: TextStyle(color: AppColors.buttonPrimary)),
+                  child: Text(
+                    'Xem chi tiết',
+                    style: TextStyle(color: AppColors.buttonPrimary),
+                  ),
                 ),
               ],
             ),
@@ -75,7 +91,11 @@ class _LatestMonthStatisticWidgetState extends State<LatestMonthStatisticWidget>
                     ),
                   ),
                 ),
-                Expanded(child: Text('Chi tiêu tháng hiện tại bằng 0, chưa có dự liệu so sánh')),
+                Expanded(
+                  child: Text(
+                    'Chi tiêu tháng hiện tại bằng 0, chưa có dự liệu so sánh',
+                  ),
+                ),
               ],
             ),
           ],

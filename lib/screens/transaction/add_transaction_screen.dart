@@ -94,59 +94,22 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
       if (!mounted) return;
 
-      // Validation
-      if (_amountController.text.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Vui lòng nhập số tiền')));
-        return;
-      }
+      if (_selectedType.value == TransactionType.adjustBalance) {
+        // For balance adjustment, calculate the difference between actual and current balance
+        final actualBalance = double.tryParse(_actualBalanceController.text.replaceAll('.', '')) ?? 0;
+        final adjustmentAmount = actualBalance - effectiveWallet.balance;
 
-      final amount = double.tryParse(_amountController.text.replaceAll(',', ''));
-      if (amount == null || amount <= 0) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Số tiền không hợp lệ')));
-        return;
-      }
-
-      if (_selectedType.value == TransactionType.transfer) {
-        final transactionOut = TransactionModel(
-          title: 'Chuyển khoản đến ${transferInWalletState?.name ?? 'Chưa chọn'}',
-          // sử dụng transferIn để gửi title
-          // nơi chuyển đến
-          amount: amount,
-          date: _selectedDateTime,
-          type: TransactionType.transferOut,
-          categoryId: 'transfer',
-          note: _noteController.text.isNotEmpty ? _noteController.text : null,
-          createAt: DateTime.now(),
-          syncId: generateSyncId(),
-          walletId: transferOutWalletState?.id ?? -1,
-        );
-
-        final transactionIn = TransactionModel(
-          title: 'Nhận chuyển khoản từ ${transferOutWalletState?.name ?? 'Chưa chọn'}',
-          amount: amount,
-          date: _selectedDateTime,
-          type: TransactionType.transferIn,
-          categoryId: 'transfer',
-          note: _noteController.text.isNotEmpty ? _noteController.text : null,
-          createAt: DateTime.now(),
-          syncId: generateSyncId(),
-          walletId: transferInWalletState?.id ?? -1,
-        );
-
-        await transactionController.addTransaction(transactionOut);
-        await transactionController.addTransaction(transactionIn);
-      } else {
-        if (selectedCategory == null) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Vui lòng chọn hạng mục')));
+        if (adjustmentAmount == 0) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Số dư thực tế giống với số dư hiện tại')));
           return;
         }
 
         final transaction = TransactionModel(
-          title: selectedCategory.name,
-          amount: amount,
+          title: 'Điều chỉnh số dư',
+          amount: adjustmentAmount,
           date: _selectedDateTime,
           type: _selectedType.value,
-          categoryId: selectedCategory.id,
+          categoryId: 'adjustment',
           note: _noteController.text.isNotEmpty ? _noteController.text : null,
           createAt: DateTime.now(),
           syncId: generateSyncId(),
@@ -154,6 +117,68 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         );
 
         await transactionController.addTransaction(transaction);
+      } else {
+        // Validation
+        if (_amountController.text.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Vui lòng nhập số tiền')));
+          return;
+        }
+
+        final amount = double.tryParse(_amountController.text.replaceAll(',', ''));
+        if (amount == null || amount <= 0) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Số tiền không hợp lệ')));
+          return;
+        }
+
+        if (_selectedType.value == TransactionType.transfer) {
+          final transactionOut = TransactionModel(
+            title: 'Chuyển khoản đến ${transferInWalletState?.name ?? 'Chưa chọn'}',
+            // sử dụng transferIn để gửi title
+            // nơi chuyển đến
+            amount: amount,
+            date: _selectedDateTime,
+            type: TransactionType.transferOut,
+            categoryId: 'transfer',
+            note: _noteController.text.isNotEmpty ? _noteController.text : null,
+            createAt: DateTime.now(),
+            syncId: generateSyncId(),
+            walletId: transferOutWalletState?.id ?? -1,
+          );
+
+          final transactionIn = TransactionModel(
+            title: 'Nhận chuyển khoản từ ${transferOutWalletState?.name ?? 'Chưa chọn'}',
+            amount: amount,
+            date: _selectedDateTime,
+            type: TransactionType.transferIn,
+            categoryId: 'transfer',
+            note: _noteController.text.isNotEmpty ? _noteController.text : null,
+            createAt: DateTime.now(),
+            syncId: generateSyncId(),
+            walletId: transferInWalletState?.id ?? -1,
+          );
+
+          await transactionController.addTransaction(transactionOut);
+          await transactionController.addTransaction(transactionIn);
+        }  else {
+          if (selectedCategory == null) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Vui lòng chọn hạng mục')));
+            return;
+          }
+
+          final transaction = TransactionModel(
+            title: selectedCategory.name,
+            amount: amount,
+            date: _selectedDateTime,
+            type: _selectedType.value,
+            categoryId: selectedCategory.id,
+            note: _noteController.text.isNotEmpty ? _noteController.text : null,
+            createAt: DateTime.now(),
+            syncId: generateSyncId(),
+            walletId: effectiveWallet.id ?? -1,
+          );
+
+          await transactionController.addTransaction(transaction);
+        }
       }
       _clearTransaction();
 

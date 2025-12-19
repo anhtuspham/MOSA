@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class IconCategories{
+class IconCategories {
   static const Map<String, IconData> incomeCategories = {
     'Lương': Icons.attach_money,
     'Thưởng': Icons.card_giftcard,

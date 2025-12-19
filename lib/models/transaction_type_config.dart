@@ -9,7 +9,7 @@ class TransactionTypeConfig {
   final String displayName;
   final Color color;
   final String description;
-  
+
   const TransactionTypeConfig({
     required this.type,
     required this.category,
@@ -120,7 +120,9 @@ class TransactionTypeManager {
     return getBalanceEffect(type) == BalanceEffect.minus;
   }
 
-  static List<TransactionType> getTypesByCategory(TransactionCategory category) {
+  static List<TransactionType> getTypesByCategory(
+    TransactionCategory category,
+  ) {
     return _configs.values
         .where((config) => config.category == category)
         .map((config) => config.type)

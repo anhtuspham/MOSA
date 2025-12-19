@@ -8,7 +8,13 @@ class TextSelectorSection extends StatelessWidget {
   final void Function()? onTap;
   final String hintText;
   final Widget leading;
-  const TextSelectorSection({super.key, required this.controller, this.onTap, required this.hintText, required this.leading});
+  const TextSelectorSection({
+    super.key,
+    required this.controller,
+    this.onTap,
+    required this.hintText,
+    required this.leading,
+  });
 
   @override
   Widget build(BuildContext context) {

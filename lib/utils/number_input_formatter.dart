@@ -6,7 +6,10 @@ class ThousandSeparatorFormatter extends TextInputFormatter {
   ThousandSeparatorFormatter({this.separator = ','});
 
   @override
-  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
     if (newValue.text.isEmpty) {
       return newValue;
     }
@@ -25,6 +28,9 @@ class ThousandSeparatorFormatter extends TextInputFormatter {
       formatted += numericOnly[i];
     }
 
-    return TextEditingValue(text: formatted, selection: TextSelection.collapsed(offset: formatted.length));
+    return TextEditingValue(
+      text: formatted,
+      selection: TextSelection.collapsed(offset: formatted.length),
+    );
   }
 }

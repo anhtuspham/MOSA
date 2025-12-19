@@ -29,7 +29,10 @@ class _AccountTabScreenState extends ConsumerState<AccountTabScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Tổng tiền', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+              Text(
+                'Tổng tiền',
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+              ),
               Text(
                 Helpers.formatCurrency(totalBalanceState.value ?? 0),
                 style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
@@ -49,18 +52,30 @@ class _AccountTabScreenState extends ConsumerState<AccountTabScreen> {
                         final wallet = wallets[index];
                         return CustomListTile(
                           leading: Image.asset(wallet.iconPath, width: 30),
-                          title: Text(wallet.name, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-                          subTitle: Text(Helpers.formatCurrency(wallet.balance)),
+                          title: Text(
+                            wallet.name,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                            ),
+                          ),
+                          subTitle: Text(
+                            Helpers.formatCurrency(wallet.balance),
+                          ),
                           trailing: IconButton(
                             onPressed: _handleShowBottomSheet,
-                            icon: Icon(Icons.more_vert, color: AppColors.textPrimary),
+                            icon: Icon(
+                              Icons.more_vert,
+                              color: AppColors.textPrimary,
+                            ),
                           ),
                         );
                       }),
                     );
                   },
                   loading: () => LoadingSectionWidget(),
-                  error: (error, stackTrace) => ErrorSectionWidget(error: error),
+                  error:
+                      (error, stackTrace) => ErrorSectionWidget(error: error),
                 ),
               ],
             ),
@@ -79,16 +94,36 @@ class _AccountTabScreenState extends ConsumerState<AccountTabScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                ListTile(leading: Icon(Icons.swap_horiz, size: 20), title: Text('Chuyển khoản'), dense: true),
+                ListTile(
+                  leading: Icon(Icons.swap_horiz, size: 20),
+                  title: Text('Chuyển khoản'),
+                  dense: true,
+                ),
                 ListTile(
                   leading: Icon(Icons.currency_exchange, size: 20),
                   title: Text('Điều chỉnh số dư'),
                   dense: true,
                 ),
-                ListTile(leading: Icon(Icons.share, size: 20), title: Text('Chia sẻ tài khoản'), dense: true),
-                ListTile(leading: Icon(Icons.edit, size: 20), title: Text('Sửa'), dense: true),
-                ListTile(leading: Icon(Icons.delete, size: 20), title: Text('Xóa'), dense: true),
-                ListTile(leading: Icon(Icons.lock, size: 20), title: Text('Ngừng sử dụng'), dense: true),
+                ListTile(
+                  leading: Icon(Icons.share, size: 20),
+                  title: Text('Chia sẻ tài khoản'),
+                  dense: true,
+                ),
+                ListTile(
+                  leading: Icon(Icons.edit, size: 20),
+                  title: Text('Sửa'),
+                  dense: true,
+                ),
+                ListTile(
+                  leading: Icon(Icons.delete, size: 20),
+                  title: Text('Xóa'),
+                  dense: true,
+                ),
+                ListTile(
+                  leading: Icon(Icons.lock, size: 20),
+                  title: Text('Ngừng sử dụng'),
+                  dense: true,
+                ),
               ],
             ),
           ),

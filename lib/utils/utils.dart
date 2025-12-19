@@ -4,12 +4,15 @@ import 'package:mosa/models/transaction_type_config.dart';
 import 'dart:math' as math;
 
 TextPainter getTextPainter(String text, {BuildContext? context}) {
-  return TextPainter(text: TextSpan(text: text, style: TextStyle(fontSize: 14)), textDirection: TextDirection.ltr)
-    ..layout();
+  return TextPainter(
+    text: TextSpan(text: text, style: TextStyle(fontSize: 14)),
+    textDirection: TextDirection.ltr,
+  )..layout();
 }
 
 String generateSyncId() {
-  return DateTime.now().millisecondsSinceEpoch.toString() + math.Random().nextInt(1000).toString();
+  return DateTime.now().millisecondsSinceEpoch.toString() +
+      math.Random().nextInt(1000).toString();
 }
 
 TransactionType getTransactionType(String type) {
@@ -31,6 +34,8 @@ TransactionType getTransactionType(String type) {
   }
 }
 
-Color getTransactionTypeColor({TransactionType type = TransactionType.expense}) {
+Color getTransactionTypeColor({
+  TransactionType type = TransactionType.expense,
+}) {
   return TransactionTypeManager.getColor(type);
 }

@@ -24,26 +24,44 @@ class StatsShellScreen extends StatelessWidget {
           child: Column(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(6),
                   gradient: LinearGradient(
-                    colors: [AppColors.primary, AppColors.fourth, AppColors.third],
+                    colors: [
+                      AppColors.primary,
+                      AppColors.fourth,
+                      AppColors.third,
+                    ],
                     begin: Alignment.centerLeft,
                   ),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text('Tài chính hiện tại', style: TextStyle(color: AppColors.textWhite)),
+                    Text(
+                      'Tài chính hiện tại',
+                      style: TextStyle(color: AppColors.textWhite),
+                    ),
                     const SizedBox(height: 2),
                     Text(
                       '15.000.222.111 đ',
-                      style: TextStyle(color: AppColors.textWhite, fontWeight: FontWeight.w600, fontSize: 26),
+                      style: TextStyle(
+                        color: AppColors.textWhite,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 26,
+                      ),
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [Expanded(child: StatCard()), const SizedBox(width: 10), Expanded(child: StatCard())],
+                      children: [
+                        Expanded(child: StatCard()),
+                        const SizedBox(width: 10),
+                        Expanded(child: StatCard()),
+                      ],
                     ),
                   ],
                 ),
@@ -55,11 +73,17 @@ class StatsShellScreen extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: OperationGridItemWidget(iconPath: AppIcons.statisticIcon, title: 'Phân tích chi tiêu'),
+                    child: OperationGridItemWidget(
+                      iconPath: AppIcons.statisticIcon,
+                      title: 'Phân tích chi tiêu',
+                    ),
                   ),
                   const SizedBox(width: 6),
                   Expanded(
-                    child: OperationGridItemWidget(iconPath: AppIcons.statisticIcon, title: 'Phân tích chi tiêu'),
+                    child: OperationGridItemWidget(
+                      iconPath: AppIcons.statisticIcon,
+                      title: 'Phân tích chi tiêu',
+                    ),
                   ),
                 ],
               ),
@@ -67,11 +91,17 @@ class StatsShellScreen extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: OperationGridItemWidget(iconPath: AppIcons.statisticIcon, title: 'Phân tích chi tiêu'),
+                    child: OperationGridItemWidget(
+                      iconPath: AppIcons.statisticIcon,
+                      title: 'Phân tích chi tiêu',
+                    ),
                   ),
                   const SizedBox(width: 6),
                   Expanded(
-                    child: OperationGridItemWidget(iconPath: AppIcons.statisticIcon, title: 'Phân tích chi tiêu'),
+                    child: OperationGridItemWidget(
+                      iconPath: AppIcons.statisticIcon,
+                      title: 'Phân tích chi tiêu',
+                    ),
                   ),
                 ],
               ),
@@ -79,11 +109,17 @@ class StatsShellScreen extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: OperationGridItemWidget(iconPath: AppIcons.statisticIcon, title: 'Phân tích chi tiêu'),
+                    child: OperationGridItemWidget(
+                      iconPath: AppIcons.statisticIcon,
+                      title: 'Phân tích chi tiêu',
+                    ),
                   ),
                   const SizedBox(width: 6),
                   Expanded(
-                    child: OperationGridItemWidget(iconPath: AppIcons.statisticIcon, title: 'Phân tích chi tiêu'),
+                    child: OperationGridItemWidget(
+                      iconPath: AppIcons.statisticIcon,
+                      title: 'Phân tích chi tiêu',
+                    ),
                   ),
                 ],
               ),
@@ -91,11 +127,17 @@ class StatsShellScreen extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: OperationGridItemWidget(iconPath: AppIcons.statisticIcon, title: 'Phân tích chi tiêu'),
+                    child: OperationGridItemWidget(
+                      iconPath: AppIcons.statisticIcon,
+                      title: 'Phân tích chi tiêu',
+                    ),
                   ),
                   const SizedBox(width: 6),
                   Expanded(
-                    child: OperationGridItemWidget(iconPath: AppIcons.statisticIcon, title: 'Phân tích chi tiêu'),
+                    child: OperationGridItemWidget(
+                      iconPath: AppIcons.statisticIcon,
+                      title: 'Phân tích chi tiêu',
+                    ),
                   ),
                 ],
               ),

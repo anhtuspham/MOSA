@@ -11,7 +11,7 @@ class Helpers {
     return formatter.format(amount);
   }
 
-  static String formatNumber(double amount){
+  static String formatNumber(double amount) {
     final formatter = NumberFormat.decimalPattern('vi_VN');
     return formatter.format(amount);
   }

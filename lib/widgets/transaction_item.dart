@@ -15,14 +15,23 @@ class TransactionItem extends ConsumerWidget {
   final Category category;
   final TransactionModel transaction;
 
-  const TransactionItem({super.key, required this.category, required this.transaction});
+  const TransactionItem({
+    super.key,
+    required this.category,
+    required this.transaction,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final walletController = ref.watch(getWalletByIdProvider(transaction.walletId));
+    final walletController = ref.watch(
+      getWalletByIdProvider(transaction.walletId),
+    );
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -35,7 +44,13 @@ class TransactionItem extends ConsumerWidget {
               children: [
                 Text(transaction.title),
                 if (transaction.note != null)
-                  Text(transaction.note!, style: TextStyle(fontSize: 10.sp, color: AppColors.textSecondary)),
+                  Text(
+                    transaction.note!,
+                    style: TextStyle(
+                      fontSize: 10.sp,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
               ],
             ),
           ),
@@ -46,7 +61,9 @@ class TransactionItem extends ConsumerWidget {
                 Helpers.formatCurrency(transaction.amount),
                 style: TextStyle(
                   fontSize: 16.sp,
-                  color: getTransactionTypeColor(type: getTransactionType(category.type)),
+                  color: getTransactionTypeColor(
+                    type: getTransactionType(category.type),
+                  ),
                 ),
               ),
               walletController.when(
@@ -55,7 +72,13 @@ class TransactionItem extends ConsumerWidget {
                     children: [
                       Image.asset(wallet?.iconPath ?? '', width: 20),
                       const SizedBox(width: 4),
-                      Text(wallet?.name ?? '', style: TextStyle(fontSize: 10.sp, color: AppColors.textSecondary)),
+                      Text(
+                        wallet?.name ?? '',
+                        style: TextStyle(
+                          fontSize: 10.sp,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
                     ],
                   );
                 },

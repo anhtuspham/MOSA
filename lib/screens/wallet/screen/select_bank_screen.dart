@@ -40,9 +40,16 @@ class _BankScreenState extends ConsumerState<SelectBankScreen> {
               final isSelected = selectBankState?.id == bank.id;
               return CustomListTile(
                 title: Text(bank.name ?? ''),
-                leading: Image.asset(bank.iconPath ?? '', width: 30,),
-                backgroundColor: isSelected ? AppColors.lightBackGroundColor : null,
-                trailing: isSelected ? IconButton(onPressed: null, icon: Icon(Icons.check, color: AppColors.primary)) : null,
+                leading: Image.asset(bank.iconPath ?? '', width: 30),
+                backgroundColor:
+                    isSelected ? AppColors.lightBackGroundColor : null,
+                trailing:
+                    isSelected
+                        ? IconButton(
+                          onPressed: null,
+                          icon: Icon(Icons.check, color: AppColors.primary),
+                        )
+                        : null,
                 enable: true,
                 onTap: () {
                   ref.read(selectedBankProvider.notifier).state = bank;

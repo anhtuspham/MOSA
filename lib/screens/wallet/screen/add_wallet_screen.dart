@@ -34,6 +34,7 @@ class _AddWalletScreenState extends ConsumerState<AddWalletScreen> {
     _noteController.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return CommonScaffold(
@@ -52,7 +53,7 @@ class _AddWalletScreenState extends ConsumerState<AddWalletScreen> {
           children: [
             amountInputSection(),
             const SizedBox(height: 12),
-            walletAndDetailSection()
+            walletAndDetailSection(),
           ],
         ),
       ),
@@ -79,10 +80,17 @@ class _AddWalletScreenState extends ConsumerState<AddWalletScreen> {
     return CardSection(
       child: Column(
         children: [
-          TextSelectorSection(controller: _walletNameController, leading: Icon(Icons.wallet), hintText: 'Tên tài khoản',),
+          TextSelectorSection(
+            controller: _walletNameController,
+            leading: Icon(Icons.wallet),
+            hintText: 'Tên tài khoản',
+          ),
           const SizedBox(height: 8),
           CustomListTile(
-            leading: Icon(Icons.wallet_sharp),
+            leading:
+                selectedTypeWallet != null
+                    ? Image.asset(selectedTypeWallet.iconPath ?? '', width: 22)
+                    : Icon(Icons.wallet_sharp),
             title: Text((selectedTypeWallet?.name ?? '')),
             enable: true,
             trailing: Icon(Icons.chevron_right),
@@ -90,20 +98,29 @@ class _AddWalletScreenState extends ConsumerState<AddWalletScreen> {
               context.push(AppRoutes.typeWalletList);
             },
           ),
-          const SizedBox(height: 8,),
-          bankSelectorSection(),
           const SizedBox(height: 8),
-          TextSelectorSection(controller: _noteController, leading: Icon(Icons.notes_sharp), hintText: 'Diễn giải',)
+          if (selectedTypeWallet?.id == 2) ...[
+            bankSelectorSection(),
+            const SizedBox(height: 8),
+          ],
+          TextSelectorSection(
+            controller: _noteController,
+            leading: Icon(Icons.notes_sharp),
+            hintText: 'Diễn giải',
+          ),
         ],
       ),
     );
   }
 
-  Widget bankSelectorSection(){
+  Widget bankSelectorSection() {
     final selectedBank = ref.watch(selectedBankProvider);
 
     return CustomListTile(
-      leading: Icon(Icons.wallet_sharp),
+      leading:
+          selectedBank != null
+              ? Image.asset(selectedBank.iconPath, width: 22)
+              : Icon(Icons.wallet_sharp),
       title: Text((selectedBank?.name ?? '')),
       enable: true,
       trailing: Icon(Icons.chevron_right),

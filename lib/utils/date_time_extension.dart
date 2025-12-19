@@ -47,11 +47,15 @@ extension DateTimeExtension on DateTime {
     final thisDate = DateTime(year, month, day);
     final diffDays = today.difference(thisDate).inDays;
 
-    switch(diffDays){
-      case -1: return AppConstants.tomorrow;
-      case 0: return AppConstants.today;
-      case 1: return AppConstants.yesterday;
-      default: return weekdayName;
+    switch (diffDays) {
+      case -1:
+        return AppConstants.tomorrow;
+      case 0:
+        return AppConstants.today;
+      case 1:
+        return AppConstants.yesterday;
+      default:
+        return weekdayName;
     }
   }
 
@@ -70,9 +74,13 @@ extension DateTimeExtension on DateTime {
   }
 
   DateTime get endOfWeek {
-    return add(
-      Duration(days: 7 - weekday),
-    ).copyWith(hour: 23, minute: 59, second: 59, millisecond: 999, microsecond: 999);
+    return add(Duration(days: 7 - weekday)).copyWith(
+      hour: 23,
+      minute: 59,
+      second: 59,
+      millisecond: 999,
+      microsecond: 999,
+    );
   }
 }
 

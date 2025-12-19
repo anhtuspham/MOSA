@@ -48,16 +48,16 @@ class DatabaseService {
 
   Future<void> _recreateDatabase(Database db) async {
     log('🔄 Recreating database with latest schema');
-    
+
     try {
       // Drop all existing tables
       await db.execute('DROP TABLE IF EXISTS ${AppConstants.tableTransactions}');
       await db.execute('DROP TABLE IF EXISTS ${AppConstants.tableWallets}');
       await db.execute('DROP TABLE IF EXISTS ${AppConstants.tableTypeWallets}');
-      
+
       // Recreate with latest schema
       await _createLatestSchema(db);
-      
+
       log('Database recreated successfully');
     } catch (e) {
       log('Database recreation failed: $e');
@@ -201,11 +201,7 @@ class DatabaseService {
   Future<int> insertTransaction(TransactionModel transaction) async {
     try {
       final db = await database;
-      final id = await db.insert(
-        AppConstants.tableTransactions,
-        transaction.toMap(),
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
+      final id = await db.insert(AppConstants.tableTransactions, transaction.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
 
       await _updateWalletBalance(transaction.walletId);
 
@@ -243,11 +239,7 @@ class DatabaseService {
   // READ BY ID
   Future<TransactionModel?> getTransactionById(int id) async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query(
-      AppConstants.tableTransactions,
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    final List<Map<String, dynamic>> maps = await db.query(AppConstants.tableTransactions, where: 'id = ?', whereArgs: [id]);
 
     if (maps.isEmpty) return null;
     return TransactionModel.fromMap(maps.first);
@@ -261,12 +253,7 @@ class DatabaseService {
 
       // get old transaction with old walletId
       final oldTransaction = await getTransactionById(transaction.id ?? -1);
-      final count = await db.update(
-        AppConstants.tableTransactions,
-        transaction.toMap(),
-        where: 'id = ?',
-        whereArgs: [transaction.id],
-      );
+      final count = await db.update(AppConstants.tableTransactions, transaction.toMap(), where: 'id = ?', whereArgs: [transaction.id]);
 
       // update wallet balance
       await _updateWalletBalance(transaction.walletId);
@@ -308,42 +295,6 @@ class DatabaseService {
       }
       rethrow;
     }
-  }
-
-  // FILTER by date range
-  Future<List<TransactionModel>> getTransactionsByDateRange(DateTime startDate, DateTime endDate) async {
-    final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query(
-      AppConstants.tableTransactions,
-      where: 'date BETWEEN ? AND ?',
-      whereArgs: [startDate.toIso8601String(), endDate.toIso8601String()],
-      orderBy: 'date DESC',
-    );
-
-    return List.generate(maps.length, (i) {
-      return TransactionModel.fromMap(maps[i]);
-    });
-  }
-
-  // FILTER by type
-  Future<List<TransactionModel>> getTransactionsByType(String type) async {
-    final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query(
-      AppConstants.tableTransactions,
-      where: 'type = ?',
-      whereArgs: [type],
-      orderBy: 'date DESC',
-    );
-
-    return List.generate(maps.length, (i) {
-      return TransactionModel.fromMap(maps[i]);
-    });
-  }
-
-  // Close database
-  Future<void> close() async {
-    final db = await database;
-    await db.close();
   }
 
   // CLEAR DATABASE - Delete entire database file
@@ -389,25 +340,6 @@ class DatabaseService {
     }
   }
 
-  // IMPORT DATABASE - Load transactions from JSON string
-  Future<void> importDatabaseFromJsonString(String jsonString) async {
-    try {
-      final List<dynamic> jsonList = jsonDecode(jsonString);
-
-      log('📥 Importing ${jsonList.length} transactions');
-
-      for (final json in jsonList) {
-        final transaction = _parseTransactionFromJson(json);
-        await insertTransaction(transaction);
-      }
-
-      log('Database imported successfully');
-    } catch (e) {
-      log('Import failed: $e');
-      rethrow;
-    }
-  }
-
   // Parse transaction from JSON
   TransactionModel _parseTransactionFromJson(Map<String, dynamic> json) {
     return TransactionModel(
@@ -426,7 +358,6 @@ class DatabaseService {
   }
 
   // Helper function to convert category type string to TransactionType enum
-
 
   // ==================== WALLET BALANCE HELPER ====================
 
@@ -503,6 +434,7 @@ class DatabaseService {
       SUM(CASE
         WHEN type IN ('income', 'borrowing', 'transferIn') THEN amount
         WHEN type IN ('expense', 'lend', 'transferOut') THEN -amount
+        WHEN type = 'adjustBalance' THEN amount
         ELSE 0
       END) as balance
     FROM ${AppConstants.tableTransactions}
@@ -518,11 +450,7 @@ class DatabaseService {
   Future<int> insertWallet(Wallet wallet) async {
     try {
       final db = await database;
-      final id = await db.insert(
-        AppConstants.tableWallets,
-        wallet.toMap(),
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
+      final id = await db.insert(AppConstants.tableWallets, wallet.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
       log('Wallet inserted with id: $id');
       return id;
     } catch (e) {
@@ -568,10 +496,7 @@ class DatabaseService {
       final db = await database;
 
       // Check if wallet has transactions
-      final result = await db.rawQuery(
-        'SELECT COUNT(*) as count FROM ${AppConstants.tableTransactions} WHERE walletId = ?',
-        [id],
-      );
+      final result = await db.rawQuery('SELECT COUNT(*) as count FROM ${AppConstants.tableTransactions} WHERE walletId = ?', [id]);
       final transactionCount = Sqflite.firstIntValue(result) ?? 0;
 
       if (transactionCount > 0) {
@@ -654,10 +579,7 @@ class DatabaseService {
   /// Get all type wallets
   Future<List<TypeWallet>> getAllTypeWallets() async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query(
-      AppConstants.tableTypeWallets,
-      orderBy: 'id ASC',
-    );
+    final List<Map<String, dynamic>> maps = await db.query(AppConstants.tableTypeWallets, orderBy: 'id ASC');
 
     return List.generate(maps.length, (i) => TypeWallet.fromMap(maps[i]));
   }
@@ -665,11 +587,7 @@ class DatabaseService {
   /// Get type wallet by ID
   Future<TypeWallet?> getTypeWalletById(int id) async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query(
-      AppConstants.tableTypeWallets,
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    final List<Map<String, dynamic>> maps = await db.query(AppConstants.tableTypeWallets, where: 'id = ?', whereArgs: [id]);
 
     if (maps.isEmpty) return null;
     return TypeWallet.fromMap(maps.first);
@@ -679,15 +597,36 @@ class DatabaseService {
   Future<int> insertTypeWallet(TypeWallet typeWallet) async {
     try {
       final db = await database;
-      final id = await db.insert(
-        AppConstants.tableTypeWallets,
-        typeWallet.toMap(),
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
+      final id = await db.insert(AppConstants.tableTypeWallets, typeWallet.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
       log('Type wallet inserted with id: $id');
       return id;
     } catch (e) {
       log('Insert type wallet failed: $e');
+      rethrow;
+    }
+  }
+
+  /// Delete type wallet (only if no wallets are using it)
+  Future<int> deleteTypeWallet(int id) async {
+    try {
+      final db = await database;
+
+      // Check if any wallets are using this type
+      final result = await db.rawQuery('SELECT COUNT(*) as count FROM ${AppConstants.tableWallets} WHERE typeWalletId = ?', [id]);
+      final walletCount = Sqflite.firstIntValue(result) ?? 0;
+
+      if (walletCount > 0) {
+        throw Exception(
+          'Cannot delete type wallet with $walletCount wallet(s) using it. '
+          'Please change wallet types or delete wallets first.',
+        );
+      }
+
+      final count = await db.delete(AppConstants.tableTypeWallets, where: 'id = ?', whereArgs: [id]);
+      log('Type wallet deleted: $count rows affected');
+      return count;
+    } catch (e) {
+      log('Delete type wallet failed: $e');
       rethrow;
     }
   }

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
-Future<DateTime?> showDateTimePicker({required BuildContext context, DateTime? initialDate}) async {
+Future<DateTime?> showDateTimePicker({
+  required BuildContext context,
+  DateTime? initialDate,
+}) async {
   initialDate ??= DateTime.now();
   DateTime? pickedDate;
   TimeOfDay? time;
@@ -19,5 +22,11 @@ Future<DateTime?> showDateTimePicker({required BuildContext context, DateTime? i
   time = await showTimePicker(context: context, initialTime: initialTime);
 
   if (time == null) return null;
-  return DateTime(pickedDate.year, pickedDate.month, pickedDate.day, time.hour, time.minute);
+  return DateTime(
+    pickedDate.year,
+    pickedDate.month,
+    pickedDate.day,
+    time.hour,
+    time.minute,
+  );
 }

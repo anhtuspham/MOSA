@@ -33,7 +33,10 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Lịch sử ghi chép', style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text(
+                    'Lịch sử ghi chép',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   selectDateTypeDropdown(),
                 ],
               ),
@@ -68,21 +71,30 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
     return PopupMenuButton(
       initialValue: dateFilterNotifier.name,
       onSelected: (value) {
-        ref.read(dateRangeFilterProvider.notifier).state = DateRangeFilter.values.firstWhere(
-          (element) => element.name == value,
-        );
+        ref.read(dateRangeFilterProvider.notifier).state = DateRangeFilter
+            .values
+            .firstWhere((element) => element.name == value);
       },
       itemBuilder:
           (context) =>
               DateRangeFilter.values.map((e) {
-                return PopupMenuItem(value: e.name, child: Text(_getFilterLabel(e)));
+                return PopupMenuItem(
+                  value: e.name,
+                  child: Text(_getFilterLabel(e)),
+                );
               }).toList(),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(border: Border.all(color: AppColors.border), borderRadius: BorderRadius.circular(8)),
+        decoration: BoxDecoration(
+          border: Border.all(color: AppColors.border),
+          borderRadius: BorderRadius.circular(8),
+        ),
         child: Row(
           children: [
-            Text(_getFilterLabel(dateFilterNotifier), style: TextStyle(fontWeight: FontWeight.w500)),
+            Text(
+              _getFilterLabel(dateFilterNotifier),
+              style: TextStyle(fontWeight: FontWeight.w500),
+            ),
             const Icon(Icons.keyboard_arrow_down),
           ],
         ),
@@ -107,7 +119,9 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
                 Text(
                   Helpers.formatCurrency(totalIncome),
                   style: TextStyle(
-                    color: getTransactionTypeColor(type: TransactionType.income),
+                    color: getTransactionTypeColor(
+                      type: TransactionType.income,
+                    ),
                     fontSize: 18,
                     fontWeight: FontWeight.w500,
                   ),
@@ -128,7 +142,9 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
                 Text(
                   Helpers.formatCurrency(totalExpense),
                   style: TextStyle(
-                    color: getTransactionTypeColor(type: TransactionType.expense),
+                    color: getTransactionTypeColor(
+                      type: TransactionType.expense,
+                    ),
                     fontSize: 18,
                     fontWeight: FontWeight.w500,
                   ),
@@ -159,7 +175,9 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
       ref.invalidate(transactionProvider);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Lỗi: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Lỗi: $e')));
       }
     }
   }

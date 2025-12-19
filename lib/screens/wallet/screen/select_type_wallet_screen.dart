@@ -13,7 +13,8 @@ class SelectTypeWalletScreen extends ConsumerStatefulWidget {
   const SelectTypeWalletScreen({super.key});
 
   @override
-  ConsumerState<SelectTypeWalletScreen> createState() => _TypeWalletScreenState();
+  ConsumerState<SelectTypeWalletScreen> createState() =>
+      _TypeWalletScreenState();
 }
 
 class _TypeWalletScreenState extends ConsumerState<SelectTypeWalletScreen> {
@@ -39,12 +40,20 @@ class _TypeWalletScreenState extends ConsumerState<SelectTypeWalletScreen> {
               final isSelected = selectTypeWalletState?.id == typeWallet.id;
               return CustomListTile(
                 title: Text(typeWallet.name ?? ''),
-                leading: Image.asset(typeWallet.iconPath ?? '', width: 30,),
-                backgroundColor: isSelected ? AppColors.lightBackGroundColor : null,
-                trailing: isSelected ? IconButton(onPressed: null, icon: Icon(Icons.check, color: AppColors.primary)) : null,
+                leading: Image.asset(typeWallet.iconPath ?? '', width: 30),
+                backgroundColor:
+                    isSelected ? AppColors.lightBackGroundColor : null,
+                trailing:
+                    isSelected
+                        ? IconButton(
+                          onPressed: null,
+                          icon: Icon(Icons.check, color: AppColors.primary),
+                        )
+                        : null,
                 enable: true,
                 onTap: () {
-                  ref.read(selectedTypeWalletProvider.notifier).state = typeWallet;
+                  ref.read(selectedTypeWalletProvider.notifier).state =
+                      typeWallet;
                   context.pop();
                 },
               );

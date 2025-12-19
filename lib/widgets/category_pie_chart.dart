@@ -23,7 +23,14 @@ class CategoryPieChart extends StatelessWidget {
           SizedBox(
             height: size.height * 0.15,
             width: size.width * 0.4,
-            child: PieChart(PieChartData(sections: _buildSection(), centerSpaceRadius: 20, sectionsSpace: 1, borderData: FlBorderData(show: false))),
+            child: PieChart(
+              PieChartData(
+                sections: _buildSection(),
+                centerSpaceRadius: 20,
+                sectionsSpace: 1,
+                borderData: FlBorderData(show: false),
+              ),
+            ),
           ),
           const SizedBox(width: 10),
           Expanded(child: _buildLegend()),
@@ -37,7 +44,11 @@ class CategoryPieChart extends StatelessWidget {
       final index = entry.key;
       final data = entry.value;
 
-      return PieChartSectionData(value: data.value, showTitle: false, color: AppColors.chartColors[index]);
+      return PieChartSectionData(
+        value: data.value,
+        showTitle: false,
+        color: AppColors.chartColors[index],
+      );
     }).toList();
   }
 
@@ -63,13 +74,26 @@ class CategoryPieChart extends StatelessWidget {
                   Container(
                     width: 10,
                     height: 10,
-                    decoration: BoxDecoration(shape: BoxShape.rectangle, borderRadius: BorderRadius.circular(2), color: AppColors.chartColors[index]),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.rectangle,
+                      borderRadius: BorderRadius.circular(2),
+                      color: AppColors.chartColors[index],
+                    ),
                   ),
                   const SizedBox(width: 8),
-                  SizedBox(width: maxCategoryWidth * AppConstants.scaleTextFactor, child: Text(data.key, overflow: TextOverflow.ellipsis, style: TextStyle
-                    (fontSize: 14))),
+                  SizedBox(
+                    width: maxCategoryWidth * AppConstants.scaleTextFactor,
+                    child: Text(
+                      data.key,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 14),
+                    ),
+                  ),
                   const SizedBox(width: 8),
-                  Text('${percentage.toStringAsFixed(2)}%', style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text(
+                    '${percentage.toStringAsFixed(2)}%',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                 ],
               ),
             );

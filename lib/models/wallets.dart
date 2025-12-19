@@ -5,7 +5,7 @@ class Wallet {
   final String name;
   final String iconPath;
   final double balance;
-  final int typeWalletId;              // Foreign key to TypeWallet table
+  final int typeWalletId; // Foreign key to TypeWallet table
   final bool isDefault;
   final bool isActive;
   final DateTime createAt;
@@ -52,9 +52,10 @@ class Wallet {
       isDefault: (map['isDefault'] as int?) == 1,
       isActive: (map['isActive'] as int?) == 1,
       createAt: DateTime.parse(map['createAt'] as String),
-      updateAt: map['updateAt'] != null
-          ? DateTime.parse(map['updateAt'] as String)
-          : null,
+      updateAt:
+          map['updateAt'] != null
+              ? DateTime.parse(map['updateAt'] as String)
+              : null,
       isSynced: (map['isSynced'] as int?) == 1,
       syncId: map['syncId'] as String,
     );
@@ -110,16 +111,12 @@ class Wallet {
   // }
 }
 
-class TypeWallet{
+class TypeWallet {
   final int? id;
   final String? name;
   final String? iconPath;
 
-  TypeWallet({
-    this.id,
-    this.name,
-    this.iconPath,
-  });
+  TypeWallet({this.id, this.name, this.iconPath});
 
   factory TypeWallet.fromJson(Map<String, dynamic> json) {
     return TypeWallet(
@@ -138,18 +135,10 @@ class TypeWallet{
   }
 
   Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'name': name,
-      'iconPath': iconPath
-    };
+    return {'id': id, 'name': name, 'iconPath': iconPath};
   }
 
-  TypeWallet copyWith({
-    int? id,
-    String? name,
-    String? iconPath
-  }) {
+  TypeWallet copyWith({int? id, String? name, String? iconPath}) {
     return TypeWallet(
       id: id ?? this.id,
       name: name ?? this.name,

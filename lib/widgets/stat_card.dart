@@ -15,7 +15,11 @@ class StatCard extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
               gradient: LinearGradient(
-                colors: [AppColors.primaryBlue, AppColors.thirdBlue, AppColors.sixthBlue],
+                colors: [
+                  AppColors.primaryBlue,
+                  AppColors.thirdBlue,
+                  AppColors.sixthBlue,
+                ],
                 // transform: GradientRotation(0.785398),
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -24,8 +28,20 @@ class StatCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Tổng có', style: TextStyle(color: AppColors.textWhite, fontWeight: FontWeight.w500)),
-                Text('15.000.000 đ', style: TextStyle(color: AppColors.textWhite, fontWeight: FontWeight.w500)),
+                Text(
+                  'Tổng có',
+                  style: TextStyle(
+                    color: AppColors.textWhite,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                Text(
+                  '15.000.000 đ',
+                  style: TextStyle(
+                    color: AppColors.textWhite,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ],
             ),
           ),
@@ -34,8 +50,14 @@ class StatCard extends StatelessWidget {
             right: 5,
             child: Container(
               padding: EdgeInsets.all(2),
-              decoration: BoxDecoration(shape: BoxShape.circle, color: AppColors.buttonPrimary),
-              child: Icon(Icons.arrow_right_alt_sharp, color: AppColors.textWhite),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.buttonPrimary,
+              ),
+              child: Icon(
+                Icons.arrow_right_alt_sharp,
+                color: AppColors.textWhite,
+              ),
             ),
           ),
         ],
