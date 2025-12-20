@@ -450,12 +450,34 @@ class DatabaseService {
   Future<int> insertWallet(Wallet wallet) async {
     try {
       final db = await database;
-      final id = await db.insert(AppConstants.tableWallets, wallet.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+
+      final existing = await db.query(AppConstants.tableWallets, where: 'name = ?', whereArgs: [wallet.name]);
+      if(existing.isNotEmpty){
+        throw 'Tên ví đã tồn tại';
+      }
+
+      final id = await db.insert(AppConstants.tableWallets, wallet.toMap());
       log('Wallet inserted with id: $id');
       return id;
     } catch (e) {
       log('Insert wallet failed: $e');
-      rethrow;
+
+      final errorMsg = e.toString();
+
+      if (errorMsg.contains('has no column named')) {
+        throw 'Database lỗi. Vui lòng xóa và cài lại app.';
+      }
+
+      if (errorMsg.contains('UNIQUE constraint')) {
+        throw 'Tên ví đã tồn tại';
+      }
+
+      if (errorMsg.contains('FOREIGN KEY constraint')) {
+        throw 'Loại ví không hợp lệ';
+      }
+
+      // Default error
+      throw 'Không thể lưu ví. Vui lòng thử lại.';
     }
   }
 

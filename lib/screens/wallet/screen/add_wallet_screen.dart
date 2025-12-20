@@ -1,16 +1,23 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mosa/providers/bank_provider.dart';
 import 'package:mosa/providers/wallet_provider.dart';
+import 'package:mosa/utils/app_icons.dart';
+import 'package:mosa/utils/toast.dart';
 import 'package:mosa/widgets/date_time_selector_section.dart';
 import 'package:mosa/widgets/note_selector_section.dart';
 import 'package:mosa/widgets/section_container.dart';
 import 'package:mosa/widgets/tab_bar_scaffold.dart';
+import 'package:toastification/toastification.dart';
 
+import '../../../models/wallets.dart';
 import '../../../router/app_routes.dart';
 import '../../../utils/app_colors.dart';
+import '../../../utils/utils.dart';
 import '../../../widgets/amount_text_field.dart';
 import '../../../widgets/card_section.dart';
 import '../../../widgets/custom_list_tile.dart';
@@ -35,6 +42,40 @@ class _AddWalletScreenState extends ConsumerState<AddWalletScreen> {
     super.dispose();
   }
 
+  Future<void> _submit() async {
+    try {
+      final walletController = ref.read(walletProvider.notifier);
+      final selectTypeWalletController = ref.read(selectedTypeWalletProvider);
+      final selectedBankController = ref.read(selectedBankProvider);
+
+      if (_walletNameController.text.isEmpty) {
+        showToast('Vui lòng nhập tên ví', isError: true);
+        return;
+      }
+      final newWallet = Wallet(
+        id: generateId(),
+        name: _walletNameController.text,
+        balance: double.tryParse(_amountController.text.replaceAll(', ', '')) ?? 0,
+        note: _noteController.text,
+        typeWalletId: selectTypeWalletController?.id ?? 99,
+        createAt: DateTime.now(),
+        isSynced: false,
+        syncId: '',
+        iconPath: AppIcons.moneyBag,
+        isActive: true,
+        bankId: selectedBankController?.id,
+      );
+
+      await walletController.insertWallet(newWallet);
+
+      showToast('Thêm ví thành công');
+      if (!mounted) return;
+      Navigator.pop(context);
+    } catch (e) {
+      showToast(e.toString(), isError: true);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return CommonScaffold(
@@ -44,33 +85,19 @@ class _AddWalletScreenState extends ConsumerState<AddWalletScreen> {
         onPressed: () {
           context.pop();
         },
-        icon: const Icon(Icons.arrow_back),
+        icon: Icon(Icons.arrow_back),
       ),
       appBarBackgroundColor: AppColors.primaryBackground,
-      actions: const [Icon(Icons.check)],
-      body: SectionContainer(
-        child: Column(
-          children: [
-            amountInputSection(),
-            const SizedBox(height: 12),
-            walletAndDetailSection(),
-          ],
-        ),
-      ),
+      actions: [
+        IconButton(onPressed: _submit, icon: Icon(Icons.check),)
+      ],
+      body: SectionContainer(child: Column(children: [amountInputSection(), const SizedBox(height: 12), walletAndDetailSection()])),
     );
   }
 
   Widget amountInputSection() {
     return CardSection(
-      child: Column(
-        children: [
-          Text('Số dư ban đầu'),
-          AmountTextField(
-            controller: _amountController,
-            amountColor: AppColors.primary,
-          ),
-        ],
-      ),
+      child: Column(children: [Text('Số dư ban đầu'), AmountTextField(controller: _amountController, amountColor: AppColors.primary)]),
     );
   }
 
@@ -80,17 +107,10 @@ class _AddWalletScreenState extends ConsumerState<AddWalletScreen> {
     return CardSection(
       child: Column(
         children: [
-          TextSelectorSection(
-            controller: _walletNameController,
-            leading: Icon(Icons.wallet),
-            hintText: 'Tên tài khoản',
-          ),
+          TextSelectorSection(controller: _walletNameController, leading: Icon(Icons.wallet), hintText: 'Tên tài khoản'),
           const SizedBox(height: 8),
           CustomListTile(
-            leading:
-                selectedTypeWallet != null
-                    ? Image.asset(selectedTypeWallet.iconPath ?? '', width: 22)
-                    : Icon(Icons.wallet_sharp),
+            leading: selectedTypeWallet != null ? Image.asset(selectedTypeWallet.iconPath ?? '', width: 22) : Icon(Icons.wallet_sharp),
             title: Text((selectedTypeWallet?.name ?? '')),
             enable: true,
             trailing: Icon(Icons.chevron_right),
@@ -99,15 +119,8 @@ class _AddWalletScreenState extends ConsumerState<AddWalletScreen> {
             },
           ),
           const SizedBox(height: 8),
-          if (selectedTypeWallet?.id == 2) ...[
-            bankSelectorSection(),
-            const SizedBox(height: 8),
-          ],
-          TextSelectorSection(
-            controller: _noteController,
-            leading: Icon(Icons.notes_sharp),
-            hintText: 'Diễn giải',
-          ),
+          if (selectedTypeWallet?.id == 2) ...[bankSelectorSection(), const SizedBox(height: 8)],
+          TextSelectorSection(controller: _noteController, leading: Icon(Icons.notes_sharp), hintText: 'Diễn giải'),
         ],
       ),
     );
@@ -117,10 +130,7 @@ class _AddWalletScreenState extends ConsumerState<AddWalletScreen> {
     final selectedBank = ref.watch(selectedBankProvider);
 
     return CustomListTile(
-      leading:
-          selectedBank != null
-              ? Image.asset(selectedBank.iconPath, width: 22)
-              : Icon(Icons.wallet_sharp),
+      leading: selectedBank != null ? Image.asset(selectedBank.iconPath, width: 22) : Icon(Icons.wallet_sharp),
       title: Text((selectedBank?.name ?? '')),
       enable: true,
       trailing: Icon(Icons.chevron_right),

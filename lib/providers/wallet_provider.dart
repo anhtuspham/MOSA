@@ -28,6 +28,8 @@ class WalletsNotifier extends AsyncNotifier<List<Wallet>> {
       refreshWallet();
     } catch (e) {
       log('Error when insert wallet $e');
+      state = AsyncError(e, StackTrace.current);
+      rethrow;
     }
   }
 

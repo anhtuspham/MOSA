@@ -12,6 +12,8 @@ class Wallet {
   final DateTime? updateAt;
   final bool isSynced;
   final String syncId;
+  final String? note;
+  final int? bankId;
 
   Wallet({
     this.id,
@@ -25,6 +27,8 @@ class Wallet {
     this.updateAt,
     this.isSynced = false,
     required this.syncId,
+    this.note,
+    this.bankId
   });
 
   factory Wallet.fromJson(Map<String, dynamic> json) {
@@ -39,6 +43,8 @@ class Wallet {
       updateAt: DateTime.now(),
       isSynced: json['isSynced'] as bool? ?? false,
       syncId: json['syncId'] as String? ?? '',
+      note: json['note'] as String? ?? '',
+      bankId: json['bankId']
     );
   }
 
@@ -58,6 +64,8 @@ class Wallet {
               : null,
       isSynced: (map['isSynced'] as int?) == 1,
       syncId: map['syncId'] as String,
+      note: map['note'] as String? ?? '',
+      bankId: map['bankId'],
     );
   }
 
@@ -74,6 +82,8 @@ class Wallet {
       'updateAt': updateAt?.toIso8601String(),
       'isSynced': isSynced ? 1 : 0,
       'syncId': syncId,
+      'note': note,
+      'bankId': bankId
     };
   }
 
@@ -89,6 +99,8 @@ class Wallet {
     DateTime? updateAt,
     bool? isSynced,
     String? syncId,
+    String? note,
+    int? bankId
   }) {
     return Wallet(
       id: id ?? this.id,
@@ -102,6 +114,8 @@ class Wallet {
       updateAt: updateAt ?? this.updateAt,
       isSynced: isSynced ?? this.isSynced,
       syncId: syncId ?? this.syncId,
+      note: note ?? this.note,
+      bankId: bankId
     );
   }
 

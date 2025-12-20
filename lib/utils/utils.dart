@@ -1,3 +1,4 @@
+
 import 'package:flutter/cupertino.dart';
 import 'package:mosa/models/enums.dart';
 import 'package:mosa/models/transaction_type_config.dart';
@@ -13,6 +14,15 @@ TextPainter getTextPainter(String text, {BuildContext? context}) {
 String generateSyncId() {
   return DateTime.now().millisecondsSinceEpoch.toString() +
       math.Random().nextInt(1000).toString();
+}
+
+int generateId() {
+  final timestamp = DateTime.now().millisecondsSinceEpoch;
+  final random = math.Random().nextInt(99999);
+
+  final last5 = timestamp % 100000;
+
+  return last5 * 100000 + random;
 }
 
 TransactionType getTransactionType(String type) {
