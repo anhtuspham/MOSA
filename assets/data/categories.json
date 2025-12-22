@@ -267,5 +267,13 @@
     "iconType": "material",
     "iconPath": "autorenew",
     "color": "#52B2FF"
+  },
+  {
+    "id": "adjustment",
+    "name": "Điều chỉnh số dư",
+    "type": "adjustment",
+    "iconType": "custom",
+    "iconPath": "assets/icons/transfer.png",
+    "color": "#ffd15b"
   }
 ]

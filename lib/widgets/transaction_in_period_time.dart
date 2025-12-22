@@ -3,11 +3,13 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mosa/providers/category_provider.dart';
+import 'package:mosa/utils/app_icons.dart';
 import 'package:mosa/utils/helpers.dart';
 import 'package:mosa/widgets/error_widget.dart';
 import 'package:mosa/widgets/loading_widget.dart';
 import 'package:mosa/widgets/transaction_item.dart';
 
+import '../models/category.dart';
 import '../models/enums.dart';
 import '../providers/date_filter_provider.dart';
 import '../utils/app_colors.dart';
@@ -119,19 +121,19 @@ class _TransactionInPeriodTimeState
               itemBuilder: (context, index) {
                 final transaction = transactionsData[index];
                 final category = categoryMap[transaction.categoryId];
-                if (category == null) {
-                  return Container(
-                    height: 60,
-                    margin: const EdgeInsets.only(bottom: 12),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Center(child: Text('Category not found')),
-                  );
-                }
+                // if (category == null) {
+                //   return Container(
+                //     height: 60,
+                //     margin: const EdgeInsets.only(bottom: 12),
+                //     decoration: BoxDecoration(
+                //       color: Colors.grey[200],
+                //       borderRadius: BorderRadius.circular(10),
+                //     ),
+                //     child: const Center(child: Text('Category not found')),
+                //   );
+                // }
                 return TransactionItem(
-                  category: category,
+                  category: category ?? Category.empty(),
                   transaction: transaction,
                 );
               },

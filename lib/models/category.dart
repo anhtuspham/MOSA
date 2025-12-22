@@ -48,6 +48,8 @@ class Category {
     );
   }
 
+  factory Category.empty() => Category(id: 'unknown', name: 'unknown', type: 'unknown', iconType: 'custom', iconPath: 'assets/icons/default.png');
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -68,7 +70,7 @@ class Category {
             : Colors.grey;
 
     if (iconType == 'custom') {
-      return Image.asset(iconPath, width: size, height: size, color: color);
+      return Image.asset(iconPath, width: size, height: size);
     } else {
       return Icon(_getMaterialIcon(iconPath), color: color, size: size);
     }

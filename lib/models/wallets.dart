@@ -43,7 +43,7 @@ class Wallet {
       updateAt: DateTime.now(),
       isSynced: json['isSynced'] as bool? ?? false,
       syncId: json['syncId'] as String? ?? '',
-      note: json['note'] as String? ?? '',
+      note: json['note'] ?? '',
       bankId: json['bankId']
     );
   }
@@ -64,7 +64,7 @@ class Wallet {
               : null,
       isSynced: (map['isSynced'] as int?) == 1,
       syncId: map['syncId'] as String,
-      note: map['note'] as String? ?? '',
+      note: map['note'] ?? '',
       bankId: map['bankId'],
     );
   }

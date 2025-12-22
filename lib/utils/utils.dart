@@ -1,3 +1,4 @@
+import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:mosa/models/enums.dart';
@@ -5,15 +6,11 @@ import 'package:mosa/models/transaction_type_config.dart';
 import 'dart:math' as math;
 
 TextPainter getTextPainter(String text, {BuildContext? context}) {
-  return TextPainter(
-    text: TextSpan(text: text, style: TextStyle(fontSize: 14)),
-    textDirection: TextDirection.ltr,
-  )..layout();
+  return TextPainter(text: TextSpan(text: text, style: TextStyle(fontSize: 14)), textDirection: TextDirection.ltr)..layout();
 }
 
 String generateSyncId() {
-  return DateTime.now().millisecondsSinceEpoch.toString() +
-      math.Random().nextInt(1000).toString();
+  return DateTime.now().millisecondsSinceEpoch.toString() + math.Random().nextInt(1000).toString();
 }
 
 int generateId() {
@@ -40,12 +37,10 @@ TransactionType getTransactionType(String type) {
     case 'transferIn':
       return TransactionType.transfer;
     default:
-      return TransactionType.expense;
+      return TransactionType.unknown;
   }
 }
 
-Color getTransactionTypeColor({
-  TransactionType type = TransactionType.expense,
-}) {
+Color getTransactionTypeColor({TransactionType type = TransactionType.expense}) {
   return TransactionTypeManager.getColor(type);
 }

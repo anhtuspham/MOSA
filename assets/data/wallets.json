@@ -15,7 +15,7 @@
   {
     "id": 2,
     "name": "Tiền mặt",
-    "iconPath": "assets/icons/money.png",
+    "iconPath": "assets/icons/cash.png",
     "balance": 26470000,
     "typeWalletId": 1,
     "isDefault": true,

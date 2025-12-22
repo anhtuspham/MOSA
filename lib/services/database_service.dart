@@ -101,7 +101,6 @@ class DatabaseService {
       final List<dynamic> jsonData = jsonDecode(jsonString);
 
       for (var data in jsonData) {
-        // Update JSON to use typeWalletId instead of typeWallet
         data['typeWalletId'] = data['typeWalletId'] ?? 1; // Default to cash
         final wallet = Wallet.fromJson(data);
         await db.insert(AppConstants.tableWallets, wallet.toMap());
@@ -120,7 +119,7 @@ class DatabaseService {
         'isSynced': 0,
         'syncId': DateTime.now().millisecondsSinceEpoch.toString(),
       });
-      log('Default wallet created');
+      log('Default wallet created cuz have bug $e');
     }
   }
 
@@ -160,6 +159,8 @@ class DatabaseService {
         updateAt TEXT,
         isSynced INTEGER NOT NULL DEFAULT 0,
         syncId TEXT NOT NULL,
+        note TEXT,
+        bankId INTEGER,
         FOREIGN KEY (typeWalletId) REFERENCES ${AppConstants.tableTypeWallets}(id) ON DELETE RESTRICT
       )
     ''');

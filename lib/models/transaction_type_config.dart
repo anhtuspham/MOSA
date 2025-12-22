@@ -86,6 +86,14 @@ class TransactionTypeManager {
       color: AppColors.primary,
       description: 'Balance adjustment',
     ),
+    TransactionType.unknown: TransactionTypeConfig(
+      type: TransactionType.unknown,
+      category: TransactionCategory.unknown,
+      balanceEffect: BalanceEffect.neutral,
+      displayName: 'Unknown',
+      color: AppColors.textPrimary,
+      description: 'Unknown transaction type'
+    )
   };
 
   static TransactionTypeConfig getConfig(TransactionType type) {

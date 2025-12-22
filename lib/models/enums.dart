@@ -7,6 +7,7 @@ enum TransactionType {
   transferIn,
   transferOut,
   adjustBalance,
+  unknown
 }
 
 enum BalanceEffect { plus, minus, neutral }
@@ -16,6 +17,7 @@ enum TransactionCategory {
   transfer, // between wallets
   lending, // lend/borrow
   adjustment, // balance adjustments
+  unknown
 }
 
 // transferIn là nhận tiền vào
