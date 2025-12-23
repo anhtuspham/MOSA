@@ -106,11 +106,12 @@ class DatabaseService {
         await db.insert(AppConstants.tableWallets, wallet.toMap());
       }
       log('Wallets seeded from JSON');
-    } catch (e) {
+    } catch (e, stackTrace) {
       // If JSON doesn't exist, create default wallet
       await db.insert(AppConstants.tableWallets, {
         'name': 'Ví mặc định',
         'iconPath': 'assets/icons/cash.png',
+        'initialBalance': 0,
         'balance': 0,
         'typeWalletId': 1, // Cash type
         'isDefault': 1,
@@ -119,7 +120,30 @@ class DatabaseService {
         'isSynced': 0,
         'syncId': DateTime.now().millisecondsSinceEpoch.toString(),
       });
-      log('Default wallet created cuz have bug $e');
+      log('Default wallet created cuz have bug', name: 'DatabaseService', error: e, stackTrace: stackTrace);
+    }
+  }
+
+  Future<void> _seedTransactions(Database db) async {
+    final count = Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM ${AppConstants.tableTransactions}'));
+
+    if (count! > 0) {
+      log('Transactions existed, skip');
+      return;
+    }
+
+    try {
+      final jsonString = await rootBundle.loadString('assets/data/transactions.json');
+      final List<dynamic> jsonData = jsonDecode(jsonString);
+
+      for (final json in jsonData) {
+        final transaction = _parseTransactionFromJson(json);
+        await db.insert(AppConstants.tableTransactions, transaction.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+      }
+
+      log('Transactions seeded from JSON');
+    } catch (e, stackTrace) {
+      log('Transactions seeding failed', name: 'DatabaseService', error: e, stackTrace: stackTrace);
     }
   }
 
@@ -151,6 +175,7 @@ class DatabaseService {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL UNIQUE,
         iconPath TEXT NOT NULL,
+        initialBalance REAL NOT NULL DEFAULT 0,
         balance REAL NOT NULL DEFAULT 0,
         typeWalletId INTEGER NOT NULL,
         isDefault INTEGER NOT NULL DEFAULT 0,
@@ -196,6 +221,21 @@ class DatabaseService {
     // Seed default data
     await _seedTypeWallets(db);
     await _seedWallets(db);
+    await _seedTransactions(db);
+  }
+
+  Future<void> initializeDatabase({bool clearExisting = false}) async {
+    try {
+      if (clearExisting) {
+        await clearDatabase();
+        _database = null;
+
+        await Future.delayed(const Duration(milliseconds: 100));
+      }
+      await database;
+    } catch (e) {
+      log('Database initialization failed', error: e);
+    }
   }
 
   // CREATE
@@ -367,6 +407,7 @@ class DatabaseService {
     try {
       final db = await database;
       final calculatedBalance = await getWalletBalance(walletId);
+      log('calculateBalance: $calculatedBalance');
 
       await db.update(
         AppConstants.tableWallets,
@@ -387,14 +428,30 @@ class DatabaseService {
   /// Get all wallets (active only by default)
   Future<List<Wallet>> getAllWallets({bool includeInactive = false}) async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query(
-      AppConstants.tableWallets,
-      where: includeInactive ? null : 'isActive = ?',
-      whereArgs: includeInactive ? null : [1],
-      orderBy: 'isDefault DESC, name ASC',
-    );
 
-    return List.generate(maps.length, (i) => Wallet.fromMap(maps[i]));
+    // Query với calculated balance
+    final List<Map<String, dynamic>> maps = await db.rawQuery('''
+    SELECT 
+      w.*,
+      COALESCE(w.initialBalance, 0) + COALESCE(
+        (SELECT SUM(CASE
+          WHEN t.type IN ('income', 'borrowing', 'transferIn') THEN t.amount
+          WHEN t.type IN ('expense', 'lend', 'transferOut') THEN -t.amount
+          WHEN t.type = 'adjustBalance' THEN t.amount
+          ELSE 0
+        END) FROM ${AppConstants.tableTransactions} t WHERE t.walletId = w.id),
+        0
+      ) as calculatedBalance
+    FROM ${AppConstants.tableWallets} w
+    ${includeInactive ? '' : 'WHERE w.isActive = 1'}
+    ORDER BY w.isDefault DESC, w.name ASC
+  ''');
+
+    return List.generate(maps.length, (i) {
+      final map = Map<String, dynamic>.from(maps[i]);
+      map['balance'] = map['calculatedBalance'] ?? map['balance'] ?? 0.0;
+      return Wallet.fromMap(map);
+    });
   }
 
   /// Get wallet by ID
@@ -432,17 +489,22 @@ class DatabaseService {
     final result = await db.rawQuery(
       '''
     SELECT
+      COALESCE(w.initialBalance, 0) + 
       SUM(CASE
-        WHEN type IN ('income', 'borrowing', 'transferIn') THEN amount
-        WHEN type IN ('expense', 'lend', 'transferOut') THEN -amount
-        WHEN type = 'adjustBalance' THEN amount
+        WHEN t.type IN ('income', 'borrowing', 'transferIn') THEN t.amount
+        WHEN t.type IN ('expense', 'lend', 'transferOut') THEN -t.amount
+        WHEN t.type = 'adjustBalance' THEN t.amount
         ELSE 0
       END) as balance
-    FROM ${AppConstants.tableTransactions}
-    WHERE walletId = ?
+    FROM ${AppConstants.tableWallets} w
+    LEFT JOIN ${AppConstants.tableTransactions} t ON w.id = t.walletId
+    WHERE w.id = ?
+    GROUP BY w.id
   ''',
       [walletId],
     );
+
+    if (result.isEmpty) return 0.0;
 
     return (result.first['balance'] as num?)?.toDouble() ?? 0.0;
   }
@@ -453,7 +515,7 @@ class DatabaseService {
       final db = await database;
 
       final existing = await db.query(AppConstants.tableWallets, where: 'name = ?', whereArgs: [wallet.name]);
-      if(existing.isNotEmpty){
+      if (existing.isNotEmpty) {
         throw 'Tên ví đã tồn tại';
       }
 

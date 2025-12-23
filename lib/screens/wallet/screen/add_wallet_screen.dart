@@ -8,11 +8,9 @@ import 'package:mosa/providers/bank_provider.dart';
 import 'package:mosa/providers/wallet_provider.dart';
 import 'package:mosa/utils/app_icons.dart';
 import 'package:mosa/utils/toast.dart';
-import 'package:mosa/widgets/date_time_selector_section.dart';
 import 'package:mosa/widgets/note_selector_section.dart';
 import 'package:mosa/widgets/section_container.dart';
 import 'package:mosa/widgets/tab_bar_scaffold.dart';
-import 'package:toastification/toastification.dart';
 
 import '../../../models/wallets.dart';
 import '../../../router/app_routes.dart';
@@ -130,8 +128,8 @@ class _AddWalletScreenState extends ConsumerState<AddWalletScreen> {
     final selectedBank = ref.watch(selectedBankProvider);
 
     return CustomListTile(
-      leading: selectedBank != null ? Image.asset(selectedBank.iconPath, width: 22) : Icon(Icons.wallet_sharp),
-      title: Text((selectedBank?.name ?? '')),
+      leading: selectedBank != null ? Image.asset(selectedBank.iconPath, width: 22) : Icon(Icons.add_circle_sharp),
+      title: Text((selectedBank?.name ?? 'Chọn ngân hàng')),
       enable: true,
       trailing: Icon(Icons.chevron_right),
       onTap: () {

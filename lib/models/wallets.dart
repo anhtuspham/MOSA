@@ -14,6 +14,7 @@ class Wallet {
   final String syncId;
   final String? note;
   final int? bankId;
+  final double initialBalance;
 
   Wallet({
     this.id,
@@ -28,7 +29,8 @@ class Wallet {
     this.isSynced = false,
     required this.syncId,
     this.note,
-    this.bankId
+    this.bankId,
+    this.initialBalance = 0,
   });
 
   factory Wallet.fromJson(Map<String, dynamic> json) {
@@ -44,7 +46,8 @@ class Wallet {
       isSynced: json['isSynced'] as bool? ?? false,
       syncId: json['syncId'] as String? ?? '',
       note: json['note'] ?? '',
-      bankId: json['bankId']
+      bankId: json['bankId'],
+      initialBalance: (json['initialBalance'] as num?)?.toDouble() ?? 0.0
     );
   }
 
@@ -66,6 +69,7 @@ class Wallet {
       syncId: map['syncId'] as String,
       note: map['note'] ?? '',
       bankId: map['bankId'],
+      initialBalance: map['initialBalance']
     );
   }
 
@@ -83,7 +87,8 @@ class Wallet {
       'isSynced': isSynced ? 1 : 0,
       'syncId': syncId,
       'note': note,
-      'bankId': bankId
+      'bankId': bankId,
+      'initialBalance': initialBalance,
     };
   }
 
@@ -100,7 +105,8 @@ class Wallet {
     bool? isSynced,
     String? syncId,
     String? note,
-    int? bankId
+    int? bankId,
+    double? initialBalance,
   }) {
     return Wallet(
       id: id ?? this.id,
@@ -115,7 +121,8 @@ class Wallet {
       isSynced: isSynced ?? this.isSynced,
       syncId: syncId ?? this.syncId,
       note: note ?? this.note,
-      bankId: bankId
+      bankId: bankId,
+      initialBalance: initialBalance ?? this.initialBalance,
     );
   }
 
