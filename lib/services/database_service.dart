@@ -286,6 +286,18 @@ class DatabaseService {
     return TransactionModel.fromMap(maps.first);
   }
 
+  /// Lấy tổng số tiền của tất cả giao dịch theo category ID
+  Future<double> getTotalAmountByCategoryId(String categoryId) async {
+    final db = await database;
+    final List<Map<String, dynamic>> result = await db.rawQuery(
+      'SELECT SUM(amount) as total FROM ${AppConstants.tableTransactions} WHERE categoryId = ?',
+      [categoryId]
+    );
+    
+    final total = result.first['total'];
+    return total != null ? (total as num).toDouble() : 0.0;
+  }
+
   // UPDATE
   Future<int> updateTransaction(TransactionModel transaction) async {
     try {

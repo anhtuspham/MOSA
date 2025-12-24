@@ -51,6 +51,25 @@ class Wallet {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'iconPath': iconPath,
+      'balance': balance,
+      'initialBalance': initialBalance,
+      'typeWalletId': typeWalletId,
+      'isDefault': isDefault,
+      'isActive': isActive,
+      'createAt': createAt.toIso8601String(),
+      'updateAt': updateAt?.toIso8601String(),
+      'isSynced': isSynced,
+      'syncId': syncId,
+      'note': note,
+      'bankId': bankId,
+    };
+  }
+
   factory Wallet.fromMap(Map<String, dynamic> map) {
     return Wallet(
       id: map['id'] as int?,

@@ -28,7 +28,7 @@ import '../../utils/app_colors.dart';
 import '../../utils/helpers.dart';
 import '../../utils/number_input_formatter.dart';
 import '../../utils/utils.dart';
-import '../../widgets/note_selector_section.dart';
+import '../../widgets/text_selector_section.dart';
 
 class AddTransactionScreen extends ConsumerStatefulWidget {
   const AddTransactionScreen({super.key});
@@ -124,7 +124,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
           return;
         }
 
-        final amount = double.tryParse(_amountController.text.replaceAll(',', ''));
+        final amount = double.tryParse(_amountController.text.replaceAll('.', ''));
         if (amount == null || amount <= 0) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Số tiền không hợp lệ')));
           return;
@@ -159,7 +159,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
           await transactionController.addTransaction(transactionOut);
           await transactionController.addTransaction(transactionIn);
-        }  else {
+        } else {
           if (selectedCategory == null) {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Vui lòng chọn hạng mục')));
             return;

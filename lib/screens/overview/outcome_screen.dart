@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mosa/utils/helpers.dart';
 
+import '../../providers/transaction_provider.dart';
 import '../../widgets/category_pie_chart.dart';
 import '../../widgets/progress_info_item.dart';
 
-class OutcomeScreen extends StatefulWidget {
+class OutcomeScreen extends ConsumerStatefulWidget {
   const OutcomeScreen({super.key});
 
   @override
-  State<OutcomeScreen> createState() => _OutcomeScreenState();
+  ConsumerState<OutcomeScreen> createState() => _OutcomeScreenState();
 }
 
-class _OutcomeScreenState extends State<OutcomeScreen> {
+class _OutcomeScreenState extends ConsumerState<OutcomeScreen> {
   @override
   Widget build(BuildContext context) {
+    final totalExpense = ref.watch(totalExpenseProvider);
     return Column(
       children: [
         Container(
@@ -22,7 +26,7 @@ class _OutcomeScreenState extends State<OutcomeScreen> {
           decoration: BoxDecoration(color: Colors.white),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [Text('Tổng chi'), Text('892.167 đ')],
+            children: [Text('Tổng chi'), Text(Helpers.formatCurrency(totalExpense), style: TextStyle(fontWeight: FontWeight.bold),)],
           ),
         ),
         CategoryPieChart(

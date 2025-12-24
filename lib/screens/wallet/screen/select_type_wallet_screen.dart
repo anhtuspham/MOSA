@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mosa/providers/bank_provider.dart';
 import 'package:mosa/providers/wallet_provider.dart';
 import 'package:mosa/widgets/custom_list_tile.dart';
 import 'package:mosa/widgets/error_widget.dart';
@@ -13,8 +14,7 @@ class SelectTypeWalletScreen extends ConsumerStatefulWidget {
   const SelectTypeWalletScreen({super.key});
 
   @override
-  ConsumerState<SelectTypeWalletScreen> createState() =>
-      _TypeWalletScreenState();
+  ConsumerState<SelectTypeWalletScreen> createState() => _TypeWalletScreenState();
 }
 
 class _TypeWalletScreenState extends ConsumerState<SelectTypeWalletScreen> {
@@ -41,19 +41,12 @@ class _TypeWalletScreenState extends ConsumerState<SelectTypeWalletScreen> {
               return CustomListTile(
                 title: Text(typeWallet.name ?? ''),
                 leading: Image.asset(typeWallet.iconPath ?? '', width: 30),
-                backgroundColor:
-                    isSelected ? AppColors.lightBackGroundColor : null,
-                trailing:
-                    isSelected
-                        ? IconButton(
-                          onPressed: null,
-                          icon: Icon(Icons.check, color: AppColors.primary),
-                        )
-                        : null,
+                backgroundColor: isSelected ? AppColors.lightBackGroundColor : null,
+                trailing: isSelected ? IconButton(onPressed: null, icon: Icon(Icons.check, color: AppColors.primary)) : null,
                 enable: true,
                 onTap: () {
-                  ref.read(selectedTypeWalletProvider.notifier).state =
-                      typeWallet;
+                  ref.read(selectedTypeWalletProvider.notifier).state = typeWallet;
+                  ref.read(selectedBankProvider.notifier).state = null;
                   context.pop();
                 },
               );

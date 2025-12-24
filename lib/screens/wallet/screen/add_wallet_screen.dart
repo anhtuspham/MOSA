@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
@@ -8,7 +9,7 @@ import 'package:mosa/providers/bank_provider.dart';
 import 'package:mosa/providers/wallet_provider.dart';
 import 'package:mosa/utils/app_icons.dart';
 import 'package:mosa/utils/toast.dart';
-import 'package:mosa/widgets/note_selector_section.dart';
+import 'package:mosa/widgets/text_selector_section.dart';
 import 'package:mosa/widgets/section_container.dart';
 import 'package:mosa/widgets/tab_bar_scaffold.dart';
 
@@ -31,6 +32,7 @@ class _AddWalletScreenState extends ConsumerState<AddWalletScreen> {
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _walletNameController = TextEditingController();
   final TextEditingController _noteController = TextEditingController();
+  String? iconWalletPath;
 
   @override
   void dispose() {
@@ -44,22 +46,24 @@ class _AddWalletScreenState extends ConsumerState<AddWalletScreen> {
     try {
       final walletController = ref.read(walletProvider.notifier);
       final selectTypeWalletController = ref.read(selectedTypeWalletProvider);
-      final selectedBankController = ref.read(selectedBankProvider);
+      final selectedBankController = ref.watch(selectedBankProvider);
 
       if (_walletNameController.text.isEmpty) {
         showToast('Vui lòng nhập tên ví', isError: true);
         return;
       }
+
       final newWallet = Wallet(
         id: generateId(),
         name: _walletNameController.text,
-        balance: double.tryParse(_amountController.text.replaceAll(', ', '')) ?? 0,
+        initialBalance: double.tryParse(_amountController.text.replaceAll('.', '')) ?? 0,
+        balance: 0,
         note: _noteController.text,
         typeWalletId: selectTypeWalletController?.id ?? 99,
         createAt: DateTime.now(),
         isSynced: false,
         syncId: '',
-        iconPath: AppIcons.moneyBag,
+        iconPath: selectedBankController?.iconPath ?? AppIcons.moneyBag,
         isActive: true,
         bankId: selectedBankController?.id,
       );
@@ -67,11 +71,20 @@ class _AddWalletScreenState extends ConsumerState<AddWalletScreen> {
       await walletController.insertWallet(newWallet);
 
       showToast('Thêm ví thành công');
+      clearInput();
       if (!mounted) return;
       Navigator.pop(context);
     } catch (e) {
       showToast(e.toString(), isError: true);
     }
+  }
+
+  void clearInput() {
+    _amountController.clear();
+    _walletNameController.clear();
+    _noteController.clear();
+    ref.read(selectedTypeWalletProvider.notifier).state = null;
+    ref.read(selectedBankProvider.notifier).state = null;
   }
 
   @override

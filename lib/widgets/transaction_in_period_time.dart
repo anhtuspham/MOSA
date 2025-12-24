@@ -12,6 +12,7 @@ import 'package:mosa/widgets/transaction_item.dart';
 import '../models/category.dart';
 import '../models/enums.dart';
 import '../providers/date_filter_provider.dart';
+import '../providers/transaction_provider.dart';
 import '../utils/app_colors.dart';
 import '../utils/date_time_extension.dart';
 import '../utils/utils.dart';
@@ -100,47 +101,24 @@ class _TransactionInPeriodTimeState
   }
 
   Widget transactionListSection() {
-    final transactionGroupState = ref.watch(transactionGroupByDateProvider);
-    final categoryState = ref.watch(flattenedCategoryProvider);
-    final transactionOfDay = transactionGroupState.whenData(
+    final enrichedTransactionGroupState = ref.watch(enrichedTransactionGroupByDateProvider);
+    final enrichedTransactionOfDay = enrichedTransactionGroupState.whenData(
       (group) => group[widget.date] ?? [],
     );
 
-    return transactionOfDay.when(
-      data: (transactionsData) {
-        return categoryState.when(
-          data: (categories) {
-            final categoryMap = {
-              for (var category in categories) category.id: category,
-            };
-
-            return ListView.builder(
-              itemCount: transactionsData.length,
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              itemBuilder: (context, index) {
-                final transaction = transactionsData[index];
-                final category = categoryMap[transaction.categoryId];
-                // if (category == null) {
-                //   return Container(
-                //     height: 60,
-                //     margin: const EdgeInsets.only(bottom: 12),
-                //     decoration: BoxDecoration(
-                //       color: Colors.grey[200],
-                //       borderRadius: BorderRadius.circular(10),
-                //     ),
-                //     child: const Center(child: Text('Category not found')),
-                //   );
-                // }
-                return TransactionItem(
-                  category: category ?? Category.empty(),
-                  transaction: transaction,
-                );
-              },
+    return enrichedTransactionOfDay.when(
+      data: (enrichedData) {
+        return ListView.builder(
+          itemCount: enrichedData.length,
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          itemBuilder: (context, index) {
+            final item = enrichedData[index];
+            return TransactionItem(
+              category: item.category ?? Category.empty(),
+              transaction: item.transaction,
             );
           },
-          error: (error, stackTrace) => ErrorSectionWidget(error: error),
-          loading: () => LoadingSectionWidget(),
         );
       },
       loading: () => CircularProgressIndicator(),

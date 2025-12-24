@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 class ThousandSeparatorFormatter extends TextInputFormatter {
   final String separator;
 
-  ThousandSeparatorFormatter({this.separator = ','});
+  ThousandSeparatorFormatter({this.separator = '.'});
 
   @override
   TextEditingValue formatEditUpdate(

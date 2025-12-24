@@ -27,7 +27,7 @@ class CustomListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final child = Container(
-      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
       color: backgroundColor,
       child: Row(
         children: [

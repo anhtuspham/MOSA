@@ -15,7 +15,6 @@ class TransactionAggregator {
       final balanceEffect = TransactionTypeManager.getBalanceEffect(
         transaction.type,
       );
-      log('balanceEffect: ${balanceEffect.toString()}');
       switch (balanceEffect) {
         case BalanceEffect.plus:
           income += transaction.amount;
