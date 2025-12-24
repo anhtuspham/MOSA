@@ -95,7 +95,6 @@ final balanceProvider = Provider((ref) {
   return income - expense;
 });
 
-
 /// Cung cấp giao dịch và tổng số tiền của chúng được lọc theo category ID cụ thể
 final transactionByCategoryProvider = Provider.family<AsyncValue<({List<TransactionModel> transactions, double total})>, String>((
   ref,
@@ -115,9 +114,9 @@ final transactionByCategoryProvider = Provider.family<AsyncValue<({List<Transact
 final totalAmountByCategoryProvider = Provider.family<double, String>((ref, categoryId) {
   final transactionAsync = ref.watch(filteredTransactionByDateRangeProvider);
   return transactionAsync.when(
-    data: (transactions) => transactions
-        .where((element) => element.categoryId == categoryId)
-        .fold(0.0, (sum, transaction) => sum + transaction.amount),
+    data:
+        (transactions) =>
+            transactions.where((element) => element.categoryId == categoryId).fold(0.0, (sum, transaction) => sum + transaction.amount),
     loading: () => 0.0,
     error: (_, __) => 0.0,
   );
@@ -157,6 +156,38 @@ final enrichedTransactionByTypeProvider =
       final enrichedTransactionAsync = ref.watch(enrichedTransactionProvider);
       return enrichedTransactionAsync.whenData((value) => value.where((element) => element.transaction.type == type).toList());
     });
+
+/// Nhóm thành các category các giao dịch được mã hóa (category, transaction) theo transaction type thành dạng List(category, transaction, total, percentage)
+final transactionGroupByCategoryProvider = Provider.family<
+  AsyncValue<List<({Category? category, List<TransactionModel> transactions, double total, double percentage})>>,
+  TransactionType
+>((ref, type) {
+  final categoryAsync = ref.watch(enrichedTransactionByTypeProvider(type));
+  final totalByType = switch (type) {
+    TransactionType.income => ref.watch(totalIncomeProvider),
+    TransactionType.expense => ref.watch(totalExpenseProvider),
+    _ => ref.watch(totalIncomeProvider),
+  };
+
+  return categoryAsync.whenData((enrichedList) {
+    final grouped = CollectionUtils.groupBy(enrichedList, (item) => item.category?.id);
+    final result =
+        grouped.entries.map((entry) {
+          final categoryId = entry.key;
+          final items = entry.value;
+
+          final transaction = items.map((e) => e.transaction).toList();
+          final category = items.first.category;
+          final total = items.fold(0.0, (previousValue, element) => previousValue + element.transaction.amount);
+          final percentage = totalByType > 0 ? (total / totalByType) * 100 : 0.0;
+
+          return (category: category, transactions: transaction, total: total, percentage: percentage);
+        }).toList();
+
+    result.sort((a, b) => b.total.compareTo(a.total));
+    return result;
+  });
+});
 
 /// Nhóm giao dịch được làm giàu theo ngày để hiển thị có tổ chức trong danh sách giao diện
 final enrichedTransactionGroupByDateProvider =

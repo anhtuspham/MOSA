@@ -22,7 +22,7 @@ class _IncomeScreenState extends ConsumerState<IncomeScreen> {
   @override
   Widget build(BuildContext context) {
     final totalIncome = ref.watch(totalIncomeProvider);
-    final transactionByTypeController = ref.watch(enrichedTransactionByTypeProvider(TransactionType.income));
+    final groupByCategoryAsync = ref.watch(transactionGroupByCategoryProvider(TransactionType.income));
 
     return RefreshIndicator(
       onRefresh: _handleOnRefresh,
@@ -39,65 +39,28 @@ class _IncomeScreenState extends ConsumerState<IncomeScreen> {
               ),
             ),
             CategoryPieChart(categoryData: {'Ăn uống': 300000, 'Xe cộ': 900000, 'Đi chơi': 900000, 'Mua sắm': 980000, 'Khác': 900000}),
-            transactionByTypeController.when(
-              data: (transactionData) {
+            groupByCategoryAsync.when(
+              data: (categoryGroup) {
                 return Column(
                   children:
-                      transactionData.map((transactionTypeValue) {
-                        final totalValue = ref.watch(totalAmountByCategoryProvider(transactionTypeValue.category?.id ?? ''));
+                      categoryGroup.map((group) {
                         return ProgressInfoItem(
-                          leadingIcon: transactionTypeValue.category?.getIcon() ?? Icon(Icons.help),
-                          title: Text(transactionTypeValue.category?.name ?? ''),
+                          leadingIcon: group.category?.getIcon() ?? Icon(Icons.help),
+                          title: Text(group.category?.name ?? ''),
                           currentProgress: 0.2,
                           trailing: Row(
                             children: [
-                              Text('(32.39%)', style: TextStyle(color: Colors.grey[500], fontSize: 11.sp)),
+                              Text('(${group.percentage.toStringAsFixed(2)}%)', style: TextStyle(color: Colors.grey[500], fontSize: 11.sp)),
                               const SizedBox(width: 3),
-                              Text(Helpers.formatCurrency(totalValue), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp)),
+                              Text(Helpers.formatCurrency(group.total), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp)),
                             ],
-                          )
+                          ),
                         );
                       }).toList(),
                 );
               },
               error: (error, stackTrace) => ErrorSectionWidget(error: error),
               loading: () => LoadingSectionWidget(),
-            ),
-            ProgressInfoItem(
-              leadingIcon: Icon(Icons.calendar_month),
-              title: Text('Điều chỉnh số dư'),
-              currentProgress: 0.2,
-              trailing: Row(
-                children: [
-                  Text('(32.39%)', style: TextStyle(color: Colors.grey[500], fontSize: 11.sp)),
-                  const SizedBox(width: 3),
-                  Text('117.167 đ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp)),
-                ],
-              ),
-            ),
-            ProgressInfoItem(
-              leadingIcon: Icon(Icons.calendar_month),
-              title: Text('Điều chỉnh số dư'),
-              currentProgress: 0.2,
-              trailing: Row(
-                children: [
-                  Text('(32.39%)', style: TextStyle(color: Colors.grey[500], fontSize: 11.sp)),
-                  const SizedBox(width: 3),
-                  Text('117.167 đ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp)),
-                ],
-              ),
-            ),
-            ProgressInfoItem(
-              leadingIcon: Icon(Icons.calendar_month),
-              title: Text('Điều chỉnh số dư'),
-              currentProgress: 0.2,
-              trailing: Row(
-                children: [
-                  Text('(32.39%)', style: TextStyle(color: Colors.grey[500], fontSize: 11.sp)),
-                  const SizedBox(width: 3),
-                  Text('117.167 đ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp)),
-                ],
-              ),
             ),
           ],
         ),
