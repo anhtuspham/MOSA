@@ -18,7 +18,7 @@ class AccountTabScreen extends ConsumerStatefulWidget {
 class _AccountTabScreenState extends ConsumerState<AccountTabScreen> {
   @override
   Widget build(BuildContext context) {
-    final totalBalanceState = ref.watch(totalBalanceWalletProvider);
+    final totalBalance = ref.watch(totalBalanceWalletProvider);
     final walletState = ref.watch(walletProvider);
 
     return Column(
@@ -30,19 +30,13 @@ class _AccountTabScreenState extends ConsumerState<AccountTabScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('Tổng tiền', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-              totalBalanceState.when(
-                data: (totalBalanceValue) {
-                  return Text(
-                    Helpers.formatCurrency(totalBalanceValue),
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16,
-                      color: totalBalanceValue >= 0 ? AppColors.textPrimary : AppColors.expense,
-                    ),
-                  );
-                },
-                error: (error, stackTrace) => ErrorSectionWidget(error: error),
-                loading: () => LoadingSectionWidget(),
+              Text(
+                Helpers.formatCurrency(totalBalance),
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                  color: totalBalance >= 0 ? AppColors.textPrimary : AppColors.expense,
+                ),
               ),
             ],
           ),

@@ -1,27 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mosa/providers/transaction_provider.dart';
 import 'package:mosa/screens/stats/widgets/latest_month_statistic_widget.dart';
 import 'package:mosa/screens/stats/widgets/operation_grid_item_widget.dart';
 import 'package:mosa/utils/app_colors.dart';
 import 'package:mosa/utils/app_icons.dart';
+import 'package:mosa/utils/helpers.dart';
+import 'package:mosa/widgets/section_container.dart';
 import 'package:mosa/widgets/stat_card.dart';
+import 'package:mosa/widgets/tab_bar_scaffold.dart';
 
-class StatsShellScreen extends StatelessWidget {
+import '../../../providers/wallet_provider.dart';
+
+class StatsShellScreen extends ConsumerWidget {
   const StatsShellScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Báo cáo', style: TextStyle(fontWeight: FontWeight.w600)),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final totalBalance = ref.watch(totalBalanceWalletProvider);
+    return CommonScaffold(
+      title: Text('Báo cáo', style: TextStyle(fontWeight: FontWeight.w600)),
+      centerTitle: true,
+      appBarBackgroundColor: AppColors.background,
+      body: SectionContainer(
         backgroundColor: AppColors.background,
-        centerTitle: true,
-        elevation: 2,
-      ),
-      body: Container(
-        padding: const EdgeInsets.all(8.0),
-        decoration: BoxDecoration(color: AppColors.secondaryBackground),
         child: SingleChildScrollView(
           child: Column(
+            mainAxisSize: MainAxisSize.max,
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(
@@ -48,7 +53,7 @@ class StatsShellScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '15.000.222.111 đ',
+                      Helpers.formatCurrency(totalBalance),
                       style: TextStyle(
                         color: AppColors.textWhite,
                         fontWeight: FontWeight.w600,
@@ -70,77 +75,6 @@ class StatsShellScreen extends StatelessWidget {
               // Latest statistic month widget
               LatestMonthStatisticWidget(),
               const SizedBox(height: 6),
-              Row(
-                children: [
-                  Expanded(
-                    child: OperationGridItemWidget(
-                      iconPath: AppIcons.statisticIcon,
-                      title: 'Phân tích chi tiêu',
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: OperationGridItemWidget(
-                      iconPath: AppIcons.statisticIcon,
-                      title: 'Phân tích chi tiêu',
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              Row(
-                children: [
-                  Expanded(
-                    child: OperationGridItemWidget(
-                      iconPath: AppIcons.statisticIcon,
-                      title: 'Phân tích chi tiêu',
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: OperationGridItemWidget(
-                      iconPath: AppIcons.statisticIcon,
-                      title: 'Phân tích chi tiêu',
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              Row(
-                children: [
-                  Expanded(
-                    child: OperationGridItemWidget(
-                      iconPath: AppIcons.statisticIcon,
-                      title: 'Phân tích chi tiêu',
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: OperationGridItemWidget(
-                      iconPath: AppIcons.statisticIcon,
-                      title: 'Phân tích chi tiêu',
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              Row(
-                children: [
-                  Expanded(
-                    child: OperationGridItemWidget(
-                      iconPath: AppIcons.statisticIcon,
-                      title: 'Phân tích chi tiêu',
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: OperationGridItemWidget(
-                      iconPath: AppIcons.statisticIcon,
-                      title: 'Phân tích chi tiêu',
-                    ),
-                  ),
-                ],
-              ),
             ],
           ),
         ),
