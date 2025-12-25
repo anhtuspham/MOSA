@@ -12,7 +12,7 @@ class CategoryGridView extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 4,
-        crossAxisSpacing: 12,
+        crossAxisSpacing: 4,
         mainAxisSpacing: 12,
         childAspectRatio: 1.5,
       ),

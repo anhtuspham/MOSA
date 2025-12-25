@@ -85,37 +85,38 @@ class SettingsShellScreen extends StatelessWidget {
                     'Tính năng',
                     style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
                   ),
+                  const SizedBox(height: 12),
                   CategoryGridView(
                     categories: [
                       ItemWidget(
                         itemId: '1',
-                        iconPath: AppIcons.statisticIcon,
-                        name: 'Ăn sáng',
+                        iconPath: AppIcons.interface,
+                        name: 'Giao diện',
                       ),
                       ItemWidget(
                         itemId: '2',
-                        iconPath: AppIcons.statisticIcon,
-                        name: 'Ăn trưa',
+                        iconPath: AppIcons.sampleRecord,
+                        name: 'Ghi chép mẫu',
                       ),
                       ItemWidget(
                         itemId: '3',
-                        iconPath: AppIcons.statisticIcon,
-                        name: 'Ăn chiều',
+                        iconPath: AppIcons.categoryRecord,
+                        name: 'Hạng mục thu chi',
                       ),
                       ItemWidget(
                         itemId: '4',
-                        iconPath: AppIcons.statisticIcon,
-                        name: 'Ăn tối',
+                        iconPath: AppIcons.scanBill,
+                        name: 'Trích xuất hóa đơn',
                       ),
                       ItemWidget(
                         itemId: '5',
-                        iconPath: AppIcons.statisticIcon,
-                        name: 'Đồ uống',
+                        iconPath: AppIcons.shopList,
+                        name: 'Danh sách mua sắm',
                       ),
                       ItemWidget(
                         itemId: '6',
-                        iconPath: AppIcons.statisticIcon,
-                        name: 'Khác',
+                        iconPath: AppIcons.limitTransaction,
+                        name: 'Hạn mức thu/chi',
                       ),
                     ],
                   ),
@@ -123,52 +124,6 @@ class SettingsShellScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(color: AppColors.surface),
-              child: Column(
-                children: [
-                  Text(
-                    'Tiện ích',
-                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
-                  ),
-                  CategoryGridView(
-                    categories: [
-                      ItemWidget(
-                        itemId: '1',
-                        iconPath: AppIcons.statisticIcon,
-                        name: 'Ăn sáng',
-                      ),
-                      ItemWidget(
-                        itemId: '2',
-                        iconPath: AppIcons.statisticIcon,
-                        name: 'Ăn trưa',
-                      ),
-                      ItemWidget(
-                        itemId: '3',
-                        iconPath: AppIcons.statisticIcon,
-                        name: 'Ăn chiều',
-                      ),
-                      ItemWidget(
-                        itemId: '4',
-                        iconPath: AppIcons.statisticIcon,
-                        name: 'Ăn tối',
-                      ),
-                      ItemWidget(
-                        itemId: '5',
-                        iconPath: AppIcons.statisticIcon,
-                        name: 'Đồ uống',
-                      ),
-                      ItemWidget(
-                        itemId: '6',
-                        iconPath: AppIcons.statisticIcon,
-                        name: 'Khác',
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
           ],
         ),
       ),

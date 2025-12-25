@@ -34,20 +34,8 @@ class ItemWidget extends ConsumerWidget {
         children: [
           Container(
             padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-            ),
-            child:
-                (category ??
-                        Category(
-                          id: itemId ?? '',
-                          name: name ?? '',
-                          type: type ?? '',
-                          iconType: iconType ?? 'material',
-                          iconPath: iconPath ?? '',
-                        ))
-                    .getIcon(),
+            decoration: BoxDecoration(color: Theme.of(context).primaryColor.withValues(alpha: 0.1), shape: BoxShape.circle),
+            child: category?.getIcon() ?? Image.asset(iconPath ?? 'assets/icons/default.png', width: 24, height: 24),
           ),
           const SizedBox(height: 4),
           Text(
