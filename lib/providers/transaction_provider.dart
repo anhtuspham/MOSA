@@ -189,6 +189,13 @@ final transactionGroupByCategoryProvider = Provider.family<
   });
 });
 
+final groupPieChartProvider = Provider.family<AsyncValue<Map<String, double>>, TransactionType>((ref, type) {
+  final groupAsync = ref.watch(transactionGroupByCategoryProvider(type));
+  return groupAsync.whenData((groups) {
+    return {for (var group in groups) group.category?.name ?? 'Khác': group.total};
+  });
+});
+
 /// Nhóm giao dịch được làm giàu theo ngày để hiển thị có tổ chức trong danh sách giao diện
 final enrichedTransactionGroupByDateProvider =
     Provider<AsyncValue<Map<DateTime, List<({TransactionModel transaction, Category? category})>>>>((ref) {
