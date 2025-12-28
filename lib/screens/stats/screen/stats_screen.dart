@@ -37,9 +37,9 @@ class StatsShellScreen extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(6),
                   gradient: LinearGradient(
                     colors: [
-                      AppColors.primary,
-                      AppColors.fourth,
+                      // AppColors.primary,
                       AppColors.third,
+                      AppColors.fourth,
                     ],
                     begin: Alignment.centerLeft,
                   ),

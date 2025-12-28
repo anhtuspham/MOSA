@@ -36,10 +36,12 @@ class AppConstants {
   };
 
   static const String dbName = 'finance_tracker.db';
-  static const int dbVersion = 5;
+  static const int dbVersion = 6;
   static const String tableTransactions = 'transactions';
   static const String tableWallets = 'wallets';
   static const String tableTypeWallets = 'type_wallets';
+  static const String tablePersons = 'persons';
+  static const String tableDebts = 'debts';
 
   static const String sunday = 'Chủ nhật';
   static const String monday = 'Thứ 2';
