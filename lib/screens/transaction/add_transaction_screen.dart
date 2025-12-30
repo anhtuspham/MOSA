@@ -54,24 +54,21 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 20),
-      child: CommonScaffold(
-        title: Container(
-          decoration: BoxDecoration(border: Border.all(width: 2, color: AppColors.lightBorder), borderRadius: BorderRadius.circular(8)),
-          alignment: Alignment.center,
-          constraints: BoxConstraints(maxWidth: 180),
-          child: transactionTypeDropdown(),
-        ),
-        centerTitle: true,
-        leading: Icon(Icons.history),
-        actions: [IconButton(onPressed: _saveTransaction, icon: Icon(Icons.check))],
-        appBarBackgroundColor: AppColors.primaryBackground,
-        body: SectionContainer(
-          child: ValueListenableBuilder(
-            valueListenable: _selectedType,
-            builder: (context, value, child) => detailTransactionSection(transactionType: _selectedType.value),
-          ),
+    return CommonScaffold(
+      title: Container(
+        decoration: BoxDecoration(border: Border.all(width: 2, color: AppColors.lightBorder), borderRadius: BorderRadius.circular(8)),
+        alignment: Alignment.center,
+        constraints: BoxConstraints(maxWidth: 180),
+        child: transactionTypeDropdown(),
+      ),
+      centerTitle: true,
+      leading: Icon(Icons.history),
+      actions: [IconButton(onPressed: _saveTransaction, icon: Icon(Icons.check))],
+      appBarBackgroundColor: AppColors.primaryBackground,
+      body: SectionContainer(
+        child: ValueListenableBuilder(
+          valueListenable: _selectedType,
+          builder: (context, value, child) => detailTransactionSection(transactionType: _selectedType.value),
         ),
       ),
     );

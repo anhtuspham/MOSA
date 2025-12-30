@@ -13,4 +13,5 @@ class AppIcons {
   static const String scanBill = 'assets/icons/scan_bill.png';
   static const String shopList = 'assets/icons/shop_list.png';
   static const String limitTransaction = 'assets/icons/limit_transaction.png';
+  static const String debtTracking = 'assets/icons/debt_tracking.png';
 }

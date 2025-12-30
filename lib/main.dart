@@ -43,7 +43,7 @@ class MyApp extends StatelessWidget {
           supportedLocales: [Locale('en'), Locale('vi', 'VN')],
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
-            fontFamily: 'EuclidCircularA',
+            fontFamily: 'Inter',
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlue),
             useMaterial3: true,
           ),

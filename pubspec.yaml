@@ -108,17 +108,17 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-    - family: EuclidCircularA
+    - family: Inter
       fonts:
-        - asset: assets/fonts/Euclid Circular A Regular.ttf
+        - asset: assets/fonts/Inter_18pt-Regular.ttf
           weight: 400
-        - asset: assets/fonts/Euclid Circular A Bold.ttf
+        - asset: assets/fonts/Inter_18pt-Bold.ttf
           weight: 700
-        - asset: assets/fonts/Euclid Circular A SemiBold.ttf
+        - asset: assets/fonts/Inter_18pt-SemiBold.ttf
           weight: 500
-        - asset: assets/fonts/Euclid Circular A Medium.ttf
+        - asset: assets/fonts/Inter_18pt-Medium.ttf
           weight: 300
-        - asset: assets/fonts/Euclid Circular A Italic.ttf
+        - asset: assets/fonts/Inter_18pt-Italic.ttf
           weight: 400
   # fonts:
   #   - family: Schyler

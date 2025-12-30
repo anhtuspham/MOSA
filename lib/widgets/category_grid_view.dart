@@ -3,7 +3,8 @@ import 'package:mosa/widgets/item_widget.dart';
 
 class CategoryGridView extends StatelessWidget {
   final List<ItemWidget> categories;
-  const CategoryGridView({super.key, required this.categories});
+  final int numberItemPerPage;
+  const CategoryGridView({super.key, required this.categories, required this.numberItemPerPage});
 
   @override
   Widget build(BuildContext context) {
@@ -11,9 +12,9 @@ class CategoryGridView extends StatelessWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 4,
+        crossAxisCount: numberItemPerPage,
         crossAxisSpacing: 4,
-        mainAxisSpacing: 12,
+        mainAxisSpacing: 18,
         childAspectRatio: 1.5,
       ),
       itemCount: categories.length,

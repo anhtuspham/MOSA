@@ -87,6 +87,7 @@ class SettingsShellScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   CategoryGridView(
+                    numberItemPerPage: 3,
                     categories: [
                       ItemWidget(
                         itemId: '1',
@@ -118,6 +119,11 @@ class SettingsShellScreen extends StatelessWidget {
                         iconPath: AppIcons.limitTransaction,
                         name: 'Hạn mức thu/chi',
                       ),
+                      ItemWidget(
+                        itemId: '7',
+                        iconPath: AppIcons.debtTracking,
+                        name: 'Theo dõi vay nợ',
+                      )
                     ],
                   ),
                 ],
