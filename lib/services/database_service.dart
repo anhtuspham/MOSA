@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:mosa/models/debt.dart';
 import 'package:mosa/models/wallets.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
@@ -209,6 +210,31 @@ class DatabaseService {
       )
     ''');
 
+    await db.execute('''
+      CREATE TABLE ${AppConstants.tablePersons}(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL UNIQUE,
+        iconPath TEXT NOT NULL
+        )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE ${AppConstants.tableDebts}(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        personId INTEGER NOT NULL,
+        amount REAL NOT NULL,
+        paidAmount REAL NOT NULL DEFAULT 0,
+        type TEXT NOT NULL,
+        status TEXT NOT NULL,
+        description TEXT NOT NULL,
+        createdDate TEXT NOT NULL,
+        dueDate TEXT,
+        walletId INTEGER,
+        FOREIGN KEY (personId) REFERENCES ${AppConstants.tablePersons}(id) ON DELETE RESTRICT
+        FOREIGN KEY (walletId) REFERENCES ${AppConstants.tableWallets}(id) ON DELETE RESTRICT
+        )
+    ''');
+
     // Create indexes for fast lookup
     await db.execute('CREATE INDEX idx_type_wallet_name ON ${AppConstants.tableTypeWallets}(name)');
     await db.execute('CREATE INDEX idx_wallet_name ON ${AppConstants.tableWallets}(name)');
@@ -217,6 +243,7 @@ class DatabaseService {
     await db.execute('CREATE INDEX idx_wallet_active ON ${AppConstants.tableWallets}(isActive)');
     await db.execute('CREATE INDEX idx_transaction_walletId ON ${AppConstants.tableTransactions}(walletId)');
     await db.execute('CREATE INDEX idx_transaction_date ON ${AppConstants.tableTransactions}(date)');
+    await db.execute('CREATE INDEX idx_debt_personId ON ${AppConstants.tableDebts}(personId)');
 
     // Seed default data
     await _seedTypeWallets(db);
@@ -259,6 +286,46 @@ class DatabaseService {
     }
   }
 
+  Future<List<Debt>> getAllDebt() async {
+    final db = await database;
+    final List<Map<String, dynamic>> map = await db.query(AppConstants.tableDebts, orderBy: 'id ASC');
+
+    return List.generate(map.length, (index) {
+      return Debt.fromJson(map[index]);
+    });
+  }
+
+  Future<int> createDebt(Debt debt) async {
+    try {
+      final db = await database;
+      final id = await db.insert(AppConstants.tableDebts, debt.toJson(), conflictAlgorithm: ConflictAlgorithm.replace);
+      await _updateWalletBalance(debt.walletId ?? -1);
+      return id;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> updateDebt(Debt debt) async {
+    try {
+      final db = await database;
+      await db.update(AppConstants.tableDebts, debt.toJson(), where: 'id = ?', whereArgs: [debt.id]);
+      await _updateWalletBalance(debt.walletId ?? -1);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> deleteDebt(Debt debt) async {
+    try {
+      final db = await database;
+      await db.delete(AppConstants.tableDebts, where: 'id = ?', whereArgs: [debt.id]);
+      await _updateWalletBalance(debt.walletId ?? -1);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   // Reset database instance
   Future<void> _resetDatabase() async {
     if (_database != null) {
@@ -291,9 +358,9 @@ class DatabaseService {
     final db = await database;
     final List<Map<String, dynamic>> result = await db.rawQuery(
       'SELECT SUM(amount) as total FROM ${AppConstants.tableTransactions} WHERE categoryId = ?',
-      [categoryId]
+      [categoryId],
     );
-    
+
     final total = result.first['total'];
     return total != null ? (total as num).toDouble() : 0.0;
   }

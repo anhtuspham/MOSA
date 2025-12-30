@@ -11,7 +11,7 @@ class Debt {
   final String description;
   final DateTime createdDate;
   final DateTime? dueDate;
-  final String? walletId;
+  final int? walletId;
 
   Debt({
     this.id,
@@ -70,7 +70,7 @@ class Debt {
     String? description,
     DateTime? createdDate,
     DateTime? dueDate,
-    String? walletId,
+    int? walletId,
   }) {
     return Debt(
       id: id ?? this.id,

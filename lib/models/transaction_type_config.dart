@@ -54,6 +54,22 @@ class TransactionTypeManager {
       color: AppColors.income,
       description: 'Money borrowed from others',
     ),
+    TransactionType.repayment: TransactionTypeConfig(
+      type: TransactionType.repayment,
+      category: TransactionCategory.debtCollection,
+      balanceEffect: BalanceEffect.minus,
+      displayName: 'Repayment',
+      color: AppColors.expense,
+      description: 'Repayment',
+    ),
+    TransactionType.debtCollection: TransactionTypeConfig(
+      type: TransactionType.debtCollection,
+      category: TransactionCategory.debtCollection,
+      balanceEffect: BalanceEffect.plus,
+      displayName: 'Debt Collection',
+      color: AppColors.expense,
+      description: 'Debt collection',
+    ),
     TransactionType.transfer: TransactionTypeConfig(
       type: TransactionType.transfer,
       category: TransactionCategory.transfer,

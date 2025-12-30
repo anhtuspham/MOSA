@@ -9,6 +9,8 @@ import 'package:mosa/services/database_service.dart';
 import 'package:mosa/services/type_wallet_service.dart';
 import 'package:mosa/utils/app_icons.dart';
 
+import 'database_service_provider.dart';
+
 class WalletsNotifier extends AsyncNotifier<List<Wallet>> {
   DatabaseService get _databaseService => ref.read(databaseServiceProvider);
 

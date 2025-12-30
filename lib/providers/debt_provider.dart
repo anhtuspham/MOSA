@@ -1,0 +1,172 @@
+import 'dart:async';
+import 'dart:developer';
+
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mosa/models/debt.dart';
+import 'package:mosa/models/enums.dart';
+import 'package:mosa/models/transaction.dart';
+import 'package:mosa/utils/utils.dart';
+
+import '../services/database_service.dart';
+import 'database_service_provider.dart';
+
+class DebtNotifier extends AsyncNotifier<List<Debt>> {
+  DatabaseService get _databaseService => ref.read(databaseServiceProvider);
+
+  @override
+  FutureOr<List<Debt>> build() async {
+    return await _databaseService.getAllDebt();
+  }
+
+  Future<void> refreshListDebt() async {
+    try {
+      final debts = await _databaseService.getAllDebt();
+      if (debts != state.value) {
+        state = AsyncData(debts);
+      }
+    } catch (e) {
+      log('Error when refresh list debt $e');
+      state = AsyncError(e, StackTrace.current);
+      rethrow;
+    }
+  }
+
+  Future<void> createDebt(Debt debt) async {
+    state = const AsyncLoading();
+
+    try {
+      int id = await _databaseService.createDebt(debt);
+      final newDebt = debt.copyWith(id: id);
+      state = AsyncData([newDebt, ...state.requireValue]);
+      refreshListDebt();
+    } catch (e) {
+      log('Error when create debt $e');
+      state = AsyncError(e, StackTrace.current);
+      rethrow;
+    }
+  }
+
+  Future<void> updateDebt(Debt debt) async {
+    state = const AsyncLoading();
+    try {
+      await _databaseService.updateDebt(debt);
+      final index = state.requireValue.indexWhere((element) => element == debt);
+      if (index != -1) {
+        state = AsyncData([...state.requireValue.sublist(0, index), debt, ...state.requireValue.sublist(index + 1)]);
+      }
+    } catch (e) {
+      log('Error when update debt $e');
+      state = AsyncError(e, StackTrace.current);
+      rethrow;
+    }
+  }
+
+  Future<void> deleteDebt(Debt debt) async {
+    state = const AsyncLoading();
+    try {
+      await _databaseService.deleteDebt(debt);
+      state = AsyncData(state.requireValue.where((element) => element != debt).toList());
+    } catch (e) {
+      log('Error when delete debt $e');
+      state = AsyncError(e, StackTrace.current);
+      rethrow;
+    }
+  }
+
+  Future<void> payDebt(int debtId, double paymentAmount, int walletId) async {
+    state = const AsyncLoading();
+    try {
+      final currentDebts = state.requireValue;
+      final debtIndex = currentDebts.indexWhere((element) => element.id == debtId);
+      if (debtIndex == -1) throw 'Không tìm thấy khoản nợ';
+      final currentDebt = currentDebts[debtIndex];
+
+      final remainingAmount = currentDebt.amount - currentDebt.paidAmount;
+      if (paymentAmount > remainingAmount) throw 'Số tiền thanh toán vượt quá khoản nợ';
+
+      final newPaidAmount = currentDebt.paidAmount + paymentAmount;
+      final newStatus = newPaidAmount >= currentDebt.amount ? DebtStatus.paid : DebtStatus.partial;
+      final newDebt = currentDebt.copyWith(paidAmount: newPaidAmount, status: newStatus);
+
+      await _databaseService.updateDebt(newDebt);
+
+      final transaction = TransactionModel(
+        title: 'Trả nợ cho: ${newDebt.personId}',
+        amount: paymentAmount,
+        date: DateTime.now(),
+        type: TransactionType.repayment,
+        createAt: DateTime.now(),
+        walletId: walletId,
+        syncId: generateSyncId(),
+      );
+
+      await _databaseService.insertTransaction(transaction);
+
+      final updateDebt = [...currentDebts];
+      updateDebt[debtIndex] = newDebt;
+      state = AsyncData(updateDebt);
+    } catch (e) {
+      log('Error when pay debt $e');
+      state = AsyncError(e, StackTrace.current);
+      rethrow;
+    }
+  }
+
+  Future<void> collectDebt(int debtId, double paymentAmount, int walletId) async {
+    state = const AsyncLoading();
+    try {
+      final currentDebts = state.requireValue;
+      final debtIndex = currentDebts.indexWhere((element) => element.id == debtId);
+      if (debtIndex == -1) throw 'Không tìm thấy khoản nợ';
+
+      final currentDebt = currentDebts[debtIndex];
+
+      final remainingAmount = currentDebt.amount - currentDebt.paidAmount;
+      if (paymentAmount > remainingAmount) throw 'Số tiền thanh toán vượt quá khoản nợ';
+
+      final newPaidAmount = currentDebt.paidAmount + paymentAmount;
+      final newStatus = newPaidAmount >= currentDebt.amount ? DebtStatus.paid : DebtStatus.partial;
+      final newDebt = currentDebt.copyWith(paidAmount: newPaidAmount, status: newStatus);
+
+      await _databaseService.updateDebt(newDebt);
+
+      final transaction = TransactionModel(
+        title: '${newDebt.personId} trả nợ',
+        amount: paymentAmount,
+        date: DateTime.now(),
+        type: TransactionType.debtCollection,
+        createAt: DateTime.now(),
+        walletId: walletId,
+        syncId: generateSyncId(),
+      );
+      await _databaseService.insertTransaction(transaction);
+      final updateDebt = [...currentDebts];
+      updateDebt[debtIndex] = newDebt;
+      state = AsyncData(updateDebt);
+    } catch (e) {
+      log('Error when collect debt $e');
+      state = AsyncError(e, StackTrace.current);
+      rethrow;
+    }
+  }
+}
+
+final debtProvider = AsyncNotifierProvider<DebtNotifier, List<Debt>>(DebtNotifier.new);
+
+final totalDebtProvider = Provider<Map<String, double>>((ref) {
+  final debts = ref.watch(debtProvider).value ?? [];
+  double totalLent = 0;
+  double totalBorrowed = 0;
+
+  for (final debt in debts) {
+    if (debt.status != DebtStatus.paid) {
+      final remaining = debt.amount - debt.paidAmount;
+      if (debt.type == DebtType.lent) {
+        totalLent += remaining;
+      } else {
+        totalBorrowed += remaining;
+      }
+    }
+  }
+  return {'lent': totalLent, 'borrowed': totalBorrowed};
+});

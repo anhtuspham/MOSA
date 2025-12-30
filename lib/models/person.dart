@@ -1,9 +1,9 @@
 class Person {
   final String id;
   final String name;
-  final String iconPath;
+  final String? iconPath;
 
-  Person({required this.id, required this.name, required this.iconPath});
+  Person({required this.id, required this.name, this.iconPath = 'assets/images/icon.png'});
 
   factory Person.fromJson(Map<String, dynamic> json) {
     return Person(id: json['id'], name: json['name'], iconPath: json['iconPath']);

@@ -12,9 +12,9 @@ import 'package:mosa/utils/date_utils.dart';
 
 import '../models/category.dart';
 import '../models/transaction.dart';
+import 'database_service_provider.dart';
 
 /// Cung cấp quyền truy cập dịch vụ cơ sở dữ liệu cho các hoạt động giao dịch
-final databaseServiceProvider = Provider<DatabaseService>((ref) => DatabaseService());
 
 class TransactionNotifier extends AsyncNotifier<List<TransactionModel>> {
   @override

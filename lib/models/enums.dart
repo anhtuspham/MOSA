@@ -1,8 +1,10 @@
 enum TransactionType {
   income,
   expense,
-  lend,
-  borrowing,
+  lend, // cho mượn
+  borrowing, // đi vay
+  repayment, // trả nợ
+  debtCollection, // thu nợ
   transfer,
   transferIn,
   transferOut,
@@ -16,6 +18,7 @@ enum TransactionCategory {
   cashFlow, // income/expense
   transfer, // between wallets
   lending, // lend/borrow
+  debtCollection, // debt collection
   adjustment, // balance adjustments
   unknown
 }
