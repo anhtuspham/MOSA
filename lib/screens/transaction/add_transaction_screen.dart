@@ -3,17 +3,18 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mosa/models/category.dart';
+import 'package:mosa/models/debt.dart';
 import 'package:mosa/models/enums.dart';
 import 'package:mosa/models/transaction.dart';
 import 'package:mosa/providers/category_provider.dart';
+import 'package:mosa/providers/debt_provider.dart';
 import 'package:mosa/providers/transaction_provider.dart';
 import 'package:mosa/providers/wallet_provider.dart';
 import 'package:mosa/router/app_routes.dart';
 import 'package:mosa/utils/app_icons.dart';
 import 'package:mosa/utils/constants.dart';
-import 'package:mosa/utils/date_time_extension.dart';
 import 'package:mosa/widgets/custom_list_tile.dart';
-import 'package:mosa/widgets/date_time_picker_dialog.dart';
 import 'package:mosa/widgets/date_time_selector_section.dart';
 import 'package:mosa/widgets/error_widget.dart';
 import 'package:mosa/widgets/loading_widget.dart';
@@ -24,6 +25,7 @@ import 'package:mosa/widgets/media_action_bar.dart';
 import 'package:mosa/widgets/tab_bar_scaffold.dart';
 import 'package:toastification/toastification.dart';
 
+import '../../providers/bank_provider.dart';
 import '../../utils/app_colors.dart';
 import '../../utils/helpers.dart';
 import '../../utils/number_input_formatter.dart';
@@ -85,6 +87,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     try {
       final selectedCategory = ref.read(selectedCategoryProvider);
       final transactionController = ref.read(transactionProvider.notifier);
+      final debtController = ref.read(debtProvider.notifier);
       final effectiveWallet = await ref.read(effectiveWalletProvider.future);
       final transferOutWalletState = ref.watch(transferOutWalletProvider);
       final transferInWalletState = ref.watch(transferInWalletProvider);
@@ -156,6 +159,16 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
           await transactionController.addTransaction(transactionOut);
           await transactionController.addTransaction(transactionIn);
+        } else if (_selectedType.value == TransactionType.lend || _selectedType.value == TransactionType.borrowing) {
+          Debt debt = Debt(
+            personId: 1,
+            amount: amount,
+            type: _selectedType.value == TransactionType.lend ? DebtType.lent : DebtType.borrowed,
+            description: _noteController.text,
+            createdDate: _selectedDateTime,
+            walletId: effectiveWallet.id ?? -1
+          );
+          await debtController.createDebt(debt);
         } else {
           if (selectedCategory == null) {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Vui lòng chọn hạng mục')));
@@ -263,28 +276,26 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
             saveButtonSection(),
           ],
         );
+      case TransactionType.lend:
+        final categories = ref.watch(flattenedCategoryProvider).value ?? [];
+        final lendCategory = Category.findByName(categories, 'Cho vay');
+        if (lendCategory != null) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            ref.read(selectedCategoryProvider.notifier).selectCategory(lendCategory);
+          });
+        }
+        return loanTransactionDetail();
+      case TransactionType.borrowing:
+        final categories = ref.watch(flattenedCategoryProvider).value ?? [];
+        final borrowCategory = Category.findByName(categories, 'Mượn');
+        if (borrowCategory != null) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            ref.read(selectedCategoryProvider.notifier).selectCategory(borrowCategory);
+          });
+        }
+        return loanTransactionDetail();
       default:
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    amountInputSection(),
-                    const SizedBox(height: 12),
-                    categorySelectorSection(),
-                    const SizedBox(height: 12),
-                    walletAndDetailSection(),
-                    const SizedBox(height: 12),
-                    mediaActionSection(),
-                  ],
-                ),
-              ),
-            ),
-            saveButtonSection(),
-          ],
-        );
+        return defaultTransactionDetail();
     }
   }
 
@@ -425,6 +436,20 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     );
   }
 
+  Widget personLoanSelectorSection() {
+    final selectedBank = ref.watch(selectedBankProvider);
+
+    return CustomListTile(
+      leading: selectedBank != null ? Image.asset(selectedBank.iconPath, width: 22) : Icon(Icons.add_circle_sharp),
+      title: Text((selectedBank?.name ?? 'Chọn người vay')),
+      enable: true,
+      trailing: Icon(Icons.chevron_right),
+      onTap: () {
+        context.push(AppRoutes.bankList);
+      },
+    );
+  }
+
   Widget walletAndDetailSection() {
     return CardSection(
       child: Column(
@@ -500,6 +525,55 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         ),
         child: Text(AppConstants.save),
       ),
+    );
+  }
+
+  Widget loanTransactionDetail() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                amountInputSection(),
+                const SizedBox(height: 12),
+                categorySelectorSection(),
+                personLoanSelectorSection(),
+                const SizedBox(height: 12),
+                walletAndDetailSection(),
+                const SizedBox(height: 12),
+                mediaActionSection(),
+              ],
+            ),
+          ),
+        ),
+        saveButtonSection(),
+      ],
+    );
+  }
+
+  Widget defaultTransactionDetail() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                amountInputSection(),
+                const SizedBox(height: 12),
+                categorySelectorSection(),
+                const SizedBox(height: 12),
+                walletAndDetailSection(),
+                const SizedBox(height: 12),
+                mediaActionSection(),
+              ],
+            ),
+          ),
+        ),
+        saveButtonSection(),
+      ],
     );
   }
 }

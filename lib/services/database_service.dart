@@ -227,10 +227,10 @@ class DatabaseService {
         type TEXT NOT NULL,
         status TEXT NOT NULL,
         description TEXT NOT NULL,
-        createdDate TEXT NOT NULL,
-        dueDate TEXT,
-        walletId INTEGER,
-        FOREIGN KEY (personId) REFERENCES ${AppConstants.tablePersons}(id) ON DELETE RESTRICT
+        createdDate INTEGER NOT NULL,
+        dueDate INTEGER,
+        walletId INTEGER NOT NULL,
+        FOREIGN KEY (personId) REFERENCES ${AppConstants.tablePersons}(id) ON DELETE RESTRICT,
         FOREIGN KEY (walletId) REFERENCES ${AppConstants.tableWallets}(id) ON DELETE RESTRICT
         )
     ''');
@@ -288,10 +288,23 @@ class DatabaseService {
 
   Future<List<Debt>> getAllDebt() async {
     final db = await database;
-    final List<Map<String, dynamic>> map = await db.query(AppConstants.tableDebts, orderBy: 'id ASC');
+    final List<Map<String, dynamic>> map = await db.query(AppConstants.tableDebts, orderBy: 'createdDate DESC');
 
     return List.generate(map.length, (index) {
       return Debt.fromJson(map[index]);
+    });
+  }
+
+  Future<List<Debt>> getDebtByType(DebtType type) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      AppConstants.tableDebts,
+      where: 'type = ?',
+      whereArgs: [type.name],
+      orderBy: 'createdDate DESC',
+    );
+    return List.generate(maps.length, (index) {
+      return Debt.fromJson(maps[index]);
     });
   }
 
@@ -321,6 +334,14 @@ class DatabaseService {
       final db = await database;
       await db.delete(AppConstants.tableDebts, where: 'id = ?', whereArgs: [debt.id]);
       await _updateWalletBalance(debt.walletId ?? -1);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> getDebtByPersonId(Debt debt) async {
+    try {
+      final db = await database;
     } catch (e) {
       rethrow;
     }

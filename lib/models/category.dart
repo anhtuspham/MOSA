@@ -76,6 +76,34 @@ class Category {
     }
   }
 
+  static Category? findByName(List<Category> categories, String name) {
+    for (final category in categories) {
+      if (category.name.toLowerCase() == name.toLowerCase()) {
+        return category;
+      }
+      // Tìm trong children nếu có
+      if (category.children?.isNotEmpty == true) {
+        final found = findByName(category.children!, name);
+        if (found != null) return found;
+      }
+    }
+    return null;
+  }
+
+  static Category? findByType(List<Category> categories, String type, {String? name}) {
+    for (final category in categories) {
+      if (category.type == type && (name == null || category.name.toLowerCase() == name.toLowerCase())) {
+        return category;
+      }
+      // Tìm trong children nếu có
+      if (category.children?.isNotEmpty == true) {
+        final found = findByType(category.children!, type, name: name);
+        if (found != null) return found;
+      }
+    }
+    return null;
+  }
+
   static IconData _getMaterialIcon(String iconName) {
     const iconMap = {
       // Income

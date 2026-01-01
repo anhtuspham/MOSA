@@ -1,5 +1,5 @@
 class Person {
-  final String id;
+  final int id;
   final String name;
   final String? iconPath;
 
@@ -13,5 +13,5 @@ class Person {
     return {'id': id, 'name': name, 'iconPath': iconPath};
   }
 
-  factory Person.empty() => Person(id: 'id', name: 'name', iconPath: 'assets/images/icon.png');
+  factory Person.empty() => Person(id: 0, name: 'name', iconPath: 'assets/images/icon.png');
 }

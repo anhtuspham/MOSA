@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 enum DebtType { lent, borrowed }
 enum DebtStatus { active, paid, partial }
 
@@ -11,19 +13,19 @@ class Debt {
   final String description;
   final DateTime createdDate;
   final DateTime? dueDate;
-  final int? walletId;
+  final int walletId;
 
   Debt({
     this.id,
     required this.personId,
     required this.amount,
-    this.paidAmount = 0.0,
     required this.type,
-    this.status = DebtStatus.active,
     required this.description,
     required this.createdDate,
+    required this.walletId,
+    this.paidAmount = 0.0,
+    this.status = DebtStatus.active,
     this.dueDate,
-    this.walletId,
   });
 
   double get remainingAmount => amount - paidAmount;
@@ -36,8 +38,8 @@ class Debt {
       personId: json['personId'],
       amount: json['amount'].toDouble(),
       paidAmount: json['paidAmount']?.toDouble() ?? 0.0,
-      type: DebtType.values[json['type']],
-      status: DebtStatus.values[json['status']],
+      type: DebtType.values.byName(json['type']),
+      status: DebtStatus.values.byName(json['status']),
       description: json['description'],
       createdDate: DateTime.fromMillisecondsSinceEpoch(json['createdDate']),
       dueDate: json['dueDate'] != null ? DateTime.fromMillisecondsSinceEpoch(json['dueDate']) : null,
@@ -51,8 +53,8 @@ class Debt {
       'personId': personId,
       'amount': amount,
       'paidAmount': paidAmount,
-      'type': type.index,
-      'status': status.index,
+      'type': type.name,
+      'status': status.name,
       'description': description,
       'createdDate': createdDate.millisecondsSinceEpoch,
       'dueDate': dueDate?.millisecondsSinceEpoch,

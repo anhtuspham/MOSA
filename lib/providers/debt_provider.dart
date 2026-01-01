@@ -25,7 +25,7 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
         state = AsyncData(debts);
       }
     } catch (e) {
-      log('Error when refresh list debt $e');
+      log('Error when refresh list debt $e', name: 'debt_provider');
       state = AsyncError(e, StackTrace.current);
       rethrow;
     }
@@ -37,6 +37,20 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
     try {
       int id = await _databaseService.createDebt(debt);
       final newDebt = debt.copyWith(id: id);
+
+      // todo check here
+      final transaction = TransactionModel(
+        title: 'Cho vay người có userID: ${newDebt.personId}',
+        amount: debt.amount,
+        date: DateTime.now(),
+        type: TransactionType.borrowing,
+        createAt: DateTime.now(),
+        walletId: debt.walletId,
+        syncId: generateSyncId(),
+      );
+
+      await _databaseService.insertTransaction(transaction);
+
       state = AsyncData([newDebt, ...state.requireValue]);
       refreshListDebt();
     } catch (e) {
@@ -152,6 +166,26 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
 }
 
 final debtProvider = AsyncNotifierProvider<DebtNotifier, List<Debt>>(DebtNotifier.new);
+
+final debtByPersonProvider = Provider.family<List<Debt>, int>((ref, personId) {
+  final debts = ref.watch(debtProvider).value ?? [];
+  return debts.where((debt) => debt.personId == personId).toList();
+});
+
+final debtByTypeProvider = Provider.family<List<Debt>, DebtType>((ref, type) {
+  final debts = ref.watch(debtProvider).value ?? [];
+  return debts.where((debt) => debt.type == type).toList();
+});
+
+final debtSummaryByTypeProvider = Provider.family<Map<int, double>, DebtType>((ref, type) {
+  final debts = ref.watch(debtByTypeProvider(type));
+  final summary = <int, double>{};
+  for (var debt in debts) {
+    final remaining = debt.remainingAmount;
+    summary[debt.personId] = (summary[debt.personId] ?? 0) + remaining;
+  }
+  return summary;
+});
 
 final totalDebtProvider = Provider<Map<String, double>>((ref) {
   final debts = ref.watch(debtProvider).value ?? [];
