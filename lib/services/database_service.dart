@@ -550,6 +550,7 @@ class DatabaseService {
     return List.generate(maps.length, (i) {
       final map = Map<String, dynamic>.from(maps[i]);
       map['balance'] = map['calculatedBalance'] ?? map['balance'] ?? 0.0;
+      log('Get all wallets: ${map['name']} - ${map['balance']}');
       return Wallet.fromMap(map);
     });
   }

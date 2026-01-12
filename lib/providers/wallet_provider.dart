@@ -38,6 +38,7 @@ class WalletsNotifier extends AsyncNotifier<List<Wallet>> {
   Future<void> refreshWallet() async {
     try {
       final wallets = await _databaseService.getAllWallets();
+      log('Refresh wallet in background: ${state.value?.first.balance} - ${wallets.first.balance}');
       if (state.value != wallets) {
         state = AsyncData(wallets);
       }
@@ -88,17 +89,15 @@ final transferInWalletProvider = StateProvider<Wallet?>((ref) => null);
 
 final effectiveWalletProvider = FutureProvider<Wallet>((ref) async {
   final selectedWallet = ref.watch(selectedWalletProvider);
+  final wallets = await ref.watch(walletProvider.future);
 
   if (selectedWallet != null) {
-    return selectedWallet;
+    final updateWallets = wallets.firstWhere((wallet) => wallet.id == selectedWallet.id);
+    return updateWallets;
   }
 
-  final defaultWallet = await ref.watch(defaultWalletProvider.future);
-  if (defaultWallet != null) {
-    return defaultWallet;
-  }
-
-  throw Exception('Không có ví nào để lưu giao dịch');
+  final defaultWallet = wallets.firstWhere((wallet) => wallet.isDefault, orElse: () => throw Exception('Không có ví nào để lưu giao dịch'));
+  return defaultWallet;
 });
 
 final totalBalanceWalletProvider = Provider<double>((ref) {

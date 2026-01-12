@@ -38,7 +38,7 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
       int id = await _databaseService.createDebt(debt);
       final newDebt = debt.copyWith(id: id);
 
-      // todo check here
+      // todo check here add category
       final transaction = TransactionModel(
         title: 'Cho vay người có userID: ${newDebt.personId}',
         amount: debt.amount,
