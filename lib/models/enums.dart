@@ -17,7 +17,7 @@ enum BalanceEffect { plus, minus, neutral }
 enum TransactionCategory {
   cashFlow, // income/expense
   transfer, // between wallets
-  lending, // lend/borrow
+  lending, // lend / borrow
   debtCollection, // debt collection
   adjustment, // balance adjustments
   unknown

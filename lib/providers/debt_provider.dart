@@ -7,8 +7,12 @@ import 'package:mosa/models/enums.dart';
 import 'package:mosa/models/transaction.dart';
 import 'package:mosa/utils/utils.dart';
 
+import '../models/category.dart';
 import '../services/database_service.dart';
+import 'category_provider.dart';
 import 'database_service_provider.dart';
+import 'package:mosa/providers/wallet_provider.dart';
+import 'package:mosa/providers/transaction_provider.dart';
 
 class DebtNotifier extends AsyncNotifier<List<Debt>> {
   DatabaseService get _databaseService => ref.read(databaseServiceProvider);
@@ -36,20 +40,41 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
 
     try {
       int id = await _databaseService.createDebt(debt);
+      final categories = ref.watch(flattenedCategoryProvider).value ?? [];
+      final lendCategory = Category.findByName(categories, 'Cho vay');
+      final borrowCategory = Category.findByName(categories, 'Mượn');
       final newDebt = debt.copyWith(id: id);
+      bool isLent = debt.type == DebtType.lent;
 
-      // todo check here add category
-      final transaction = TransactionModel(
+      final lendTransaction = TransactionModel(
         title: 'Cho vay người có userID: ${newDebt.personId}',
         amount: debt.amount,
         date: DateTime.now(),
-        type: TransactionType.borrowing,
+        type: TransactionType.lend,
         createAt: DateTime.now(),
+        categoryId: lendCategory?.id,
         walletId: debt.walletId,
         syncId: generateSyncId(),
       );
 
-      await _databaseService.insertTransaction(transaction);
+      final borrowingTransaction = TransactionModel(
+        title: 'Vay từ có userID: ${newDebt.personId}',
+        amount: debt.amount,
+        date: DateTime.now(),
+        type: TransactionType.borrowing,
+        createAt: DateTime.now(),
+        categoryId: borrowCategory?.id,
+        walletId: debt.walletId,
+        syncId: generateSyncId(),
+      );
+
+      await _databaseService.insertTransaction(isLent ? lendTransaction : borrowingTransaction);
+
+      // Refresh wallet provider to update balance
+      await ref.read(walletProvider.notifier).refreshWallet();
+
+      // Refresh transaction provider to show new transaction
+      await ref.read(transactionProvider.notifier).refreshTransactions();
 
       state = AsyncData([newDebt, ...state.requireValue]);
       refreshListDebt();
@@ -116,6 +141,12 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
 
       await _databaseService.insertTransaction(transaction);
 
+      // Refresh wallet provider to update balance
+      await ref.read(walletProvider.notifier).refreshWallet();
+
+      // Refresh transaction provider to show new transaction
+      await ref.read(transactionProvider.notifier).refreshTransactions();
+
       final updateDebt = [...currentDebts];
       updateDebt[debtIndex] = newDebt;
       state = AsyncData(updateDebt);
@@ -154,6 +185,13 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
         syncId: generateSyncId(),
       );
       await _databaseService.insertTransaction(transaction);
+
+      // Refresh wallet provider to update balance
+      await ref.read(walletProvider.notifier).refreshWallet();
+
+      // Refresh transaction provider to show new transaction
+      await ref.read(transactionProvider.notifier).refreshTransactions();
+
       final updateDebt = [...currentDebts];
       updateDebt[debtIndex] = newDebt;
       state = AsyncData(updateDebt);

@@ -5,7 +5,7 @@ class Category {
   final String id;
   final String name;
 
-  /// income / expense / lend / borrow
+  /// income / expense / lend / borrowing / repayment / debtCollection
   final String type;
 
   /// custom / material

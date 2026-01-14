@@ -57,6 +57,17 @@ class TransactionNotifier extends AsyncNotifier<List<TransactionModel>> {
       return state.requireValue.where((element) => element.id != id).toList();
     });
   }
+
+  Future<void> refreshTransactions() async {
+    try {
+      final transactions = await _databaseService.getAllTransactions();
+      if (state.value != transactions) {
+        state = AsyncData(transactions);
+      }
+    } catch (e) {
+      log('Error refreshing transactions: $e');
+    }
+  }
 }
 
 /// Quản lý danh sách tất cả giao dịch với các thao tác CRUD (Tạo, Đọc, Cập nhật, Xóa)
