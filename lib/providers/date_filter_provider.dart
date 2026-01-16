@@ -17,7 +17,7 @@ import 'package:mosa/utils/transaction_utils.dart';
 enum DateRangeFilter { week, month, quarter, year }
 
 final dateRangeFilterProvider = StateProvider<DateRangeFilter>(
-  (ref) => DateRangeFilter.month,
+    (ref) => DateRangeFilter.month,
 );
 
 final _getDateRangeProvider = Provider<DateTimeRange>((ref) {

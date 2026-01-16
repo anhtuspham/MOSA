@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:mosa/models/debt.dart';
+import 'package:mosa/models/person.dart';
 import 'package:mosa/models/wallets.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
@@ -9,6 +10,7 @@ import 'package:flutter/services.dart';
 import '../models/transaction.dart';
 import '../models/enums.dart';
 import '../services/category_service.dart';
+import '../services/person_service.dart';
 import '../utils/constants.dart';
 import '../utils/utils.dart';
 
@@ -148,6 +150,33 @@ class DatabaseService {
     }
   }
 
+  Future<void> _seedPersons(Database db) async {
+    final count = Sqflite.firstIntValue(
+      await db.rawQuery('SELECT COUNT(*) FROM ${AppConstants.tablePersons}'),
+    );
+
+    if (count! > 0) {
+      log('Persons already exist, skip seeding');
+      return;
+    }
+
+    // Load from JSON only if database is empty
+    try {
+      final persons = await PersonService.loadPersons();
+      for (var person in persons) {
+        await db.insert(
+          AppConstants.tablePersons,
+          person.toJson(),
+          conflictAlgorithm: ConflictAlgorithm.ignore,
+        );
+      }
+      log('Persons seeded from JSON: ${persons.length} entries');
+    } catch (e, stackTrace) {
+      log('Person seeding failed',
+          name: 'DatabaseService', error: e, stackTrace: stackTrace);
+    }
+  }
+
   Future<void> _onDowngrade(Database db, int oldVersion, int newVersion) async {
     log('📦 Database downgraded from version $oldVersion to $newVersion');
   }
@@ -249,6 +278,7 @@ class DatabaseService {
     await _seedTypeWallets(db);
     await _seedWallets(db);
     await _seedTransactions(db);
+    await _seedPersons(db);
   }
 
   Future<void> initializeDatabase({bool clearExisting = false}) async {
@@ -343,6 +373,86 @@ class DatabaseService {
     try {
       final db = await database;
     } catch (e) {
+      rethrow;
+    }
+  }
+
+  // ==================== PERSON OPERATIONS ====================
+
+  /// Get all persons ordered by name
+  Future<List<Person>> getAllPersons() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      AppConstants.tablePersons,
+      orderBy: 'name ASC',
+    );
+    return List.generate(maps.length, (i) => Person.fromJson(maps[i]));
+  }
+
+  /// Get person by ID
+  Future<Person?> getPersonById(int id) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      AppConstants.tablePersons,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    if (maps.isEmpty) return null;
+    return Person.fromJson(maps.first);
+  }
+
+  /// Insert new person
+  Future<int> insertPerson(Person person) async {
+    try {
+      final db = await database;
+
+      // Check for duplicate name
+      final existing = await db.query(
+        AppConstants.tablePersons,
+        where: 'name = ?',
+        whereArgs: [person.name],
+      );
+      if (existing.isNotEmpty) {
+        throw 'Tên người đã tồn tại';
+      }
+
+      final id = await db.insert(AppConstants.tablePersons, person.toJson());
+      log('Person inserted with id: $id');
+      return id;
+    } catch (e) {
+      log('Insert person failed: $e');
+      if (e.toString().contains('UNIQUE constraint')) {
+        throw 'Tên người đã tồn tại';
+      }
+      rethrow;
+    }
+  }
+
+  /// Update person (name and iconPath only, cannot change id)
+  Future<int> updatePerson(Person person) async {
+    try {
+      final db = await database;
+
+      // Check if another person has the same name
+      final existing = await db.query(
+        AppConstants.tablePersons,
+        where: 'name = ? AND id != ?',
+        whereArgs: [person.name, person.id],
+      );
+      if (existing.isNotEmpty) {
+        throw 'Tên người đã tồn tại';
+      }
+
+      final count = await db.update(
+        AppConstants.tablePersons,
+        person.toJson(),
+        where: 'id = ?',
+        whereArgs: [person.id],
+      );
+      log('Person updated: $count rows affected');
+      return count;
+    } catch (e) {
+      log('Update person failed: $e');
       rethrow;
     }
   }

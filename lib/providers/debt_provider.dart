@@ -46,8 +46,12 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
       final newDebt = debt.copyWith(id: id);
       bool isLent = debt.type == DebtType.lent;
 
+      // Get person name for transaction title
+      final person = await _databaseService.getPersonById(newDebt.personId);
+      final personName = person?.name ?? 'Unknown';
+
       final lendTransaction = TransactionModel(
-        title: 'Cho vay người có userID: ${newDebt.personId}',
+        title: 'Cho vay: $personName',
         amount: debt.amount,
         date: DateTime.now(),
         type: TransactionType.lend,
@@ -58,7 +62,7 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
       );
 
       final borrowingTransaction = TransactionModel(
-        title: 'Vay từ có userID: ${newDebt.personId}',
+        title: 'Vay từ: $personName',
         amount: debt.amount,
         date: DateTime.now(),
         type: TransactionType.borrowing,
@@ -129,8 +133,12 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
 
       await _databaseService.updateDebt(newDebt);
 
+      // Get person name for transaction title
+      final person = await _databaseService.getPersonById(newDebt.personId);
+      final personName = person?.name ?? 'Unknown';
+
       final transaction = TransactionModel(
-        title: 'Trả nợ cho: ${newDebt.personId}',
+        title: 'Trả nợ cho: $personName',
         amount: paymentAmount,
         date: DateTime.now(),
         type: TransactionType.repayment,
@@ -175,8 +183,12 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
 
       await _databaseService.updateDebt(newDebt);
 
+      // Get person name for transaction title
+      final person = await _databaseService.getPersonById(newDebt.personId);
+      final personName = person?.name ?? 'Unknown';
+
       final transaction = TransactionModel(
-        title: '${newDebt.personId} trả nợ',
+        title: '$personName trả nợ',
         amount: paymentAmount,
         date: DateTime.now(),
         type: TransactionType.debtCollection,

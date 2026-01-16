@@ -1,0 +1,12 @@
+[
+  { "id": 1, "name": "Nguyễn Anh", "iconPath": "assets/icons/person_default.png" },
+  { "id": 2, "name": "Trần Huy", "iconPath": "assets/icons/person_default.png" },
+  { "id": 3, "name": "Lê Hà", "iconPath": "assets/icons/person_default.png" },
+  { "id": 4, "name": "Phạm Long", "iconPath": "assets/icons/person_default.png" },
+  { "id": 5, "name": "Hoàng Thắng", "iconPath": "assets/icons/person_default.png" },
+  { "id": 6, "name": "Vũ Linh", "iconPath": "assets/icons/person_default.png" },
+  { "id": 7, "name": "Đặng Tùng", "iconPath": "assets/icons/person_default.png" },
+  { "id": 8, "name": "Bùi Mai", "iconPath": "assets/icons/person_default.png" },
+  { "id": 9, "name": "Đỗ Tuấn", "iconPath": "assets/icons/person_default.png" },
+  { "id": 10, "name": "Ngô Yến", "iconPath": "assets/icons/person_default.png" }
+]

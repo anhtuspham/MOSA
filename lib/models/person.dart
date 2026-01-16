@@ -14,4 +14,12 @@ class Person {
   }
 
   factory Person.empty() => Person(id: 0, name: 'name', iconPath: 'assets/images/icon.png');
+
+  Person copyWith({int? id, String? name, String? iconPath}) {
+    return Person(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      iconPath: iconPath ?? this.iconPath,
+    );
+  }
 }

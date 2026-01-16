@@ -9,6 +9,7 @@ import 'package:mosa/screens/stats/screen/stats_screen.dart';
 import 'package:mosa/screens/transaction/add_transaction_screen.dart';
 import 'package:mosa/screens/wallet/screen/add_wallet_screen.dart';
 import 'package:mosa/screens/wallet/screen/select_bank_screen.dart';
+import 'package:mosa/screens/wallet/screen/select_person_screen.dart';
 import 'package:mosa/screens/wallet/screen/select_transfer_from_wallet_screen.dart';
 import 'package:mosa/screens/wallet/screen/select_transfer_to_wallet_screen.dart';
 import 'package:mosa/screens/wallet/screen/select_wallet_screen.dart';
@@ -155,6 +156,11 @@ final goRouter = GoRouter(
       path: AppRoutes.bankList,
       name: 'bankList',
       builder: (context, state) => SelectBankScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.personList,
+      name: 'personList',
+      builder: (context, state) => SelectPersonScreen(),
     ),
   ],
   errorBuilder: (context, state) {

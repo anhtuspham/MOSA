@@ -26,6 +26,7 @@ import 'package:mosa/widgets/tab_bar_scaffold.dart';
 import 'package:toastification/toastification.dart';
 
 import '../../providers/bank_provider.dart';
+import '../../providers/person_provider.dart';
 import '../../utils/app_colors.dart';
 import '../../utils/helpers.dart';
 import '../../utils/number_input_formatter.dart';
@@ -160,13 +161,24 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
           await transactionController.addTransaction(transactionOut);
           await transactionController.addTransaction(transactionIn);
         } else if (_selectedType.value == TransactionType.lend || _selectedType.value == TransactionType.borrowing) {
+          // Validate person selection
+          final selectedPerson = ref.read(selectedPersonProvider);
+          if (selectedPerson == null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Vui lòng chọn người')),
+            );
+            return;
+          }
+
           Debt debt = Debt(
-            personId: 1,
+            personId: selectedPerson.id,
             amount: amount,
             type: _selectedType.value == TransactionType.lend ? DebtType.lent : DebtType.borrowed,
-            description: _noteController.text,
+            description: _noteController.text.isNotEmpty
+                ? _noteController.text
+                : 'Giao dịch với ${selectedPerson.name}',
             createdDate: _selectedDateTime,
-            walletId: effectiveWallet.id ?? -1
+            walletId: effectiveWallet.id ?? -1,
           );
           await debtController.createDebt(debt);
         } else {
@@ -437,15 +449,21 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   }
 
   Widget personLoanSelectorSection() {
-    final selectedBank = ref.watch(selectedBankProvider);
+    final selectedPerson = ref.watch(selectedPersonProvider);
 
     return CustomListTile(
-      leading: selectedBank != null ? Image.asset(selectedBank.iconPath, width: 22) : Icon(Icons.add_circle_sharp),
-      title: Text((selectedBank?.name ?? 'Chọn người vay')),
+      leading: selectedPerson != null
+          ? Image.asset(
+              selectedPerson.iconPath ?? 'assets/images/icon.png',
+              width: 22,
+              errorBuilder: (_, __, ___) => Icon(Icons.person, size: 22),
+            )
+          : Icon(Icons.person_add_outlined),
+      title: Text(selectedPerson?.name ?? 'Chọn người'),
       enable: true,
       trailing: Icon(Icons.chevron_right),
       onTap: () {
-        context.push(AppRoutes.bankList);
+        context.push(AppRoutes.personList);
       },
     );
   }
