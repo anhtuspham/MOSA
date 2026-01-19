@@ -289,8 +289,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
           ],
         );
       case TransactionType.lend:
-        final categories = ref.watch(flattenedCategoryProvider).value ?? [];
-        final lendCategory = Category.findByName(categories, 'Cho vay');
+        final lendCategory = ref.watch(categoryByNameProvider('Cho vay')).value;
         if (lendCategory != null) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             ref.read(selectedCategoryProvider.notifier).selectCategory(lendCategory);
@@ -298,8 +297,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         }
         return loanTransactionDetail();
       case TransactionType.borrowing:
-        final categories = ref.watch(flattenedCategoryProvider).value ?? [];
-        final borrowCategory = Category.findByName(categories, 'Mượn');
+        final borrowCategory = ref.watch(categoryByNameProvider('Mượn')).value;
         if (borrowCategory != null) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             ref.read(selectedCategoryProvider.notifier).selectCategory(borrowCategory);

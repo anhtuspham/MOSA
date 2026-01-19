@@ -239,7 +239,7 @@
   {
     "id": "lend_receive",
     "name": "Mượn",
-    "type": "borrowing",
+    "type": "lend",
     "iconType": "material",
     "iconPath": "gavel",
     "color": "#F44336"
@@ -247,7 +247,7 @@
   {
     "id": "lend_payback",
     "name": "Trả nợ",
-    "type": "repayment",
+    "type": "lend",
     "iconType": "material",
     "iconPath": "check_circle",
     "color": "#2196F3"
@@ -255,7 +255,7 @@
   {
     "id": "lend_collect",
     "name": "Thu nợ",
-    "type": "debtCollection",
+    "type": "lend",
     "iconType": "material",
     "iconPath": "paid",
     "color": "#FFC107"

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:mosa/models/person.dart';
 import 'package:mosa/services/database_service.dart';
+import 'package:mosa/utils/collection_utils.dart';
 import 'database_service_provider.dart';
 
 class PersonNotifier extends AsyncNotifier<List<Person>> {
@@ -72,19 +73,12 @@ class PersonNotifier extends AsyncNotifier<List<Person>> {
 }
 
 // Main provider - AsyncNotifier for full CRUD
-final personProvider = AsyncNotifierProvider<PersonNotifier, List<Person>>(
-  PersonNotifier.new,
-);
+final personProvider = AsyncNotifierProvider<PersonNotifier, List<Person>>(PersonNotifier.new);
 
 // Selection provider - tracks currently selected person
 final selectedPersonProvider = StateProvider<Person?>((ref) => null);
 
-// Helper provider - get person by ID (for display purposes)
 final personByIdProvider = Provider.family<Person?, int>((ref, personId) {
   final persons = ref.watch(personProvider).value ?? [];
-  try {
-    return persons.firstWhere((p) => p.id == personId);
-  } catch (e) {
-    return null;
-  }
+  return CollectionUtils.safeLookup(persons, (person) => person.id == personId);
 });

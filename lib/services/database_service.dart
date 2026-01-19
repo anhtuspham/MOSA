@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:mosa/models/debt.dart';
 import 'package:mosa/models/person.dart';
 import 'package:mosa/models/wallets.dart';
+import 'package:mosa/models/category.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'dart:convert';
@@ -177,6 +178,43 @@ class DatabaseService {
     }
   }
 
+  Future<void> _seedCategories(Database db) async {
+    final count = Sqflite.firstIntValue(
+      await db.rawQuery('SELECT COUNT(*) FROM ${AppConstants.tableCategories}'),
+    );
+
+    if (count! > 0) {
+      log('Categories already exist, skip seeding');
+      return;
+    }
+
+    // Load from JSON only if database is empty
+    try {
+      final categories = await CategoryService.loadCategories();
+      final List<Category> flatCategories = [];
+
+      for (var category in categories) {
+        flatCategories.add(category);
+        if (category.children != null) {
+          flatCategories.addAll(category.children!);
+        }
+      }
+
+      for (var category in flatCategories) {
+        await db.insert(
+          AppConstants.tableCategories,
+          category.toMap(),
+          conflictAlgorithm: ConflictAlgorithm.ignore,
+        );
+      }
+
+      log('Categories seeded: ${flatCategories.length} entries');
+    } catch (e, stackTrace) {
+      log('Person seeding failed',
+          name: 'DatabaseService', error: e, stackTrace: stackTrace);
+    }
+  }
+
   Future<void> _onDowngrade(Database db, int oldVersion, int newVersion) async {
     log('📦 Database downgraded from version $oldVersion to $newVersion');
   }
@@ -264,6 +302,19 @@ class DatabaseService {
         )
     ''');
 
+    await db.execute('''
+      CREATE TABLE ${AppConstants.tableCategories}(
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        type TEXT NOT NULL,
+        iconType TEXT NOT NULL,
+        iconPath TEXT NOT NULL,
+        color TEXT,
+        parentId TEXT,
+        FOREIGN KEY (parentId) REFERENCES ${AppConstants.tableCategories}(id) ON DELETE RESTRICT
+      )
+    ''');
+
     // Create indexes for fast lookup
     await db.execute('CREATE INDEX idx_type_wallet_name ON ${AppConstants.tableTypeWallets}(name)');
     await db.execute('CREATE INDEX idx_wallet_name ON ${AppConstants.tableWallets}(name)');
@@ -273,12 +324,14 @@ class DatabaseService {
     await db.execute('CREATE INDEX idx_transaction_walletId ON ${AppConstants.tableTransactions}(walletId)');
     await db.execute('CREATE INDEX idx_transaction_date ON ${AppConstants.tableTransactions}(date)');
     await db.execute('CREATE INDEX idx_debt_personId ON ${AppConstants.tableDebts}(personId)');
+    await db.execute('CREATE INDEX idx_debt_categoriesId ON ${AppConstants.tableCategories}(id)');
 
     // Seed default data
     await _seedTypeWallets(db);
     await _seedWallets(db);
     await _seedTransactions(db);
     await _seedPersons(db);
+    await _seedCategories(db);
   }
 
   Future<void> initializeDatabase({bool clearExisting = false}) async {
@@ -453,6 +506,74 @@ class DatabaseService {
       return count;
     } catch (e) {
       log('Update person failed: $e');
+      rethrow;
+    }
+  }
+
+  // ==================== CATEGORIES OPERATIONS ====================
+
+  /// Get all category ordered by name
+  Future<List<Category>> getAllCategories() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      AppConstants.tableCategories,
+      orderBy: 'name ASC',
+    );
+    return List.generate(maps.length, (i) => Category.fromJson(maps[i]));
+  }
+
+  /// Insert new category
+  Future<int> insertCategory(Category category) async {
+    try {
+      final db = await database;
+
+      // Check for duplicate name
+      final existing = await db.query(
+        AppConstants.tablePersons,
+        where: 'name = ?',
+        whereArgs: [category.name],
+      );
+      if (existing.isNotEmpty) {
+        throw 'Tên category đã tồn tại';
+      }
+
+      final id = await db.insert(AppConstants.tablePersons, category.toJson());
+      log('Person inserted with id: $id');
+      return id;
+    } catch (e) {
+      log('Insert category failed: $e');
+      if (e.toString().contains('UNIQUE constraint')) {
+        throw 'Tên category đã tồn tại';
+      }
+      rethrow;
+    }
+  }
+
+  /// Update category (name and iconPath only, cannot change id)
+  Future<int> updateCategory(Category category) async {
+    try {
+      final db = await database;
+
+      // Check if another person has the same name
+      final existing = await db.query(
+        AppConstants.tableCategories,
+        where: 'name = ? AND id != ?',
+        whereArgs: [category.name, category.id],
+      );
+      if (existing.isNotEmpty) {
+        throw 'Tên category đã tồn tại';
+      }
+
+      final count = await db.update(
+        AppConstants.tableCategories,
+        category.toJson(),
+        where: 'id = ?',
+        whereArgs: [category.id],
+      );
+      log('category updated: $count rows affected');
+      return count;
+    } catch (e) {
+      log('Update category failed: $e');
       rethrow;
     }
   }

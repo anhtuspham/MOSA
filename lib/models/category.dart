@@ -63,6 +63,31 @@ class Category {
     };
   }
 
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'type': type,
+      'iconType': iconType,
+      'iconPath': iconPath,
+      'color': color,
+      'parentId': parentId,
+    };
+  }
+
+  factory Category.fromMap(Map<String, dynamic> map) {
+    return Category(
+      id: map['id'] as String,
+      name: map['name'] as String,
+      type: map['type'] as String,
+      iconType: map['iconType'] as String,
+      iconPath: map['iconPath'] as String,
+      color: map['color'] as String?,
+      parentId: map['parentId'] as String?,
+      children: [],
+    );
+  }
+
   Widget getIcon({double size = 24}) {
     final color =
         this.color != null
@@ -76,33 +101,33 @@ class Category {
     }
   }
 
-  static Category? findByName(List<Category> categories, String name) {
-    for (final category in categories) {
-      if (category.name.toLowerCase() == name.toLowerCase()) {
-        return category;
-      }
-      // Tìm trong children nếu có
-      if (category.children?.isNotEmpty == true) {
-        final found = findByName(category.children!, name);
-        if (found != null) return found;
-      }
-    }
-    return null;
-  }
-
-  static Category? findByType(List<Category> categories, String type, {String? name}) {
-    for (final category in categories) {
-      if (category.type == type && (name == null || category.name.toLowerCase() == name.toLowerCase())) {
-        return category;
-      }
-      // Tìm trong children nếu có
-      if (category.children?.isNotEmpty == true) {
-        final found = findByType(category.children!, type, name: name);
-        if (found != null) return found;
-      }
-    }
-    return null;
-  }
+  // static Category? findByName(List<Category> categories, String name) {
+  //   for (final category in categories) {
+  //     if (category.name.toLowerCase() == name.toLowerCase()) {
+  //       return category;
+  //     }
+  //     // Tìm trong children nếu có
+  //     if (category.children?.isNotEmpty == true) {
+  //       final found = findByName(category.children!, name);
+  //       if (found != null) return found;
+  //     }
+  //   }
+  //   return null;
+  // }
+  //
+  // static Category? findByType(List<Category> categories, String type, {String? name}) {
+  //   for (final category in categories) {
+  //     if (category.type == type && (name == null || category.name.toLowerCase() == name.toLowerCase())) {
+  //       return category;
+  //     }
+  //     // Tìm trong children nếu có
+  //     if (category.children?.isNotEmpty == true) {
+  //       final found = findByType(category.children!, type, name: name);
+  //       if (found != null) return found;
+  //     }
+  //   }
+  //   return null;
+  // }
 
   static IconData _getMaterialIcon(String iconName) {
     const iconMap = {

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mosa/models/debt.dart';
 import 'package:mosa/models/enums.dart';
 import 'package:mosa/models/transaction.dart';
+import 'package:mosa/providers/person_provider.dart';
 import 'package:mosa/utils/utils.dart';
 
 import '../models/category.dart';
@@ -41,13 +42,13 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
     try {
       int id = await _databaseService.createDebt(debt);
       final categories = ref.watch(flattenedCategoryProvider).value ?? [];
-      final lendCategory = Category.findByName(categories, 'Cho vay');
-      final borrowCategory = Category.findByName(categories, 'Mượn');
+      final lendCategory = ref.watch(categoryByNameProvider('Cho vay')).value;
+      final borrowCategory = ref.watch(categoryByNameProvider('Mượn')).value;
       final newDebt = debt.copyWith(id: id);
       bool isLent = debt.type == DebtType.lent;
 
       // Get person name for transaction title
-      final person = await _databaseService.getPersonById(newDebt.personId);
+      final person = ref.watch(personByIdProvider(newDebt.personId));
       final personName = person?.name ?? 'Unknown';
 
       final lendTransaction = TransactionModel(
@@ -134,7 +135,8 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
       await _databaseService.updateDebt(newDebt);
 
       // Get person name for transaction title
-      final person = await _databaseService.getPersonById(newDebt.personId);
+      final person = ref.watch(personByIdProvider(newDebt.personId));
+      // final person = await _databaseService.getPersonById(newDebt.personId);
       final personName = person?.name ?? 'Unknown';
 
       final transaction = TransactionModel(
@@ -184,7 +186,8 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
       await _databaseService.updateDebt(newDebt);
 
       // Get person name for transaction title
-      final person = await _databaseService.getPersonById(newDebt.personId);
+      final person = ref.watch(personByIdProvider(newDebt.personId));
+      // final person = await _databaseService.getPersonById(newDebt.personId);
       final personName = person?.name ?? 'Unknown';
 
       final transaction = TransactionModel(

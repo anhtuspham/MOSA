@@ -41,6 +41,7 @@ class AppConstants {
   static const String tableWallets = 'wallets';
   static const String tableTypeWallets = 'type_wallets';
   static const String tablePersons = 'persons';
+  static const String tableCategories = 'categories';
   static const String tableDebts = 'debts';
 
   static const String sunday = 'Chủ nhật';

@@ -9,7 +9,7 @@ import 'package:toastification/toastification.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // await DatabaseService().initializeDatabase(clearExisting: true);
+  await DatabaseService().initializeDatabase(clearExisting: true);
 
   runApp(ProviderScope(child: const MyApp()));
 }
