@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mosa/providers/category_provider.dart';
+import 'package:mosa/providers/transaction_provider.dart';
 import 'package:mosa/utils/app_colors.dart';
 import 'package:mosa/widgets/custom_expansion_tile.dart';
 import 'package:mosa/widgets/item_widget.dart';
@@ -29,9 +30,7 @@ class _CategoryTabState extends ConsumerState<CategoryTab> {
 
   @override
   Widget build(BuildContext context) {
-    final asyncCategories = ref.watch(
-      categoryByTypeProvider(widget.categoryType),
-    );
+    final asyncCategories = ref.watch(categoryByTypeProvider(widget.categoryType));
 
     return Container(
       decoration: BoxDecoration(color: AppColors.secondaryBackground),
@@ -57,21 +56,14 @@ class _CategoryTabState extends ConsumerState<CategoryTab> {
                   if (category.children == null || category.children!.isEmpty) {
                     return Container(
                       color: AppColors.background,
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 0,
-                        vertical: 3,
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 18,
-                        vertical: 8,
-                      ),
+                      margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 3),
+                      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
                       child: ItemWidget(
                         category: category,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         onTap: () {
-                          ref
-                              .read(selectedCategoryProvider.notifier)
-                              .selectCategory(category);
+                          ref.read(selectedCategoryProvider.notifier).selectCategory(category);
+                          ref.read(currentTransactionByTypeProvider.notifier).state = ref.watch(autoTransactionTypeProvider);
                           context.pop();
                         },
                       ),
@@ -83,9 +75,8 @@ class _CategoryTabState extends ConsumerState<CategoryTab> {
                         category: category,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         onTap: () {
-                          ref
-                              .read(selectedCategoryProvider.notifier)
-                              .selectCategory(category);
+                          ref.read(selectedCategoryProvider.notifier).selectCategory(category);
+                          ref.read(currentTransactionByTypeProvider.notifier).state = ref.watch(autoTransactionTypeProvider);
                           context.pop();
                         },
                       ),
@@ -94,20 +85,18 @@ class _CategoryTabState extends ConsumerState<CategoryTab> {
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: category.children!.length,
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 4,
-                                crossAxisSpacing: 10,
-                                childAspectRatio: 1.4,
-                              ),
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 4,
+                            crossAxisSpacing: 10,
+                            childAspectRatio: 1.4,
+                          ),
                           itemBuilder: (context, index) {
                             final child = category.children![index];
                             return ItemWidget(
                               category: child,
                               onTap: () {
-                                ref
-                                    .read(selectedCategoryProvider.notifier)
-                                    .selectCategory(child);
+                                ref.read(selectedCategoryProvider.notifier).selectCategory(child);
+                                ref.read(currentTransactionByTypeProvider.notifier).state = ref.watch(autoTransactionTypeProvider);
                                 context.pop();
                               },
                             );

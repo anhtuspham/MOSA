@@ -41,11 +41,18 @@ class AddTransactionScreen extends ConsumerStatefulWidget {
 }
 
 class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
-  late final ValueNotifier<TransactionType> _selectedType = ValueNotifier<TransactionType>(TransactionType.expense);
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _noteController = TextEditingController();
   final TextEditingController _actualBalanceController = TextEditingController();
   late DateTime _selectedDateTime = DateTime.now();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(currentTransactionByTypeProvider.notifier).state = TransactionType.expense;
+    });
+  }
 
   @override
   void dispose() {
@@ -57,6 +64,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final selectedTransactionType = ref.watch(currentTransactionByTypeProvider) ?? TransactionType.expense;
+
     return CommonScaffold(
       title: Container(
         decoration: BoxDecoration(border: Border.all(width: 2, color: AppColors.lightBorder), borderRadius: BorderRadius.circular(8)),
@@ -68,12 +77,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       leading: Icon(Icons.history),
       actions: [IconButton(onPressed: _saveTransaction, icon: Icon(Icons.check))],
       appBarBackgroundColor: AppColors.primaryBackground,
-      body: SectionContainer(
-        child: ValueListenableBuilder(
-          valueListenable: _selectedType,
-          builder: (context, value, child) => detailTransactionSection(transactionType: _selectedType.value),
-        ),
-      ),
+      body: SectionContainer(child: detailTransactionSection(transactionType: selectedTransactionType)),
     );
   }
 
@@ -87,6 +91,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   Future<void> _saveTransaction() async {
     try {
       final selectedCategory = ref.read(selectedCategoryProvider);
+      final selectedTransactionType = ref.read(currentTransactionByTypeProvider) ?? TransactionType.expense;
       final transactionController = ref.read(transactionProvider.notifier);
       final debtController = ref.read(debtProvider.notifier);
       final effectiveWallet = await ref.read(effectiveWalletProvider.future);
@@ -95,7 +100,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
       if (!mounted) return;
 
-      if (_selectedType.value == TransactionType.adjustBalance) {
+      if (selectedTransactionType == TransactionType.adjustBalance) {
         // For balance adjustment, calculate the difference between actual and current balance
         final actualBalance = double.tryParse(_actualBalanceController.text.replaceAll('.', '')) ?? 0;
         final adjustmentAmount = actualBalance - effectiveWallet.balance;
@@ -109,7 +114,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
           title: 'Điều chỉnh số dư',
           amount: adjustmentAmount,
           date: _selectedDateTime,
-          type: _selectedType.value,
+          type: selectedTransactionType,
           categoryId: 'adjustment',
           note: _noteController.text.isNotEmpty ? _noteController.text : null,
           createAt: DateTime.now(),
@@ -131,7 +136,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
           return;
         }
 
-        if (_selectedType.value == TransactionType.transfer) {
+        if (selectedTransactionType == TransactionType.transfer) {
           final transactionOut = TransactionModel(
             title: 'Chuyển khoản đến ${transferInWalletState?.name ?? 'Chưa chọn'}',
             // sử dụng transferIn để gửi title
@@ -160,23 +165,19 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
           await transactionController.addTransaction(transactionOut);
           await transactionController.addTransaction(transactionIn);
-        } else if (_selectedType.value == TransactionType.lend || _selectedType.value == TransactionType.borrowing) {
+        } else if (selectedTransactionType == TransactionType.lend || selectedTransactionType == TransactionType.borrowing) {
           // Validate person selection
           final selectedPerson = ref.read(selectedPersonProvider);
           if (selectedPerson == null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Vui lòng chọn người')),
-            );
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Vui lòng chọn người')));
             return;
           }
 
           Debt debt = Debt(
             personId: selectedPerson.id,
             amount: amount,
-            type: _selectedType.value == TransactionType.lend ? DebtType.lent : DebtType.borrowed,
-            description: _noteController.text.isNotEmpty
-                ? _noteController.text
-                : 'Giao dịch với ${selectedPerson.name}',
+            type: selectedTransactionType == TransactionType.lend ? DebtType.lent : DebtType.borrowed,
+            description: _noteController.text.isNotEmpty ? _noteController.text : 'Giao dịch với ${selectedPerson.name}',
             createdDate: _selectedDateTime,
             walletId: effectiveWallet.id ?? -1,
           );
@@ -191,7 +192,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
             title: selectedCategory.name,
             amount: amount,
             date: _selectedDateTime,
-            type: _selectedType.value,
+            type: selectedTransactionType,
             categoryId: selectedCategory.id,
             note: _noteController.text.isNotEmpty ? _noteController.text : null,
             createAt: DateTime.now(),
@@ -289,20 +290,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
           ],
         );
       case TransactionType.lend:
-        final lendCategory = ref.watch(categoryByNameProvider('Cho vay')).value;
-        if (lendCategory != null) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            ref.read(selectedCategoryProvider.notifier).selectCategory(lendCategory);
-          });
-        }
         return loanTransactionDetail();
       case TransactionType.borrowing:
-        final borrowCategory = ref.watch(categoryByNameProvider('Mượn')).value;
-        if (borrowCategory != null) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            ref.read(selectedCategoryProvider.notifier).selectCategory(borrowCategory);
-          });
-        }
         return loanTransactionDetail();
       default:
         return defaultTransactionDetail();
@@ -310,6 +299,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   }
 
   Widget transactionTypeDropdown() {
+    final selectedTransactionType = ref.read(currentTransactionByTypeProvider) ?? TransactionType.expense;
     return DropdownButtonFormField(
       decoration: InputDecoration(
         floatingLabelBehavior: FloatingLabelBehavior.never,
@@ -319,7 +309,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       ),
       isExpanded: true,
       alignment: Alignment.center,
-      initialValue: _selectedType.value,
+      initialValue: selectedTransactionType,
       items: [
         DropdownMenuItem(value: TransactionType.expense, child: Text('Chi tiền')),
         DropdownMenuItem(value: TransactionType.income, child: Text('Thu tiền')),
@@ -331,8 +321,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       onChanged: (value) {
         if (value != null) {
           setState(() {
-            _selectedType.value = value;
-            ref.read(currentTransactionByTypeProvider.notifier).state = _selectedType.value;
+            ref.read(currentTransactionByTypeProvider.notifier).state = value;
             _clearTransaction();
           });
         }
@@ -341,11 +330,12 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   }
 
   Widget amountInputSection() {
+    final selectedTransactionType = ref.read(currentTransactionByTypeProvider) ?? TransactionType.expense;
     return CardSection(
       child: Column(
         children: [
           Text('Số tiền'),
-          AmountTextField(controller: _amountController, amountColor: getTransactionTypeColor(type: _selectedType.value)),
+          AmountTextField(controller: _amountController, amountColor: getTransactionTypeColor(type: selectedTransactionType)),
         ],
       ),
     );
@@ -418,8 +408,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
             title: Text(selectedCategory != null ? (selectedCategory.name) : 'Chọn hạng mục'),
             enable: true,
             trailing: Row(children: [Text('Tất cả'), const SizedBox(width: 12), Icon(Icons.chevron_right)]),
-            onTap: () {
-              context.push(AppRoutes.categoryList);
+            onTap: () async {
+              await context.push(AppRoutes.categoryList);
             },
           ),
         ],
@@ -450,13 +440,14 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     final selectedPerson = ref.watch(selectedPersonProvider);
 
     return CustomListTile(
-      leading: selectedPerson != null
-          ? Image.asset(
-              selectedPerson.iconPath ?? 'assets/images/icon.png',
-              width: 22,
-              errorBuilder: (_, __, ___) => Icon(Icons.person, size: 22),
-            )
-          : Icon(Icons.person_add_outlined),
+      leading:
+          selectedPerson != null
+              ? Image.asset(
+                selectedPerson.iconPath ?? 'assets/images/icon.png',
+                width: 22,
+                errorBuilder: (_, __, ___) => Icon(Icons.person, size: 22),
+              )
+              : Icon(Icons.person_add_outlined),
       title: Text(selectedPerson?.name ?? 'Chọn người'),
       enable: true,
       trailing: Icon(Icons.chevron_right),

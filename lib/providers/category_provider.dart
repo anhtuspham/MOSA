@@ -2,11 +2,15 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:mosa/models/category.dart';
+import 'package:mosa/models/enums.dart';
 import 'package:mosa/providers/database_service_provider.dart';
 import 'package:mosa/services/database_service.dart';
 import 'package:mosa/utils/collection_utils.dart';
 import 'package:mosa/utils/tree_utils.dart';
+
+import '../utils/utils.dart';
 
 // final categoriesProvider = FutureProvider<List<Category>>((ref) {
 //   return CategoryService.loadCategories();
@@ -69,4 +73,11 @@ final selectedCategoryProvider = NotifierProvider<CategoryNotifier, Category?>(C
 final categoryMapProvider = FutureProvider<Map<String, Category>>((ref) async {
   final categories = await ref.watch(flattenedCategoryProvider.future);
   return {for (var category in categories) category.id: category};
+});
+
+
+final autoTransactionTypeProvider = StateProvider<TransactionType?>((ref) {
+  final selectCategory = ref.watch(selectedCategoryProvider);
+  if (selectCategory == null) return null;
+  return getTransactionType(selectCategory.type);
 });
