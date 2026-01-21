@@ -49,7 +49,7 @@ class _AddWalletScreenState extends ConsumerState<AddWalletScreen> {
       final selectedBankController = ref.watch(selectedBankProvider);
 
       if (_walletNameController.text.isEmpty) {
-        showToast('Vui lòng nhập tên ví', isError: true);
+        showResultToast('Vui lòng nhập tên ví', isError: true);
         return;
       }
 
@@ -70,12 +70,12 @@ class _AddWalletScreenState extends ConsumerState<AddWalletScreen> {
 
       await walletController.insertWallet(newWallet);
 
-      showToast('Thêm ví thành công');
+      showResultToast('Thêm ví thành công');
       clearInput();
       if (!mounted) return;
       Navigator.pop(context);
     } catch (e) {
-      showToast(e.toString(), isError: true);
+      showResultToast(e.toString(), isError: true);
     }
   }
 
@@ -123,7 +123,7 @@ class _AddWalletScreenState extends ConsumerState<AddWalletScreen> {
           CustomListTile(
             leading: selectedTypeWallet != null ? Image.asset(selectedTypeWallet.iconPath ?? '', width: 22) : Icon(Icons.wallet_sharp),
             title: Text((selectedTypeWallet?.name ?? '')),
-            enable: true,
+
             trailing: Icon(Icons.chevron_right),
             onTap: () {
               context.push(AppRoutes.typeWalletList);
@@ -143,7 +143,7 @@ class _AddWalletScreenState extends ConsumerState<AddWalletScreen> {
     return CustomListTile(
       leading: selectedBank != null ? Image.asset(selectedBank.iconPath, width: 22) : Icon(Icons.add_circle_sharp),
       title: Text((selectedBank?.name ?? 'Chọn ngân hàng')),
-      enable: true,
+
       trailing: Icon(Icons.chevron_right),
       onTap: () {
         context.push(AppRoutes.bankList);

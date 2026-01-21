@@ -64,7 +64,11 @@ class WalletsNotifier extends AsyncNotifier<List<Wallet>> {
   Future<void> deleteWallet(int id) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      await _databaseService.deleteWallet(id);
+      final status = await _databaseService.deleteWallet(id);
+      if (status <= 0) {
+        throw Exception('Không thể xóa ví');
+      }
+      // Return updated wallet list without the deleted wallet
       return state.requireValue.where((element) => element.id != id).toList();
     });
   }

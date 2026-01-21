@@ -61,7 +61,7 @@ class _SelectWalletScreenState extends ConsumerState<SelectWalletScreen> {
                           icon: Icon(Icons.check, color: AppColors.primary),
                         )
                         : null,
-                enable: true,
+
                 onTap: () {
                   ref.read(selectedWalletProvider.notifier).state = wallet;
                   context.pop();

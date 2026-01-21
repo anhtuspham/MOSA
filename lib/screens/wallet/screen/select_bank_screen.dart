@@ -50,7 +50,7 @@ class _BankScreenState extends ConsumerState<SelectBankScreen> {
                           icon: Icon(Icons.check, color: AppColors.primary),
                         )
                         : null,
-                enable: true,
+
                 onTap: () {
                   ref.read(selectedBankProvider.notifier).state = bank;
                   context.pop();

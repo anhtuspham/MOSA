@@ -65,7 +65,7 @@ class _SelectWalletScreenState
                           icon: Icon(Icons.check, color: AppColors.primary),
                         )
                         : null,
-                enable: true,
+
                 onTap: () {
                   ref.read(transferOutWalletProvider.notifier).state = wallet;
                   log('home wallet: ${wallet.name}');

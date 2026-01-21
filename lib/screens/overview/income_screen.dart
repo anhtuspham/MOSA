@@ -85,7 +85,7 @@ class _IncomeScreenState extends ConsumerState<IncomeScreen> {
       ref.invalidate(transactionGroupByCategoryProvider(TransactionType.income));
       ref.invalidate(groupPieChartProvider(TransactionType.income));
     } catch (e) {
-      showToast('Lỗi khi tải trang', isError: true);
+      showResultToast('Lỗi khi tải trang', isError: true);
     }
   }
 }

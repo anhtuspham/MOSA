@@ -43,7 +43,7 @@ class _TypeWalletScreenState extends ConsumerState<SelectTypeWalletScreen> {
                 leading: Image.asset(typeWallet.iconPath ?? '', width: 30),
                 backgroundColor: isSelected ? AppColors.lightBackGroundColor : null,
                 trailing: isSelected ? IconButton(onPressed: null, icon: Icon(Icons.check, color: AppColors.primary)) : null,
-                enable: true,
+
                 onTap: () {
                   ref.read(selectedTypeWalletProvider.notifier).state = typeWallet;
                   ref.read(selectedBankProvider.notifier).state = null;

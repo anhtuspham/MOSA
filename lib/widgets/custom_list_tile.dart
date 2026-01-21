@@ -8,7 +8,7 @@ class CustomListTile extends StatelessWidget {
   final Widget? subTitle;
   final Widget? trailing;
   final VoidCallback? onTap;
-  final bool enable;
+  // final bool enable;
   // Padding
   final double horizontalGap;
   final Color? backgroundColor;
@@ -19,7 +19,7 @@ class CustomListTile extends StatelessWidget {
     this.subTitle,
     this.trailing,
     this.onTap,
-    this.enable = false,
+    // this.enable = false,
     this.horizontalGap = 20,
     this.backgroundColor = AppColors.surface,
   });
@@ -43,7 +43,7 @@ class CustomListTile extends StatelessWidget {
   }
 
   Widget _buildInkWell(Widget child) {
-    return InkWell(onTap: enable ? onTap : null, child: child);
+    return InkWell(onTap: onTap, child: child);
   }
 
   Widget _buildTitleAndSubtitlePart(Widget title, Widget? subTitle) {

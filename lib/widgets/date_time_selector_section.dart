@@ -21,7 +21,7 @@ class DateTimeSelectorSection extends StatelessWidget {
         '${selectedDateTime.weekdayLabel} - ${selectedDateTime.ddMMyyy}',
       ),
       trailing: Text(selectedDateTime.hhMM),
-      enable: true,
+
       onTap: () async {
         final selected =
             await showDateTimePicker(context: context) ?? DateTime.now();

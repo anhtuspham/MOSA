@@ -295,7 +295,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         );
       default:
         final selectedCategory = ref.watch(selectedCategoryProvider);
-        if(selectedCategory != null && selectedCategory.type == 'lend'){
+        if (selectedCategory != null && selectedCategory.type == 'lend') {
           return loanTransactionDetail();
         }
         return defaultTransactionDetail();
@@ -410,7 +410,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
           CustomListTile(
             leading: selectedCategory != null ? selectedCategory.getIcon() : Icon(Icons.add_circle_rounded),
             title: Text(selectedCategory != null ? (selectedCategory.name) : 'Chọn hạng mục'),
-            enable: true,
             trailing: Row(children: [Text('Tất cả'), const SizedBox(width: 12), Icon(Icons.chevron_right)]),
             onTap: () async {
               await context.push(AppRoutes.categoryList);
@@ -434,7 +433,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
           leading: Image.asset(walletData.iconPath, width: 22),
           title: Text(walletData.name),
           trailing: Icon(Icons.chevron_right),
-          enable: true,
           onTap: () {
             context.push(AppRoutes.selectWallet);
           },
@@ -458,7 +456,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
               )
               : Icon(Icons.person_add_outlined),
       title: Text(selectedPerson?.name ?? 'Chọn người'),
-      enable: true,
+
       trailing: Icon(Icons.chevron_right),
       onTap: () {
         context.push(AppRoutes.personList);
@@ -520,7 +518,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
             leading: Image.asset(wallet?.iconPath ?? AppIcons.plusIcon, width: 22),
             title: Text(wallet?.name ?? 'Chọn tài khoản'),
             trailing: Icon(Icons.chevron_right),
-            enable: true,
             onTap: () => context.push(route),
           ),
         ],
@@ -584,7 +581,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 walletAndDetailSection(),
                 const SizedBox(height: 12),
                 mediaActionSection(),
-
               ],
             ),
           ),

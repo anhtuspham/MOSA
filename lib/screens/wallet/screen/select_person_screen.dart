@@ -84,7 +84,7 @@ class _SelectPersonScreenState extends ConsumerState<SelectPersonScreen> {
                       Icon(Icons.check, color: AppColors.primary),
                   ],
                 ),
-                enable: true,
+
                 onTap: () {
                   ref.read(selectedPersonProvider.notifier).state = person;
                   context.pop();
