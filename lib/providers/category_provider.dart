@@ -79,5 +79,14 @@ final categoryMapProvider = FutureProvider<Map<String, Category>>((ref) async {
 final autoTransactionTypeProvider = StateProvider<TransactionType?>((ref) {
   final selectCategory = ref.watch(selectedCategoryProvider);
   if (selectCategory == null) return null;
-  return getTransactionType(selectCategory.type);
+
+  // First try to get transaction type from category ID/name (handles special cases like lending)
+  final transactionType = getTransactionTypeFromCategory(selectCategory.id, selectCategory.name);
+
+  // If it's unknown, fall back to the generic type mapping
+  if (transactionType == TransactionType.unknown) {
+    return getTransactionType(selectCategory.type);
+  }
+
+  return transactionType;
 });

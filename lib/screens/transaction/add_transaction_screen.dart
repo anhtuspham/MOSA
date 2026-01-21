@@ -65,6 +65,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   @override
   Widget build(BuildContext context) {
     final selectedTransactionType = ref.watch(currentTransactionByTypeProvider) ?? TransactionType.expense;
+    final selectedCategory = ref.watch(selectedCategoryProvider);
 
     return CommonScaffold(
       title: Container(
@@ -95,8 +96,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       final transactionController = ref.read(transactionProvider.notifier);
       final debtController = ref.read(debtProvider.notifier);
       final effectiveWallet = await ref.read(effectiveWalletProvider.future);
-      final transferOutWalletState = ref.watch(transferOutWalletProvider);
-      final transferInWalletState = ref.watch(transferInWalletProvider);
+      final transferOutWalletState = ref.read(transferOutWalletProvider);
+      final transferInWalletState = ref.read(transferInWalletProvider);
 
       if (!mounted) return;
 
@@ -232,6 +233,9 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
   Widget detailTransactionSection({TransactionType transactionType = TransactionType.expense}) {
     switch (transactionType) {
+      case TransactionType.lend:
+      case TransactionType.borrowing:
+        return loanTransactionDetail();
       case TransactionType.transfer:
         return Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -289,11 +293,11 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
             saveButtonSection(),
           ],
         );
-      case TransactionType.lend:
-        return loanTransactionDetail();
-      case TransactionType.borrowing:
-        return loanTransactionDetail();
       default:
+        final selectedCategory = ref.watch(selectedCategoryProvider);
+        if(selectedCategory != null && selectedCategory.type == 'lend'){
+          return loanTransactionDetail();
+        }
         return defaultTransactionDetail();
     }
   }
@@ -410,6 +414,11 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
             trailing: Row(children: [Text('Tất cả'), const SizedBox(width: 12), Icon(Icons.chevron_right)]),
             onTap: () async {
               await context.push(AppRoutes.categoryList);
+              // Auto-update transaction type based on selected category
+              final autoType = ref.read(autoTransactionTypeProvider);
+              if (autoType != null) {
+                ref.read(currentTransactionByTypeProvider.notifier).state = autoType;
+              }
             },
           ),
         ],
@@ -575,6 +584,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 walletAndDetailSection(),
                 const SizedBox(height: 12),
                 mediaActionSection(),
+
               ],
             ),
           ),

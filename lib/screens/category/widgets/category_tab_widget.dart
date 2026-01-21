@@ -53,7 +53,7 @@ class _CategoryTabState extends ConsumerState<CategoryTab> {
                 itemCount: categories.length,
                 itemBuilder: (context, index) {
                   final category = categories[index];
-                  if (category.children == null || category.children!.isEmpty) {
+                  if (category.children?.isEmpty ?? true) {
                     return Container(
                       color: AppColors.background,
                       margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 3),
@@ -63,7 +63,7 @@ class _CategoryTabState extends ConsumerState<CategoryTab> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         onTap: () {
                           ref.read(selectedCategoryProvider.notifier).selectCategory(category);
-                          ref.read(currentTransactionByTypeProvider.notifier).state = ref.watch(autoTransactionTypeProvider);
+                          // ref.read(currentTransactionByTypeProvider.notifier).state = ref.watch(autoTransactionTypeProvider);
                           context.pop();
                         },
                       ),
@@ -76,7 +76,7 @@ class _CategoryTabState extends ConsumerState<CategoryTab> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         onTap: () {
                           ref.read(selectedCategoryProvider.notifier).selectCategory(category);
-                          ref.read(currentTransactionByTypeProvider.notifier).state = ref.watch(autoTransactionTypeProvider);
+                          // ref.read(currentTransactionByTypeProvider.notifier).state = ref.watch(autoTransactionTypeProvider);
                           context.pop();
                         },
                       ),
@@ -96,7 +96,7 @@ class _CategoryTabState extends ConsumerState<CategoryTab> {
                               category: child,
                               onTap: () {
                                 ref.read(selectedCategoryProvider.notifier).selectCategory(child);
-                                ref.read(currentTransactionByTypeProvider.notifier).state = ref.watch(autoTransactionTypeProvider);
+                                // ref.read(currentTransactionByTypeProvider.notifier).state = ref.watch(autoTransactionTypeProvider);
                                 context.pop();
                               },
                             );
