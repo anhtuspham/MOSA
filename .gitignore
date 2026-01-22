@@ -107,6 +107,11 @@ unlinked_spec.ds
 # Coverage
 coverage/
 
+# Firebase configuration files
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+lib/firebase_options.dart
+
 # Symbols
 app.*.symbols
 

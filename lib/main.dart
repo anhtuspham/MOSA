@@ -1,15 +1,35 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mosa/firebase_options.dart';
 import 'package:mosa/router/app_router.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:mosa/services/database_service.dart';
+import 'package:mosa/services/fcm_service.dart';
+import 'package:mosa/utils/notification_helper.dart';
 import 'package:toastification/toastification.dart';
+import 'package:timezone/data/latest.dart' as tz;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await DatabaseService().initializeDatabase(clearExisting: true);
+  // Initialize timezone database
+  tz.initializeTimeZones();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform
+  );
+
+  // Initialize FCM
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  await FCMService.instance.initialize();
+
+  // Initialize notification helper
+  await NotificationHelper.initialize();
+
+  // await DatabaseService().initializeDatabase(clearExisting: true);
 
   runApp(ProviderScope(child: const MyApp()));
 }
