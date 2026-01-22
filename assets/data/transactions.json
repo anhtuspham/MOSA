@@ -1,46 +1,56 @@
 [
   {
-    "title": "Lương tháng 9",
+    "title": "Lương tháng 1",
     "amount": 15000000,
     "categoryId": "income_salary",
-    "walletId": 2,
-    "date": "2025-09-01T09:00:00.000Z",
+    "walletId": 1,
+    "date": "2026-01-01T09:00:00.000Z",
     "type": "income",
     "note": "Lương hàng tháng"
   },
+  {
+    "title": "Thưởng dự án",
+    "amount": 3000000,
+    "categoryId": "income_bonus",
+    "walletId": 1,
+    "date": "2026-01-02T14:00:00.000Z",
+    "type": "income",
+    "note": "Thưởng hoàn thành dự án"
+  },
+  {
+    "title": "Tiền lãi từ tiết kiệm",
+    "amount": 250000,
+    "categoryId": "income_interest",
+    "walletId": 1,
+    "date": "2026-01-03T10:00:00.000Z",
+    "type": "income",
+    "note": "Tiền lãi tiết kiệm"
+  },
+
   {
     "title": "Ăn sáng - Cơm tấm",
     "amount": 35000,
     "categoryId": "expense_food_breakfast",
     "walletId": 2,
-    "date": "2025-09-01T07:30:00.000Z",
+    "date": "2026-01-03T07:30:00.000Z",
     "type": "expense",
     "note": "Ăn sáng bên ngoài"
   },
   {
-    "title": "Mua sắm quần áo",
-    "amount": 450000,
-    "categoryId": "expense_shopping_clothes",
+    "title": "Xe buýt đi làm",
+    "amount": 15000,
+    "categoryId": "expense_transport_bus",
     "walletId": 2,
-    "date": "2025-09-02T14:00:00.000Z",
+    "date": "2026-01-03T07:00:00.000Z",
     "type": "expense",
-    "note": "Mua áo phông và quần"
-  },
-  {
-    "title": "Taxi về nhà",
-    "amount": 85000,
-    "categoryId": "expense_transport_taxi",
-    "walletId": 2,
-    "date": "2025-09-02T18:45:00.000Z",
-    "type": "expense",
-    "note": "Grab từ công ty về nhà"
+    "note": "Vé xe buýt"
   },
   {
     "title": "Cà phê sáng",
     "amount": 25000,
     "categoryId": "expense_coffee",
-    "walletId": 2,
-    "date": "2025-09-03T08:00:00.000Z",
+    "walletId": 4,
+    "date": "2026-01-04T08:00:00.000Z",
     "type": "expense",
     "note": "Cà phê tại quán"
   },
@@ -49,43 +59,52 @@
     "amount": 50000,
     "categoryId": "expense_food_lunch",
     "walletId": 2,
-    "date": "2025-09-03T12:30:00.000Z",
+    "date": "2026-01-04T12:30:00.000Z",
     "type": "expense",
     "note": "Ăn phở xóm"
   },
   {
-    "title": "Xe buýt đi làm",
-    "amount": 15000,
-    "categoryId": "expense_transport_bus",
-    "walletId": 2,
-    "date": "2025-09-03T07:00:00.000Z",
+    "title": "Taxi về nhà",
+    "amount": 85000,
+    "categoryId": "expense_transport_taxi",
+    "walletId": 3,
+    "date": "2026-01-05T18:45:00.000Z",
     "type": "expense",
-    "note": "Vé xe buýt"
+    "note": "Grab từ công ty về nhà"
   },
   {
-    "title": "Mua điện tử - Sạc điện thoại",
-    "amount": 150000,
-    "categoryId": "expense_shopping_electronics",
-    "walletId": 2,
-    "date": "2025-09-04T15:20:00.000Z",
+    "title": "Mua sắm quần áo",
+    "amount": 450000,
+    "categoryId": "expense_shopping_clothes",
+    "walletId": 3,
+    "date": "2026-01-06T14:00:00.000Z",
     "type": "expense",
-    "note": "Sạc nhanh USB-C"
+    "note": "Mua áo phông và quần"
   },
   {
     "title": "Ăn tối - Lẩu",
     "amount": 180000,
     "categoryId": "expense_food_dinner",
     "walletId": 2,
-    "date": "2025-09-04T19:00:00.000Z",
+    "date": "2026-01-07T19:00:00.000Z",
     "type": "expense",
     "note": "Ăn lẩu với bạn"
+  },
+  {
+    "title": "Mua điện tử - Sạc điện thoại",
+    "amount": 150000,
+    "categoryId": "expense_shopping_electronics",
+    "walletId": 3,
+    "date": "2026-01-08T15:20:00.000Z",
+    "type": "expense",
+    "note": "Sạc nhanh USB-C"
   },
   {
     "title": "Xem phim",
     "amount": 90000,
     "categoryId": "expense_entertainment",
-    "walletId": 2,
-    "date": "2025-09-05T19:30:00.000Z",
+    "walletId": 4,
+    "date": "2026-01-09T19:30:00.000Z",
     "type": "expense",
     "note": "Vé xem phim"
   },
@@ -93,71 +112,35 @@
     "title": "Hóa đơn điện nước",
     "amount": 250000,
     "categoryId": "expense_bill",
-    "walletId": 2,
-    "date": "2025-09-05T10:00:00.000Z",
+    "walletId": 1,
+    "date": "2026-01-10T10:00:00.000Z",
     "type": "expense",
-    "note": "Tiền điện nước tháng 8"
+    "note": "Tiền điện nước"
   },
   {
     "title": "Khám bác sĩ",
     "amount": 200000,
     "categoryId": "expense_health",
     "walletId": 2,
-    "date": "2025-09-06T09:00:00.000Z",
+    "date": "2026-01-11T09:00:00.000Z",
     "type": "expense",
     "note": "Khám sức khỏe định kỳ"
-  },
-  {
-    "title": "Thưởng tháng 8",
-    "amount": 3000000,
-    "categoryId": "income_bonus",
-    "walletId": 2,
-    "date": "2025-09-06T14:00:00.000Z",
-    "type": "income",
-    "note": "Thưởng hoàn thành dự án"
   },
   {
     "title": "Du lịch - Vé máy bay",
     "amount": 2500000,
     "categoryId": "expense_travel",
-    "walletId": 2,
-    "date": "2025-09-07T10:30:00.000Z",
+    "walletId": 1,
+    "date": "2026-01-12T10:30:00.000Z",
     "type": "expense",
-    "note": "Vé bay Hà Nội - TP HCM"
-  },
-  {
-    "title": "Ăn sáng - Bánh mì",
-    "amount": 20000,
-    "categoryId": "expense_food_breakfast",
-    "walletId": 2,
-    "date": "2025-09-08T06:45:00.000Z",
-    "type": "expense",
-    "note": "Bánh mì nướng"
-  },
-  {
-    "title": "Mua sắm khác",
-    "amount": 320000,
-    "categoryId": "expense_shopping_other",
-    "walletId": 2,
-    "date": "2025-09-09T16:00:00.000Z",
-    "type": "expense",
-    "note": "Mua các vật dụng gia đình"
-  },
-  {
-    "title": "Xe đạp - Vận chuyển",
-    "amount": 40000,
-    "categoryId": "expense_transport_bike",
-    "walletId": 2,
-    "date": "2025-09-10T08:15:00.000Z",
-    "type": "expense",
-    "note": "Xe đạp đi mua đồ"
+    "note": "Vé máy bay"
   },
   {
     "title": "Học thêm tiếng Anh",
     "amount": 500000,
     "categoryId": "expense_education",
-    "walletId": 2,
-    "date": "2025-09-10T18:00:00.000Z",
+    "walletId": 3,
+    "date": "2026-01-14T18:00:00.000Z",
     "type": "expense",
     "note": "Học phí tháng"
   },
@@ -166,323 +149,26 @@
     "amount": 1000000,
     "categoryId": "lend_borrow",
     "walletId": 2,
-    "date": "2025-09-11T19:00:00.000Z",
+    "date": "2026-01-16T19:00:00.000Z",
     "type": "lend",
-    "note": "Cho Linh vay tiền chơi"
-  },
-  {
-    "title": "Ăn trưa - Cơm gà",
-    "amount": 45000,
-    "categoryId": "expense_food_lunch",
-    "walletId": 2,
-    "date": "2025-09-12T12:00:00.000Z",
-    "type": "expense",
-    "note": "Ăn cơm gà xóm"
-  },
-  {
-    "title": "Tiền lãi từ tiết kiệm",
-    "amount": 250000,
-    "categoryId": "income_interest",
-    "walletId": 1,
-    "date": "2025-10-01T10:00:00.000Z",
-    "type": "income",
-    "note": "Tiền lãi tháng 9"
-  },
-  {
-    "title": "Lương tháng 10",
-    "amount": 15000000,
-    "categoryId": "income_salary",
-    "walletId": 2,
-    "date": "2025-10-01T09:00:00.000Z",
-    "type": "income",
-    "note": "Lương hàng tháng"
-  },
-  {
-    "title": "Nhà cửa - Sơn nhà",
-    "amount": 800000,
-    "categoryId": "expense_house",
-    "walletId": 2,
-    "date": "2025-10-02T08:00:00.000Z",
-    "type": "expense",
-    "note": "Sơn lại tường nhà"
-  },
-  {
-    "title": "Cà phê sáng",
-    "amount": 28000,
-    "categoryId": "expense_coffee",
-    "walletId": 2,
-    "date": "2025-10-03T07:45:00.000Z",
-    "type": "expense",
-    "note": "Cà phê tại quán"
-  },
-  {
-    "title": "Mua sắm quần áo",
-    "amount": 600000,
-    "categoryId": "expense_shopping_clothes",
-    "walletId": 2,
-    "date": "2025-10-04T14:30:00.000Z",
-    "type": "expense",
-    "note": "Mua áo khoác mùa lạnh"
-  },
-  {
-    "title": "Taxi về nhà",
-    "amount": 92000,
-    "categoryId": "expense_transport_taxi",
-    "walletId": 2,
-    "date": "2025-10-05T18:30:00.000Z",
-    "type": "expense",
-    "note": "Grab từ nhà hàng"
-  },
-  {
-    "title": "Ăn tối - Nhà hàng",
-    "amount": 220000,
-    "categoryId": "expense_food_dinner",
-    "walletId": 2,
-    "date": "2025-10-05T19:15:00.000Z",
-    "type": "expense",
-    "note": "Ăn tối lễ"
-  },
-  {
-    "title": "Quà tặng",
-    "amount": 500000,
-    "categoryId": "income_gift",
-    "walletId": 2,
-    "date": "2025-10-06T14:00:00.000Z",
-    "type": "income",
-    "note": "Quà sinh nhật từ mẹ"
-  },
-  {
-    "title": "Mua điện tử - Tai nghe",
-    "amount": 800000,
-    "categoryId": "expense_shopping_electronics",
-    "walletId": 2,
-    "date": "2025-10-07T15:00:00.000Z",
-    "type": "expense",
-    "note": "Tai nghe không dây"
-  },
-  {
-    "title": "Giải trí - Karaoke",
-    "amount": 150000,
-    "categoryId": "expense_entertainment",
-    "walletId": 2,
-    "date": "2025-10-08T20:00:00.000Z",
-    "type": "expense",
-    "note": "Hát karaoke với công ty"
-  },
-  {
-    "title": "Xe buýt",
-    "amount": 20000,
-    "categoryId": "expense_transport_bus",
-    "walletId": 2,
-    "date": "2025-10-09T07:30:00.000Z",
-    "type": "expense",
-    "note": "Vé xe buýt"
-  },
-  {
-    "title": "Hóa đơn nước điện",
-    "amount": 280000,
-    "categoryId": "expense_bill",
-    "walletId": 2,
-    "date": "2025-10-10T10:00:00.000Z",
-    "type": "expense",
-    "note": "Tiền điện nước tháng 9"
-  },
-  {
-    "title": "Ăn trưa - Bún chả",
-    "amount": 55000,
-    "categoryId": "expense_food_lunch",
-    "walletId": 2,
-    "date": "2025-10-11T12:30:00.000Z",
-    "type": "expense",
-    "note": "Ăn bún chả"
-  },
-  {
-    "title": "Mua sắm khác",
-    "amount": 280000,
-    "categoryId": "expense_shopping_other",
-    "walletId": 2,
-    "date": "2025-10-12T16:45:00.000Z",
-    "type": "expense",
-    "note": "Mua đồ gia dụng"
-  },
-  {
-    "title": "Du lịch - Khách sạn",
-    "amount": 1500000,
-    "categoryId": "expense_travel",
-    "walletId": 2,
-    "date": "2025-10-13T15:00:00.000Z",
-    "type": "expense",
-    "note": "Khách sạn 3 đêm"
+    "note": "Cho Linh vay tiền"
   },
   {
     "title": "Bạn trả tiền vay",
     "amount": 1000000,
     "categoryId": "lend_payback",
     "walletId": 2,
-    "date": "2025-10-14T19:00:00.000Z",
+    "date": "2026-01-20T19:00:00.000Z",
     "type": "lend",
     "note": "Linh trả tiền"
   },
   {
-    "title": "Ăn sáng - Cơm tấm",
-    "amount": 32000,
-    "categoryId": "expense_food_breakfast",
-    "walletId": 2,
-    "date": "2025-10-15T07:15:00.000Z",
-    "type": "expense",
-    "note": "Ăn sáng"
-  },
-  {
-    "title": "Khám bác sĩ",
-    "amount": 180000,
-    "categoryId": "expense_health",
-    "walletId": 2,
-    "date": "2025-10-16T10:30:00.000Z",
-    "type": "expense",
-    "note": "Khám mắt"
-  },
-  {
-    "title": "Cà phê",
-    "amount": 30000,
-    "categoryId": "expense_coffee",
-    "walletId": 2,
-    "date": "2025-10-17T09:00:00.000Z",
-    "type": "expense",
-    "note": "Cà phê sáng"
-  },
-  {
-    "title": "Mua sắm quần áo",
-    "amount": 350000,
-    "categoryId": "expense_shopping_clothes",
-    "walletId": 2,
-    "date": "2025-10-18T14:00:00.000Z",
-    "type": "expense",
-    "note": "Mua quần jean"
-  },
-  {
-    "title": "Taxi",
-    "amount": 75000,
-    "categoryId": "expense_transport_taxi",
-    "walletId": 2,
-    "date": "2025-10-19T17:30:00.000Z",
-    "type": "expense",
-    "note": "Grab về nhà"
-  },
-  {
-    "title": "Ăn tối",
-    "amount": 190000,
-    "categoryId": "expense_food_dinner",
-    "walletId": 2,
-    "date": "2025-10-20T19:00:00.000Z",
-    "type": "expense",
-    "note": "Ăn tối với gia đình"
-  },
-  {
-    "title": "Đầu tư chứng chỉ",
-    "amount": 5000000,
-    "categoryId": "income_investment",
-    "walletId": 1,
-    "date": "2025-10-21T14:00:00.000Z",
-    "type": "income",
-    "note": "Lợi nhuận đầu tư"
-  },
-  {
-    "title": "Học thêm",
-    "amount": 500000,
-    "categoryId": "expense_education",
-    "walletId": 2,
-    "date": "2025-10-22T18:30:00.000Z",
-    "type": "expense",
-    "note": "Học phí"
-  },
-  {
-    "title": "Xe đạp",
-    "amount": 35000,
-    "categoryId": "expense_transport_bike",
-    "walletId": 2,
-    "date": "2025-10-23T08:00:00.000Z",
-    "type": "expense",
-    "note": "Thuê xe đạp"
-  },
-  {
-    "title": "Xem phim",
-    "amount": 100000,
-    "categoryId": "expense_entertainment",
-    "walletId": 2,
-    "date": "2025-10-24T19:45:00.000Z",
-    "type": "expense",
-    "note": "Vé phim"
-  },
-  {
-    "title": "Ăn trưa",
-    "amount": 60000,
+    "title": "Ăn trưa - Cơm gà",
+    "amount": 45000,
     "categoryId": "expense_food_lunch",
     "walletId": 2,
-    "date": "2025-10-25T12:00:00.000Z",
+    "date": "2026-01-22T12:00:00.000Z",
     "type": "expense",
-    "note": "Cơm"
-  },
-  {
-    "title": "Mua điện tử",
-    "amount": 500000,
-    "categoryId": "expense_shopping_electronics",
-    "walletId": 2,
-    "date": "2025-10-26T15:30:00.000Z",
-    "type": "expense",
-    "note": "Sạc laptop"
-  },
-  {
-    "title": "Xe buýt",
-    "amount": 25000,
-    "categoryId": "expense_transport_bus",
-    "walletId": 2,
-    "date": "2025-10-27T07:00:00.000Z",
-    "type": "expense",
-    "note": "Vé xe buýt"
-  },
-  {
-    "title": "Hóa đơn",
-    "amount": 300000,
-    "categoryId": "expense_bill",
-    "walletId": 2,
-    "date": "2025-10-28T10:00:00.000Z",
-    "type": "expense",
-    "note": "Hóa đơn tiền"
-  },
-  {
-    "title": "Cà phê",
-    "amount": 26000,
-    "categoryId": "expense_coffee",
-    "walletId": 2,
-    "date": "2025-10-29T08:30:00.000Z",
-    "type": "expense",
-    "note": "Cà phê"
-  },
-  {
-    "title": "Ăn sáng",
-    "amount": 38000,
-    "categoryId": "expense_food_breakfast",
-    "walletId": 2,
-    "date": "2025-10-30T07:00:00.000Z",
-    "type": "expense",
-    "note": "Bánh mì"
-  },
-  {
-    "title": "Mua sắm quần áo",
-    "amount": 400000,
-    "categoryId": "expense_shopping_clothes",
-    "walletId": 2,
-    "date": "2025-11-01T15:00:00.000Z",
-    "type": "expense",
-    "note": "Áo len"
-  },
-  {
-    "title": "Lương tháng 11",
-    "amount": 15000000,
-    "categoryId": "income_salary",
-    "walletId": 2,
-    "date": "2025-11-01T09:00:00.000Z",
-    "type": "income",
-    "note": "Lương tháng 11"
+    "note": "Ăn trưa cuối kỳ"
   }
 ]
