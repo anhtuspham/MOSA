@@ -41,9 +41,8 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
 
     try {
       int id = await _databaseService.createDebt(debt);
-      final categories = ref.watch(flattenedCategoryProvider).value ?? [];
-      final lendCategory = ref.watch(categoryByNameProvider('Cho vay')).value;
-      final borrowCategory = ref.watch(categoryByNameProvider('Mượn')).value;
+      final lendCategory = await ref.read(categoryByNameProvider('Cho vay').future);
+      final borrowCategory = await ref.read(categoryByNameProvider('Mượn').future);
       final newDebt = debt.copyWith(id: id);
       bool isLent = debt.type == DebtType.lent;
 

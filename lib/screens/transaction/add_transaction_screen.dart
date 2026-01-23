@@ -65,7 +65,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   @override
   Widget build(BuildContext context) {
     final selectedTransactionType = ref.watch(currentTransactionByTypeProvider) ?? TransactionType.expense;
-    final selectedCategory = ref.watch(selectedCategoryProvider);
 
     return CommonScaffold(
       title: Container(
