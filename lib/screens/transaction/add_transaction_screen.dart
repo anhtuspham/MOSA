@@ -45,6 +45,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   final TextEditingController _noteController = TextEditingController();
   final TextEditingController _actualBalanceController = TextEditingController();
   late DateTime _selectedDateTime = DateTime.now();
+  DateTime? _selectedLoanDateTime;
 
   @override
   void initState() {
@@ -554,6 +555,14 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 personLoanSelectorSection(),
                 const SizedBox(height: 12),
                 walletAndDetailSection(),
+                DateOnlySelectorSection(
+                  selectedDateOnly: _selectedLoanDateTime,
+                  onDateTimeChanged: (newDateTime) {
+                    setState(() {
+                      _selectedLoanDateTime = newDateTime;
+                    });
+                  },
+                ),
                 const SizedBox(height: 12),
                 mediaActionSection(),
               ],
