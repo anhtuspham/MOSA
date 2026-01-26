@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mosa/router/app_routes.dart';
 import 'package:mosa/screens/category/screen/category_screen.dart';
+import 'package:mosa/screens/debt/loan_tracking_screen.dart';
 import 'package:mosa/screens/login/login_screen.dart';
 import 'package:mosa/screens/setting/setting_screen.dart';
 import 'package:mosa/screens/shell_scaffold/shell_scaffold_screen.dart';
@@ -88,6 +89,14 @@ final goRouter = GoRouter(
               path: AppRoutes.settings,
               name: 'setting',
               builder: (context, state) => SettingsShellScreen(),
+              routes: [
+                // Nested routes within Settings branch
+                GoRoute(
+                  path: 'loan-tracking', // Relative path, becomes /settings/loan-tracking
+                  name: 'loanTracking',
+                  builder: (context, state) => LoanTrackingScreen(),
+                ),
+              ],
             ),
           ],
         ),

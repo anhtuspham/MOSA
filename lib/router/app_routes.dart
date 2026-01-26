@@ -50,6 +50,9 @@ abstract class AppRoutes {
   static const String bankList = '/bankList';
   static const String personList = '/personList';
 
+  // === SETTING ROUTES (nested under /settings) ===
+  static const String loanTracking = '/settings/loan-tracking';
+
   // ===== PHASE 2: GROUP FEATURES (PREPARED) =====
   static const String createGroup = '/create-group';
   static const String groupDetail = '/group/:groupId';

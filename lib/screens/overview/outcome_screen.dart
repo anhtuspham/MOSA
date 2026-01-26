@@ -68,6 +68,7 @@ class _OutcomeScreenState extends ConsumerState<OutcomeScreen> {
                               Text(Helpers.formatCurrency(group.total), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp)),
                             ],
                           ),
+                          actionIcon: Icons.arrow_forward_ios_rounded,
                         );
                       }).toList(),
                 );

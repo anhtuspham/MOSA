@@ -6,7 +6,7 @@ import 'package:mosa/screens/wallet/widgets/accumulated_tab_screen.dart';
 import 'package:mosa/utils/app_colors.dart';
 import 'package:mosa/utils/app_icons.dart';
 import 'package:mosa/widgets/custom_list_tile.dart';
-import 'package:mosa/widgets/tab_bar_scaffold.dart';
+import 'package:mosa/widgets/common_scaffold.dart';
 
 /// Wallet management screen with accounts, savings, and accumulation tabs
 class WalletShellScreen extends StatelessWidget {

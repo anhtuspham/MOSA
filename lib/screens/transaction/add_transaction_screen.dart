@@ -22,7 +22,7 @@ import 'package:mosa/widgets/section_container.dart';
 import 'package:mosa/widgets/card_section.dart';
 import 'package:mosa/widgets/amount_text_field.dart';
 import 'package:mosa/widgets/media_action_bar.dart';
-import 'package:mosa/widgets/tab_bar_scaffold.dart';
+import 'package:mosa/widgets/common_scaffold.dart';
 import 'package:toastification/toastification.dart';
 
 import '../../providers/bank_provider.dart';

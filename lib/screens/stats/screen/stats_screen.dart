@@ -8,7 +8,7 @@ import 'package:mosa/utils/app_icons.dart';
 import 'package:mosa/utils/helpers.dart';
 import 'package:mosa/widgets/section_container.dart';
 import 'package:mosa/widgets/stat_card.dart';
-import 'package:mosa/widgets/tab_bar_scaffold.dart';
+import 'package:mosa/widgets/common_scaffold.dart';
 
 import '../../../providers/wallet_provider.dart';
 

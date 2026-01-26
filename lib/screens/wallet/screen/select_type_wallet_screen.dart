@@ -6,7 +6,7 @@ import 'package:mosa/providers/wallet_provider.dart';
 import 'package:mosa/widgets/custom_list_tile.dart';
 import 'package:mosa/widgets/error_widget.dart';
 import 'package:mosa/widgets/loading_widget.dart';
-import 'package:mosa/widgets/tab_bar_scaffold.dart';
+import 'package:mosa/widgets/common_scaffold.dart';
 
 import '../../../utils/app_colors.dart';
 

@@ -52,7 +52,7 @@ class _AccumulatedTabScreenState extends State<AccumulatedTabScreen> {
                   ),
                   currentProgress: 0.4,
                   linearColors: AppColors.primary,
-                  forwardIcon: Icons.more_vert,
+                  actionIcon: Icons.more_vert,
                   subTitle: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [

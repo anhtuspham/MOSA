@@ -11,7 +11,7 @@ import 'package:mosa/utils/app_icons.dart';
 import 'package:mosa/utils/toast.dart';
 import 'package:mosa/widgets/text_selector_section.dart';
 import 'package:mosa/widgets/section_container.dart';
-import 'package:mosa/widgets/tab_bar_scaffold.dart';
+import 'package:mosa/widgets/common_scaffold.dart';
 
 import '../../../models/wallets.dart';
 import '../../../router/app_routes.dart';

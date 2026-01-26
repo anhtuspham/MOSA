@@ -5,7 +5,7 @@ import 'package:mosa/models/enums.dart';
 import 'package:mosa/providers/transaction_provider.dart';
 import 'package:mosa/screens/category/widgets/category_tab_widget.dart';
 import 'package:mosa/utils/app_colors.dart';
-import 'package:mosa/widgets/tab_bar_scaffold.dart';
+import 'package:mosa/widgets/common_scaffold.dart';
 
 /// Screen to select transaction category with expense, income, and loan tabs
 class CategoryScreen extends ConsumerStatefulWidget {

@@ -1,5 +1,9 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:mosa/router/app_routes.dart';
 import 'package:mosa/utils/app_colors.dart';
 import 'package:mosa/utils/app_icons.dart';
 import 'package:mosa/widgets/category_grid_view.dart';
@@ -122,6 +126,10 @@ class SettingsShellScreen extends StatelessWidget {
                       ItemWidget(
                         itemId: '7',
                         iconPath: AppIcons.debtTracking,
+                        onTap: () {
+                          log('hello');
+                          context.push(AppRoutes.loanTracking);
+                        },
                         name: 'Theo dõi vay nợ',
                       )
                     ],

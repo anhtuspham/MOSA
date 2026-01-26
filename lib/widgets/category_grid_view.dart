@@ -24,6 +24,7 @@ class CategoryGridView extends StatelessWidget {
           itemId: category.itemId,
           name: category.name,
           iconPath: category.iconPath,
+          onTap: category.onTap,
         );
       },
     );

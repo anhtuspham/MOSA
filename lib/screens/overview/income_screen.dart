@@ -66,6 +66,7 @@ class _IncomeScreenState extends ConsumerState<IncomeScreen> {
                               Text(Helpers.formatCurrency(group.total), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp)),
                             ],
                           ),
+                          actionIcon: Icons.arrow_forward_ios_rounded,
                         );
                       }).toList(),
                 );
