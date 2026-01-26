@@ -85,7 +85,7 @@ final autoTransactionTypeProvider = StateProvider<TransactionType?>((ref) {
 
   // If it's unknown, fall back to the generic type mapping
   if (transactionType == TransactionType.unknown) {
-    return getTransactionType(selectCategory.type);
+    return getTransactionTypeFromString(selectCategory.type);
   }
 
   return transactionType;

@@ -181,6 +181,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
             description: _noteController.text.isNotEmpty ? _noteController.text : 'Giao dịch với ${selectedPerson.name}',
             createdDate: _selectedDateTime,
             walletId: effectiveWallet.id ?? -1,
+            dueDate: _selectedLoanDateTime,
           );
           await debtController.createDebt(debt);
         } else {
@@ -235,7 +236,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     switch (transactionType) {
       case TransactionType.lend:
       case TransactionType.borrowing:
-        return loanTransactionDetail();
+        return loanTransactionDetail(transactionType: transactionType);
       case TransactionType.transfer:
         return Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -294,9 +295,10 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
           ],
         );
       default:
+        // Handle repayment, debt collection cause they are expense, income transaction type
         final selectedCategory = ref.watch(selectedCategoryProvider);
         if (selectedCategory != null && selectedCategory.type == 'lend') {
-          return loanTransactionDetail();
+          return loanTransactionDetail(transactionType: transactionType);
         }
         return defaultTransactionDetail();
     }
@@ -541,7 +543,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     );
   }
 
-  Widget loanTransactionDetail() {
+  Widget loanTransactionDetail({required TransactionType? transactionType}) {
+    final selectedTransactionType = ref.watch(currentTransactionByTypeProvider);
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -562,6 +565,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                       _selectedLoanDateTime = newDateTime;
                     });
                   },
+                  defaultTitle: selectedTransactionType == TransactionType.lend ? 'Ngày thu nợ' : 'Ngày trả nợ',
                 ),
                 const SizedBox(height: 12),
                 mediaActionSection(),

@@ -31,8 +31,9 @@ class DateTimeSelectorSection extends StatelessWidget {
 class DateOnlySelectorSection extends StatelessWidget {
   final DateTime? selectedDateOnly;
   final ValueChanged<DateTime?> onDateTimeChanged;
+  final String defaultTitle;
 
-  const DateOnlySelectorSection({super.key, this.selectedDateOnly, required this.onDateTimeChanged});
+  const DateOnlySelectorSection({super.key, this.selectedDateOnly, required this.onDateTimeChanged, required this.defaultTitle});
 
   bool _isDateBeforeToday() {
     if (selectedDateOnly == null) return false;
@@ -51,7 +52,7 @@ class DateOnlySelectorSection extends StatelessWidget {
       title: Row(
         children: [
           Text(
-            selectedDateOnly != null ? selectedDateOnly!.ddMMyyy : "Ngày thu nợ",
+            selectedDateOnly != null ? selectedDateOnly!.ddMMyyy : defaultTitle,
             style: TextStyle(
               color: isOverdue ? Colors.amberAccent.shade700 : null,
               fontWeight: isOverdue ? FontWeight.bold : null,
@@ -80,7 +81,7 @@ class DateOnlySelectorSection extends StatelessWidget {
         final selectedDate = DateTime(selected.year, selected.month, selected.day);
 
         if (selectedDate.isBefore(todayDate)) {
-          showInfoToast('Ngày thu nợ đã quá hạn! Hãy nhớ thu nợ sớm.');
+          showInfoToast('Ngày trả nợ phải lớn hơn hoặc bằng ngày ${today.day}/${today.month}/${today.year}.');
         }
 
         log('selectedDate: ${selected.ddMMyyy}');

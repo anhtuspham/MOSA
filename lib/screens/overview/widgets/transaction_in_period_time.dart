@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mosa/utils/helpers.dart';
-import 'package:mosa/widgets/transaction_item.dart';
+import 'package:mosa/screens/overview/widgets/transaction_item.dart';
 
 import '../../../models/category.dart';
 import '../../../models/enums.dart';

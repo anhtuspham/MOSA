@@ -1,6 +1,9 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mosa/config/app_config.dart';
 import 'package:mosa/models/category.dart';
 import 'package:mosa/models/enums.dart';
 import 'package:mosa/models/transaction.dart';
@@ -9,7 +12,7 @@ import 'package:mosa/utils/helpers.dart';
 import 'package:mosa/utils/utils.dart';
 import 'package:mosa/widgets/error_widget.dart';
 import 'package:mosa/widgets/loading_widget.dart';
-import '../utils/app_colors.dart';
+import '../../../utils/app_colors.dart';
 
 class TransactionItem extends ConsumerWidget {
   final Category category;
@@ -62,7 +65,7 @@ class TransactionItem extends ConsumerWidget {
                 style: TextStyle(
                   fontSize: 16.sp,
                   color: getTransactionTypeColor(
-                    type: getTransactionType(category.type),
+                    type: transaction.type,
                   ),
                 ),
               ),

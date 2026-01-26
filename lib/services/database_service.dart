@@ -273,6 +273,7 @@ class DatabaseService {
         updateAt TEXT,
         isSynced INTEGER NOT NULL DEFAULT 0,
         syncId TEXT NOT NULL,
+        dueDate TEXT,
         FOREIGN KEY (walletId) REFERENCES ${AppConstants.tableWallets}(id) ON DELETE RESTRICT
       )
     ''');
@@ -720,7 +721,7 @@ class DatabaseService {
       categoryId: json['categoryId'] as String,
       walletId: json['walletId'] as int,
       date: DateTime.parse(json['date'] as String),
-      type: getTransactionType(json['type'] as String),
+      type: getTransactionTypeFromString(json['type'] as String),
       note: json['note'] as String?,
       createAt: DateTime.now(),
       updateAt: DateTime.now(),

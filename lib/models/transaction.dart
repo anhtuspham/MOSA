@@ -14,6 +14,7 @@ class TransactionModel {
   final bool isSynced;
   final String syncId;
   final int walletId;
+  final DateTime? dueDate;
 
   TransactionModel({
     this.id,
@@ -28,6 +29,7 @@ class TransactionModel {
     this.isSynced = false,
     required this.syncId,
     required this.walletId,
+    this.dueDate
   });
 
   factory TransactionModel.fromJson(Map<String, dynamic> json) {
@@ -37,12 +39,13 @@ class TransactionModel {
       categoryId: json['categoryId'] as String,
       walletId: json['walletId'] as int,
       date: DateTime.parse(json['date'] as String),
-      type: getTransactionType(json['type'] as String),
+      type: getTransactionTypeFromString(json['type'] as String),
       note: json['note'] as String?,
       createAt: DateTime.now(),
       updateAt: DateTime.now(),
       isSynced: json['isSynced'] as bool? ?? false,
       syncId: json['syncId'] as String? ?? '',
+      dueDate: json['dueDate'],
     );
   }
 
@@ -66,6 +69,9 @@ class TransactionModel {
       isSynced: (map['isSynced'] as int?) == 1,
       syncId: map['syncId'],
       walletId: map['walletId'] as int,
+      dueDate: map['dueDate'] != null
+          ? DateTime.parse(map['dueDate'] as String)
+          : null,
     );
   }
 
@@ -83,6 +89,7 @@ class TransactionModel {
       'isSynced': isSynced ? 1 : 0,
       'syncId': syncId,
       'walletId': walletId,
+      'dueDate': dueDate?.toIso8601String(),
     };
   }
 

@@ -54,6 +54,8 @@ dependencies:
   firebase_core: ^4.4.0
   firebase_messaging: ^16.1.1
   timezone: ^0.9.4
+  logger: ^2.6.2
+  encrypt: ^5.0.3
 
 dev_dependencies:
   flutter_test:

@@ -58,6 +58,7 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
         createAt: DateTime.now(),
         categoryId: lendCategory?.id,
         walletId: debt.walletId,
+        dueDate: debt.dueDate,
         syncId: generateSyncId(),
       );
 
@@ -69,6 +70,7 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
         createAt: DateTime.now(),
         categoryId: borrowCategory?.id,
         walletId: debt.walletId,
+        dueDate: debt.dueDate,
         syncId: generateSyncId(),
       );
 

@@ -22,14 +22,13 @@ int generateId() {
   return last5 * 100000 + random;
 }
 
-TransactionType getTransactionType(String type) {
+TransactionType getTransactionTypeFromString(String type) {
   switch (type.toLowerCase()) {
     case 'income':
       return TransactionType.income;
     case 'expense':
       return TransactionType.expense;
     case 'lend':
-      log('type lend: $type');
       return TransactionType.lend;
     case 'borrowing':
       log('type borrowing: $type');
