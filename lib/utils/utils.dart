@@ -73,6 +73,26 @@ TransactionType getTransactionTypeFromCategory(String categoryId, String categor
   }
 }
 
+String? getCategoryNameForTransactionType(TransactionType type) {
+  switch (type) {
+    case TransactionType.lend:
+      return 'Cho vay';
+    case TransactionType.borrowing:
+      return 'Mượn';
+    case TransactionType.repayment:
+    case TransactionType.debtCollection:
+    case TransactionType.transfer:
+    case TransactionType.transferIn:
+    case TransactionType.transferOut:
+    case TransactionType.adjustBalance:
+      return null;
+    case TransactionType.expense:
+    case TransactionType.income:
+    case TransactionType.unknown:
+      return null;
+  }
+}
+
 Color getTransactionTypeColor({TransactionType type = TransactionType.expense}) {
   return TransactionTypeManager.getColor(type);
 }

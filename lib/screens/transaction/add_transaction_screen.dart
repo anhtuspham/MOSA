@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mosa/config/app_config.dart';
 import 'package:mosa/models/category.dart';
 import 'package:mosa/models/debt.dart';
 import 'package:mosa/models/enums.dart';
@@ -14,6 +15,7 @@ import 'package:mosa/providers/wallet_provider.dart';
 import 'package:mosa/router/app_routes.dart';
 import 'package:mosa/utils/app_icons.dart';
 import 'package:mosa/utils/constants.dart';
+import 'package:mosa/utils/toast.dart';
 import 'package:mosa/widgets/custom_list_tile.dart';
 import 'package:mosa/widgets/date_time_selector_section.dart';
 import 'package:mosa/widgets/error_widget.dart';
@@ -98,51 +100,73 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       final effectiveWallet = await ref.read(effectiveWalletProvider.future);
       final transferOutWalletState = ref.read(transferOutWalletProvider);
       final transferInWalletState = ref.read(transferInWalletProvider);
+      double? amount = 0;
 
       if (!mounted) return;
-
-      if (selectedTransactionType == TransactionType.adjustBalance) {
-        // For balance adjustment, calculate the difference between actual and current balance
-        final actualBalance = double.tryParse(_actualBalanceController.text.replaceAll('.', '')) ?? 0;
-        final adjustmentAmount = actualBalance - effectiveWallet.balance;
-
-        if (adjustmentAmount == 0) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Số dư thực tế giống với số dư hiện tại')));
-          return;
-        }
-
-        final transaction = TransactionModel(
-          title: 'Điều chỉnh số dư',
-          amount: adjustmentAmount,
-          date: _selectedDateTime,
-          type: selectedTransactionType,
-          categoryId: 'adjustment',
-          note: _noteController.text.isNotEmpty ? _noteController.text : null,
-          createAt: DateTime.now(),
-          syncId: generateSyncId(),
-          walletId: effectiveWallet.id ?? -1,
-        );
-
-        await transactionController.addTransaction(transaction);
-      } else {
-        // Validation
+      if (selectedTransactionType != TransactionType.adjustBalance) {
         if (_amountController.text.isEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Vui lòng nhập số tiền')));
+          showResultToast('Vui lòng nhập số tiền', isError: true);
           return;
         }
 
-        final amount = double.tryParse(_amountController.text.replaceAll('.', ''));
+        amount = double.tryParse(_amountController.text.replaceAll('.', ''));
         if (amount == null || amount <= 0) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Số tiền không hợp lệ')));
+          showResultToast('Số tiền không hợp lệ', isError: true);
           return;
         }
+      }
+      switch (selectedTransactionType) {
+        case TransactionType.adjustBalance:
+          // For balance adjustment, calculate the difference between actual and current balance
+          final actualBalance = double.tryParse(_actualBalanceController.text.replaceAll('.', '')) ?? 0;
+          final adjustmentAmount = actualBalance - effectiveWallet.balance;
 
-        if (selectedTransactionType == TransactionType.transfer) {
+          if (adjustmentAmount == 0) {
+            showResultToast('Số dư thực tế giống với số dư hiện tại', isError: true);
+            return;
+          }
+
+          final transaction = TransactionModel(
+            title: 'Điều chỉnh số dư',
+            amount: adjustmentAmount,
+            date: _selectedDateTime,
+            type: selectedTransactionType,
+            categoryId: 'adjustment',
+            note: _noteController.text.isNotEmpty ? _noteController.text : null,
+            createAt: DateTime.now(),
+            syncId: generateSyncId(),
+            walletId: effectiveWallet.id ?? -1,
+          );
+
+          await transactionController.addTransaction(transaction);
+        case TransactionType.lend:
+        case TransactionType.borrowing:
+          // Validate person selection
+          final selectedPerson = ref.read(selectedPersonProvider);
+          if (selectedPerson == null) {
+            showResultToast('Vui lòng chọn người', isError: true);
+            return;
+          }
+          Debt debt = Debt(
+            personId: selectedPerson.id,
+            amount: amount,
+            type: selectedTransactionType == TransactionType.lend ? DebtType.lent : DebtType.borrowed,
+            description: _noteController.text.isNotEmpty ? _noteController.text : 'Giao dịch với ${selectedPerson.name}',
+            createdDate: _selectedDateTime,
+            walletId: effectiveWallet.id ?? -1,
+            dueDate: _selectedLoanDateTime,
+          );
+          await debtController.createDebt(debt);
+        case TransactionType.repayment:
+          throw UnimplementedError();
+        case TransactionType.debtCollection:
+          throw UnimplementedError();
+        case TransactionType.transfer:
           final transactionOut = TransactionModel(
             title: 'Chuyển khoản đến ${transferInWalletState?.name ?? 'Chưa chọn'}',
             // sử dụng transferIn để gửi title
             // nơi chuyển đến
-            amount: amount,
+            amount: amount ?? 0,
             date: _selectedDateTime,
             type: TransactionType.transferOut,
             categoryId: 'transfer',
@@ -154,7 +178,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
           final transactionIn = TransactionModel(
             title: 'Nhận chuyển khoản từ ${transferOutWalletState?.name ?? 'Chưa chọn'}',
-            amount: amount,
+            amount: amount ?? 0,
             date: _selectedDateTime,
             type: TransactionType.transferIn,
             categoryId: 'transfer',
@@ -166,27 +190,10 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
           await transactionController.addTransaction(transactionOut);
           await transactionController.addTransaction(transactionIn);
-        } else if (selectedTransactionType == TransactionType.lend || selectedTransactionType == TransactionType.borrowing) {
-          // Validate person selection
-          final selectedPerson = ref.read(selectedPersonProvider);
-          if (selectedPerson == null) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Vui lòng chọn người')));
-            return;
-          }
 
-          Debt debt = Debt(
-            personId: selectedPerson.id,
-            amount: amount,
-            type: selectedTransactionType == TransactionType.lend ? DebtType.lent : DebtType.borrowed,
-            description: _noteController.text.isNotEmpty ? _noteController.text : 'Giao dịch với ${selectedPerson.name}',
-            createdDate: _selectedDateTime,
-            walletId: effectiveWallet.id ?? -1,
-            dueDate: _selectedLoanDateTime,
-          );
-          await debtController.createDebt(debt);
-        } else {
+        default:
           if (selectedCategory == null) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Vui lòng chọn hạng mục')));
+            showResultToast('Vui lòng chọn hạng mục', isError: true);
             return;
           }
 
@@ -203,7 +210,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
           );
 
           await transactionController.addTransaction(transaction);
-        }
       }
       _clearTransaction();
 
@@ -324,12 +330,30 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         DropdownMenuItem(value: TransactionType.transfer, child: Text('Chuyển khoản')),
         DropdownMenuItem(value: TransactionType.adjustBalance, child: Text('Điều chỉnh số dư')),
       ],
-      onChanged: (value) {
+      onChanged: (value) async {
         if (value != null) {
+          ref.read(currentTransactionByTypeProvider.notifier).state = value;
+
           setState(() {
-            ref.read(currentTransactionByTypeProvider.notifier).state = value;
             _clearTransaction();
           });
+
+          final categoryName = getCategoryNameForTransactionType(value);
+
+          if (categoryName != null) {
+            try {
+              final category = await ref.read(categoryByNameProvider(categoryName).future);
+              if (mounted) {
+                ref.read(selectedCategoryProvider.notifier).selectCategory(category);
+              }
+            } catch (e) {
+              if (mounted) {
+                ref.read(selectedCategoryProvider.notifier).selectCategory(null);
+              }
+            }
+          } else {
+            ref.read(selectedCategoryProvider.notifier).selectCategory(null);
+          }
         }
       },
     );

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mosa/config/app_config.dart';
 import 'package:mosa/models/debt.dart';
 import 'package:mosa/models/enums.dart';
 import 'package:mosa/models/transaction.dart';
@@ -26,6 +27,7 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
   Future<void> refreshListDebt() async {
     try {
       final debts = await _databaseService.getAllDebt();
+      appConfig.printLog('i', 'all debts: ${debts.map((e) => e.toJson(),)}');
       if (debts != state.value) {
         state = AsyncData(debts);
       }

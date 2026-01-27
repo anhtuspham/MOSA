@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mosa/config/section_container_config.dart';
+import 'package:mosa/providers/debt_provider.dart';
 import 'package:mosa/widgets/common_scaffold.dart';
 import 'package:mosa/widgets/section_container.dart';
 
@@ -14,16 +16,17 @@ import '../../widgets/custom_list_tile.dart';
 import '../../widgets/custom_modal_bottom_sheet.dart';
 import '../../widgets/progress_info_item.dart';
 
-class LoanTrackingScreen extends StatefulWidget {
+class LoanTrackingScreen extends ConsumerStatefulWidget {
   const LoanTrackingScreen({super.key});
 
   @override
-  State<LoanTrackingScreen> createState() => _LoanTrackingScreenState();
+  ConsumerState<LoanTrackingScreen> createState() => _LoanTrackingScreenState();
 }
 
-class _LoanTrackingScreenState extends State<LoanTrackingScreen> {
+class _LoanTrackingScreenState extends ConsumerState<LoanTrackingScreen> {
   @override
   Widget build(BuildContext context) {
+    final totalDebt = ref.watch(totalDebtProvider);
     return CommonScaffold(
       title: Text("Theo dõi vay nợ"),
       leading: IconButton(
@@ -33,21 +36,33 @@ class _LoanTrackingScreenState extends State<LoanTrackingScreen> {
       actions: const [Icon(Icons.search)],
       appBarBackgroundColor: AppColors.background,
       tabs: [Tab(text: "Cho vay"), Tab(text: "Còn Nợ")],
-      children: [loanTrackingContent('loan'), loanTrackingContent('debt')],
+      children: [
+        loanTrackingContent('loan', totalAmount: totalDebt['lent'] ?? 0),
+        loanTrackingContent('debt', totalAmount: totalDebt['borrowed'] ?? 0)
+      ],
     );
   }
 
-  Widget loanTrackingContent(String typeLoan) {
+  Widget loanTrackingContent(String typeLoan, {required double totalAmount}) {
     bool isLoan = typeLoan == 'loan';
+    // Calculate collected/paid amount (for demo, using 80% progress)
+    double collectedOrPaid = totalAmount * 0.8;
+    double progress = totalAmount > 0 ? collectedOrPaid / totalAmount : 0;
+
     return SectionContainer(
       child: Column(
         children: [
           ProgressInfoItem(
             title: Text(isLoan ? 'Cần thu' : 'Phải trả'),
-            currentProgress: 0.8,
+            currentProgress: progress,
             linearColors: AppColors.chartColors.first,
             trailing: Row(
-              children: [Text(Helpers.formatCurrency(100000000), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp))],
+              children: [
+                Text(
+                  Helpers.formatCurrency(totalAmount - collectedOrPaid),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
+                )
+              ],
             ),
             bottomContent: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -55,15 +70,21 @@ class _LoanTrackingScreenState extends State<LoanTrackingScreen> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(isLoan ? 'Đã thu' : 'Còn nợ', style: TextStyle(fontSize: 12.sp)),
-                    Text(Helpers.formatCurrency(100000000), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp)),
+                    Text(isLoan ? 'Đã thu' : 'Đã trả', style: TextStyle(fontSize: 12.sp)),
+                    Text(
+                      Helpers.formatCurrency(collectedOrPaid),
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp),
+                    ),
                   ],
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(isLoan ? 'Tổng cho vay' : 'Tổng đi vay', style: TextStyle(fontSize: 12.sp)),
-                    Text(Helpers.formatCurrency(100000000), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp)),
+                    Text(
+                      Helpers.formatCurrency(totalAmount),
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp),
+                    ),
                   ],
                 ),
               ],
@@ -89,7 +110,7 @@ class _LoanTrackingScreenState extends State<LoanTrackingScreen> {
                           ),
                         ),
                         Text(
-                          Helpers.formatCurrency(10000),
+                          Helpers.formatCurrency(totalAmount - collectedOrPaid),
                           style: TextStyle(
                             fontSize: 15.sp,
                             color: AppColors.expense,
