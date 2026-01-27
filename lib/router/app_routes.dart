@@ -49,6 +49,7 @@ abstract class AppRoutes {
   static const String typeWalletList = '/typeWalletList';
   static const String bankList = '/bankList';
   static const String personList = '/personList';
+  static const String debtSelection = '/debtSelection';
 
   // === SETTING ROUTES (nested under /settings) ===
   static const String loanTracking = '/settings/loan-tracking';

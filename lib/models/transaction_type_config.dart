@@ -67,7 +67,7 @@ class TransactionTypeManager {
       category: TransactionCategory.debtCollection,
       balanceEffect: BalanceEffect.plus,
       displayName: 'Debt Collection',
-      color: AppColors.expense,
+      color: AppColors.income,
       description: 'Debt collection',
     ),
     TransactionType.transfer: TransactionTypeConfig(

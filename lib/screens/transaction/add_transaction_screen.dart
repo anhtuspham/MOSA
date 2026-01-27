@@ -68,6 +68,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   @override
   Widget build(BuildContext context) {
     final selectedTransactionType = ref.watch(currentTransactionByTypeProvider) ?? TransactionType.expense;
+    appConfig.printLog('e', 'transactionType: ${selectedTransactionType}');
 
     return CommonScaffold(
       title: Container(
@@ -89,6 +90,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     _noteController.clear();
     _actualBalanceController.clear();
     ref.read(selectedCategoryProvider.notifier).selectCategory(null);
+    ref.read(selectedDebtProvider.notifier).state = null;
+    ref.read(selectedPersonProvider.notifier).state = null;
   }
 
   Future<void> _saveTransaction() async {
@@ -157,10 +160,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
             dueDate: _selectedLoanDateTime,
           );
           await debtController.createDebt(debt);
-        case TransactionType.repayment:
-          throw UnimplementedError();
-        case TransactionType.debtCollection:
-          throw UnimplementedError();
         case TransactionType.transfer:
           final transactionOut = TransactionModel(
             title: 'Chuyển khoản đến ${transferInWalletState?.name ?? 'Chưa chọn'}',
@@ -197,19 +196,39 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
             return;
           }
 
-          final transaction = TransactionModel(
-            title: selectedCategory.name,
-            amount: amount,
-            date: _selectedDateTime,
-            type: selectedTransactionType,
-            categoryId: selectedCategory.id,
-            note: _noteController.text.isNotEmpty ? _noteController.text : null,
-            createAt: DateTime.now(),
-            syncId: generateSyncId(),
-            walletId: effectiveWallet.id ?? -1,
-          );
+          if (selectedCategory.type == 'lend' && selectedTransactionType == TransactionType.income) {
+            // debtCollection
+            final selectedDebt = ref.read(selectedDebtProvider);
+            if (selectedDebt == null || selectedDebt.id == null) {
+              showResultToast('Vui lòng chọn khoản nợ cần thu', isError: true);
+              return;
+            }
 
-          await transactionController.addTransaction(transaction);
+            await debtController.collectDebt(selectedDebt.id!, amount ?? 0, effectiveWallet.id!);
+          } else if (selectedCategory.type == 'lend' && selectedTransactionType == TransactionType.expense) {
+            // repayment
+            final selectedDebt = ref.read(selectedDebtProvider);
+            if (selectedDebt == null || selectedDebt.id == null) {
+              showResultToast('Vui lòng chọn khoản nợ cần trả', isError: true);
+              return;
+            }
+
+            await debtController.payDebt(selectedDebt.id!, amount ?? 0, effectiveWallet.id!);
+          } else {
+            final transaction = TransactionModel(
+              title: selectedCategory.name,
+              amount: amount,
+              date: _selectedDateTime,
+              type: selectedTransactionType,
+              categoryId: selectedCategory.id,
+              note: _noteController.text.isNotEmpty ? _noteController.text : null,
+              createAt: DateTime.now(),
+              syncId: generateSyncId(),
+              walletId: effectiveWallet.id ?? -1,
+            );
+
+            await transactionController.addTransaction(transaction);
+          }
       }
       _clearTransaction();
 
@@ -304,7 +323,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         // Handle repayment, debt collection cause they are expense, income transaction type
         final selectedCategory = ref.watch(selectedCategoryProvider);
         if (selectedCategory != null && selectedCategory.type == 'lend') {
-          return loanTransactionDetail(transactionType: transactionType);
+          return loanTransactionDetail(transactionType: transactionType, isRepaymentOrCollection: true);
         }
         return defaultTransactionDetail();
     }
@@ -490,6 +509,40 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     );
   }
 
+  Widget selectedDebtInfoSection() {
+    final selectedDebt = ref.watch(selectedDebtProvider);
+    final selectedCategory = ref.watch(selectedCategoryProvider);
+
+    if (selectedDebt == null) {
+      return CustomListTile(
+        leading: Icon(Icons.receipt_long_outlined),
+        title: Text('Chưa chọn khoản nợ'),
+        subTitle: Text('Vui lòng chọn từ danh mục'),
+        trailing: Icon(Icons.info_outline, color: Colors.orange),
+      );
+    }
+
+    final person = ref.watch(personByIdProvider(selectedDebt.personId));
+
+    return CustomListTile(
+      leading: CircleAvatar(child: Text(person?.name.substring(0, 1).toUpperCase() ?? 'A')),
+      title: Text(person?.name ?? 'Unknown'),
+      subTitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(height: 4),
+          Text(selectedDebt.description, style: TextStyle(fontSize: 13)),
+          SizedBox(height: 2),
+          Text(
+            'Còn lại: ${Helpers.formatCurrency(selectedDebt.remainingAmount)}',
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.expense),
+          ),
+        ],
+      ),
+      trailing: Icon(Icons.check_circle, color: AppColors.success),
+    );
+  }
+
   Widget walletAndDetailSection() {
     return CardSection(
       child: Column(
@@ -567,8 +620,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     );
   }
 
-  Widget loanTransactionDetail({required TransactionType? transactionType}) {
-    final selectedTransactionType = ref.watch(currentTransactionByTypeProvider);
+  Widget loanTransactionDetail({required TransactionType? transactionType, bool isRepaymentOrCollection = false}) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -579,18 +631,21 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 amountInputSection(),
                 const SizedBox(height: 12),
                 categorySelectorSection(),
-                personLoanSelectorSection(),
+                // Show debt info for repayment/collection, person selector for lend/borrow
+                isRepaymentOrCollection ? selectedDebtInfoSection() : personLoanSelectorSection(),
                 const SizedBox(height: 12),
                 walletAndDetailSection(),
-                DateOnlySelectorSection(
-                  selectedDateOnly: _selectedLoanDateTime,
-                  onDateTimeChanged: (newDateTime) {
-                    setState(() {
-                      _selectedLoanDateTime = newDateTime;
-                    });
-                  },
-                  defaultTitle: selectedTransactionType == TransactionType.lend ? 'Ngày thu nợ' : 'Ngày trả nợ',
-                ),
+                // Only show due date for lend/borrow, not for repayment/collection
+                if (!isRepaymentOrCollection)
+                  DateOnlySelectorSection(
+                    selectedDateOnly: _selectedLoanDateTime,
+                    onDateTimeChanged: (newDateTime) {
+                      setState(() {
+                        _selectedLoanDateTime = newDateTime;
+                      });
+                    },
+                    defaultTitle: transactionType == TransactionType.lend ? 'Ngày thu nợ' : 'Ngày trả nợ',
+                  ),
                 const SizedBox(height: 12),
                 mediaActionSection(),
               ],

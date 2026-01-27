@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:mosa/config/app_config.dart';
 import 'package:mosa/models/debt.dart';
 import 'package:mosa/models/enums.dart';
@@ -123,6 +124,8 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
   Future<void> payDebt(int debtId, double paymentAmount, int walletId) async {
     state = const AsyncLoading();
     try {
+      final payBackCategory = await ref.read(categoryByNameProvider('Trả nợ').future);
+
       final currentDebts = state.requireValue;
       final debtIndex = currentDebts.indexWhere((element) => element.id == debtId);
       if (debtIndex == -1) throw 'Không tìm thấy khoản nợ';
@@ -148,6 +151,7 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
         date: DateTime.now(),
         type: TransactionType.repayment,
         createAt: DateTime.now(),
+        categoryId: payBackCategory?.id,
         walletId: walletId,
         syncId: generateSyncId(),
       );
@@ -173,6 +177,8 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
   Future<void> collectDebt(int debtId, double paymentAmount, int walletId) async {
     state = const AsyncLoading();
     try {
+      final collectCategory = await ref.read(categoryByNameProvider('Thu nợ').future);
+
       final currentDebts = state.requireValue;
       final debtIndex = currentDebts.indexWhere((element) => element.id == debtId);
       if (debtIndex == -1) throw 'Không tìm thấy khoản nợ';
@@ -199,6 +205,7 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
         date: DateTime.now(),
         type: TransactionType.debtCollection,
         createAt: DateTime.now(),
+        categoryId: collectCategory?.id,
         walletId: walletId,
         syncId: generateSyncId(),
       );
@@ -260,3 +267,6 @@ final totalDebtProvider = Provider<Map<String, double>>((ref) {
   }
   return {'lent': totalLent, 'borrowed': totalBorrowed};
 });
+
+// Provider to hold selected debt for repayment/collection
+final selectedDebtProvider = StateProvider<Debt?>((ref) => null);

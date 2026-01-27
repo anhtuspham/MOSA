@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mosa/models/enums.dart';
 import 'package:mosa/router/app_routes.dart';
 import 'package:mosa/screens/category/screen/category_screen.dart';
+import 'package:mosa/screens/debt/debt_selection_screen.dart';
 import 'package:mosa/screens/debt/loan_tracking_screen.dart';
 import 'package:mosa/screens/login/login_screen.dart';
 import 'package:mosa/screens/setting/setting_screen.dart';
@@ -17,6 +19,7 @@ import 'package:mosa/screens/wallet/screen/select_wallet_screen.dart';
 import 'package:mosa/screens/wallet/screen/select_type_wallet_screen.dart';
 import 'package:mosa/screens/wallet/screen/wallet_screen.dart';
 
+import '../models/debt.dart';
 import '../screens/home/home_screen.dart';
 
 /// Go Router Configuration with StatefulShellRoute
@@ -170,6 +173,15 @@ final goRouter = GoRouter(
       path: AppRoutes.personList,
       name: 'personList',
       builder: (context, state) => SelectPersonScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.debtSelection,
+      name: 'debtSelection',
+      builder: (context, state) {
+        final debtTypeString = state.uri.queryParameters['type'] ?? 'borrowed';
+        final debtType = debtTypeString == 'lent' ? DebtType.lent : DebtType.borrowed;
+        return DebtSelectionScreen(debtType: debtType);
+      },
     ),
   ],
   errorBuilder: (context, state) {

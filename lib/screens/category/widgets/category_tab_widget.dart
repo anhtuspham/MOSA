@@ -3,8 +3,12 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mosa/models/debt.dart';
+import 'package:mosa/models/enums.dart';
 import 'package:mosa/providers/category_provider.dart';
+import 'package:mosa/providers/debt_provider.dart';
 import 'package:mosa/providers/transaction_provider.dart';
+import 'package:mosa/router/app_routes.dart';
 import 'package:mosa/utils/app_colors.dart';
 import 'package:mosa/widgets/custom_expansion_tile.dart';
 import 'package:mosa/widgets/item_widget.dart';
@@ -26,6 +30,43 @@ class _CategoryTabState extends ConsumerState<CategoryTab> {
   void dispose() {
     _scrollController.dispose();
     super.dispose();
+  }
+
+  /// Handle category selection with special logic for debt categories
+  Future<void> _handleCategorySelection(BuildContext context, category) async {
+    // Check if this is a debt-related category
+    final categoryId = category.id;
+    final categoryName = category.name?.toLowerCase() ?? '';
+
+    if (categoryId == 'lend_payback' || categoryName == 'trả nợ') {
+      // Repayment - show borrowed debts
+      final result = await context.push(
+        '${AppRoutes.debtSelection}?type=borrowed',
+      );
+
+      if (result != null && result is Debt) {
+        // User selected a debt
+        ref.read(selectedDebtProvider.notifier).state = result;
+        ref.read(selectedCategoryProvider.notifier).selectCategory(category);
+        if (context.mounted) context.pop();
+      }
+    } else if (categoryId == 'lend_collect' || categoryName == 'thu nợ') {
+      // Debt collection - show lent debts
+      final result = await context.push(
+        '${AppRoutes.debtSelection}?type=lent',
+      );
+
+      if (result != null && result is Debt) {
+        // User selected a debt
+        ref.read(selectedDebtProvider.notifier).state = result;
+        ref.read(selectedCategoryProvider.notifier).selectCategory(category);
+        if (context.mounted) context.pop();
+      }
+    } else {
+      // Regular category - normal flow
+      ref.read(selectedCategoryProvider.notifier).selectCategory(category);
+      context.pop();
+    }
   }
 
   @override
@@ -61,11 +102,7 @@ class _CategoryTabState extends ConsumerState<CategoryTab> {
                       child: ItemWidget(
                         category: category,
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        onTap: () {
-                          ref.read(selectedCategoryProvider.notifier).selectCategory(category);
-                          // ref.read(currentTransactionByTypeProvider.notifier).state = ref.watch(autoTransactionTypeProvider);
-                          context.pop();
-                        },
+                        onTap: () => _handleCategorySelection(context, category),
                       ),
                     );
                   } else {
@@ -74,11 +111,7 @@ class _CategoryTabState extends ConsumerState<CategoryTab> {
                       header: ItemWidget(
                         category: category,
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        onTap: () {
-                          ref.read(selectedCategoryProvider.notifier).selectCategory(category);
-                          // ref.read(currentTransactionByTypeProvider.notifier).state = ref.watch(autoTransactionTypeProvider);
-                          context.pop();
-                        },
+                        onTap: () => _handleCategorySelection(context, category),
                       ),
                       children: [
                         GridView.builder(
@@ -94,11 +127,7 @@ class _CategoryTabState extends ConsumerState<CategoryTab> {
                             final child = category.children![index];
                             return ItemWidget(
                               category: child,
-                              onTap: () {
-                                ref.read(selectedCategoryProvider.notifier).selectCategory(child);
-                                // ref.read(currentTransactionByTypeProvider.notifier).state = ref.watch(autoTransactionTypeProvider);
-                                context.pop();
-                              },
+                              onTap: () => _handleCategorySelection(context, child),
                             );
                           },
                         ),
