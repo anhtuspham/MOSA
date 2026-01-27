@@ -1,18 +1,30 @@
 import 'package:flutter/material.dart';
 
-import '../utils/app_colors.dart';
+import '../config/section_container_config.dart';
 
 class SectionContainer extends StatelessWidget {
   final Widget child;
-  final Color? backgroundColor;
+  final SectionContainerConfig? config;
 
-  const SectionContainer({super.key, required this.child, this.backgroundColor});
+  const SectionContainer({
+    super.key,
+    required this.child,
+    this.config,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final effectiveConfig = config ?? SectionContainerConfig.defaultConfig;
+
     return Container(
-      decoration: BoxDecoration(color: backgroundColor ?? AppColors.primaryBackground),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 18),
+      margin: effectiveConfig.margin,
+      padding: effectiveConfig.padding,
+      decoration: BoxDecoration(
+        color: effectiveConfig.backgroundColor,
+        borderRadius: effectiveConfig.borderRadius,
+        border: effectiveConfig.border,
+        boxShadow: effectiveConfig.boxShadow,
+      ),
       child: child,
     );
   }

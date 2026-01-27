@@ -11,6 +11,7 @@ import 'package:mosa/utils/app_icons.dart';
 import 'package:mosa/utils/helpers.dart';
 import 'package:mosa/utils/toast.dart';
 import 'package:mosa/widgets/custom_list_tile.dart';
+import 'package:mosa/widgets/custom_modal_bottom_sheet.dart';
 import 'package:mosa/widgets/error_widget.dart';
 import 'package:mosa/widgets/loading_widget.dart';
 
@@ -84,98 +85,88 @@ class _AccountTabScreenState extends ConsumerState<AccountTabScreen> {
   }
 
   void _handleShowBottomSheet(Wallet wallet) {
-    showModalBottomSheet(
+    showCustomBottomSheet(
       context: context,
-      isScrollControlled: true,
-      builder:
-          (context) => Padding(
-            padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CustomListTile(
-                  leading: Icon(Icons.swap_horiz, size: 20),
-                  title: Text('Chuyển khoản', style: TextStyle(fontSize: 16)),
-                  onTap: () async {
-                    Navigator.pop(context); // Close bottom sheet with Navigator
-                    await Future.delayed(Duration(milliseconds: 150)); // Wait for close animation
-                    if (mounted) {
-                      context.go(AppRoutes.addTransaction);
-                    }
-                  },
-                  backgroundColor: Colors.transparent,
-                ),
-                CustomListTile(
-                  leading: Icon(Icons.currency_exchange, size: 20),
-                  title: Text('Điều chỉnh số dư', style: TextStyle(fontSize: 16)),
-                  onTap: () {
-                    context.pop(); // Close bottom sheet first
-                    showInfoToast('Tính năng đang trong giai đoạn phát triển.');
-                  },
-                  backgroundColor: Colors.transparent,
-                ),
-                CustomListTile(
-                  leading: Icon(Icons.share, size: 20),
-                  title: Text('Chia sẻ tài khoản', style: TextStyle(fontSize: 16)),
-                  onTap: () {
-                    context.pop(); // Close bottom sheet first
-                    showInfoToast('Tính năng đang trong giai đoạn phát triển.');
-                  },
-                  backgroundColor: Colors.transparent,
-                ),
-                CustomListTile(
-                  leading: Icon(Icons.edit, size: 20),
-                  title: Text('Sửa', style: TextStyle(fontSize: 16)),
-                  onTap: () {
-                    context.pop(); // Close bottom sheet first
-                    showInfoToast('Tính năng đang trong giai đoạn phát triển.');
-                  },
-                  backgroundColor: Colors.transparent,
-                ),
-                CustomListTile(
-                  leading: Icon(Icons.delete, size: 20),
-                  title: Text('Xóa', style: TextStyle(fontSize: 16)),
-                  onTap: () {
-                    context.pop(); // Close bottom sheet first
-                    _showDeleteConfirmation(wallet);
-                  },
-                  backgroundColor: Colors.transparent,
-                ),
-                CustomListTile(
-                  leading: Icon(Icons.lock, size: 20),
-                  title: Text('Ngừng sử dụng', style: TextStyle(fontSize: 16)),
-                  onTap: () {
-                    context.pop(); // Close bottom sheet first
-                    showInfoToast('Tính năng đang trong giai đoạn phát triển.');
-                  },
-                  backgroundColor: Colors.transparent,
-                ),
-              ],
-            ),
-          ),
+      children: [
+        CustomListTile(
+          leading: Icon(Icons.swap_horiz, size: 20),
+          title: Text('Chuyển khoản', style: TextStyle(fontSize: 16)),
+          onTap: () async {
+            Navigator.pop(context); // Close bottom sheet with Navigator
+            await Future.delayed(Duration(milliseconds: 150)); // Wait for close animation
+            if (mounted) {
+              context.go(AppRoutes.addTransaction);
+            }
+          },
+          backgroundColor: Colors.transparent,
+        ),
+        CustomListTile(
+          leading: Icon(Icons.currency_exchange, size: 20),
+          title: Text('Điều chỉnh số dư', style: TextStyle(fontSize: 16)),
+          onTap: () {
+            context.pop(); // Close bottom sheet first
+            showInfoToast('Tính năng đang trong giai đoạn phát triển.');
+          },
+          backgroundColor: Colors.transparent,
+        ),
+        CustomListTile(
+          leading: Icon(Icons.share, size: 20),
+          title: Text('Chia sẻ tài khoản', style: TextStyle(fontSize: 16)),
+          onTap: () {
+            context.pop(); // Close bottom sheet first
+            showInfoToast('Tính năng đang trong giai đoạn phát triển.');
+          },
+          backgroundColor: Colors.transparent,
+        ),
+        CustomListTile(
+          leading: Icon(Icons.edit, size: 20),
+          title: Text('Sửa', style: TextStyle(fontSize: 16)),
+          onTap: () {
+            context.pop(); // Close bottom sheet first
+            showInfoToast('Tính năng đang trong giai đoạn phát triển.');
+          },
+          backgroundColor: Colors.transparent,
+        ),
+        CustomListTile(
+          leading: Icon(Icons.delete, size: 20),
+          title: Text('Xóa', style: TextStyle(fontSize: 16)),
+          onTap: () {
+            context.pop(); // Close bottom sheet first
+            _showDeleteConfirmation(wallet);
+          },
+          backgroundColor: Colors.transparent,
+        ),
+        CustomListTile(
+          leading: Icon(Icons.lock, size: 20),
+          title: Text('Ngừng sử dụng', style: TextStyle(fontSize: 16)),
+          onTap: () {
+            context.pop(); // Close bottom sheet first
+            showInfoToast('Tính năng đang trong giai đoạn phát triển.');
+          },
+          backgroundColor: Colors.transparent,
+        ),
+      ]
     );
   }
 
   void _showDeleteConfirmation(Wallet wallet) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Xác nhận xóa'),
-        content: Text('Bạn có chắc chắn muốn xóa ví "${wallet.name}"?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Hủy'),
+      builder:
+          (context) => AlertDialog(
+            title: Text('Xác nhận xóa'),
+            content: Text('Bạn có chắc chắn muốn xóa ví "${wallet.name}"?'),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(context), child: Text('Hủy')),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _handleDeleteWallet(wallet);
+                },
+                child: Text('Xóa', style: TextStyle(color: Colors.red)),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _handleDeleteWallet(wallet);
-            },
-            child: Text('Xóa', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
     );
   }
 

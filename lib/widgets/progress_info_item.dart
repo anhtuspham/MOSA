@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mosa/config/section_container_config.dart';
+import 'package:mosa/widgets/section_container.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
 class ProgressInfoItem extends StatelessWidget {
@@ -11,6 +13,7 @@ class ProgressInfoItem extends StatelessWidget {
   final IconData? actionIcon;
   final Widget? subTitle;
   final Widget? bottomContent;
+
   const ProgressInfoItem({
     super.key,
     this.leadingIcon,
@@ -20,18 +23,13 @@ class ProgressInfoItem extends StatelessWidget {
     this.linearColors = Colors.red,
     this.actionIcon,
     this.subTitle,
-    this.bottomContent
+    this.bottomContent,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-      ),
+    return SectionContainer(
+      config: SectionContainerConfig.compact,
       child: Column(
         children: [
           Row(
@@ -63,12 +61,11 @@ class ProgressInfoItem extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(width: 10),
-              Icon(actionIcon, size: 16, color: Colors.grey[700]),
+              if (actionIcon != null) ...[const SizedBox(width: 10), Icon(actionIcon, size: 16, color: Colors.grey[700])],
             ],
           ),
           SizedBox(height: 5),
-          bottomContent ?? SizedBox()
+          bottomContent ?? SizedBox(),
         ],
       ),
     );

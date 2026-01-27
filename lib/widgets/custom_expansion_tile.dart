@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mosa/config/section_container_config.dart';
 import 'package:mosa/utils/app_colors.dart';
+import 'package:mosa/widgets/section_container.dart';
 
 class CustomExpansionTile extends StatelessWidget {
   final bool? initialExpand;
@@ -14,19 +16,18 @@ class CustomExpansionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(color: AppColors.background),
-      margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 3),
+    return SectionContainer(
+      config: SectionContainerConfig.noPadding,
       child: ExpansionTile(
         initiallyExpanded: initialExpand ?? false,
         title: header,
         shape: OutlineInputBorder(
           borderSide: BorderSide(color: Colors.transparent),
         ),
-        backgroundColor: AppColors.background,
+        // backgroundColor: AppColors.background,
         expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
         dense: true,
-        childrenPadding: EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+        // childrenPadding: EdgeInsets.symmetric(horizontal: 18, vertical: 8),
         children: children,
       ),
     );

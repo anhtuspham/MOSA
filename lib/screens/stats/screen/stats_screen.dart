@@ -23,7 +23,7 @@ class StatsShellScreen extends ConsumerWidget {
       centerTitle: true,
       appBarBackgroundColor: AppColors.background,
       body: SectionContainer(
-        backgroundColor: AppColors.background,
+        // backgroundColor: AppColors.background,
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.max,
