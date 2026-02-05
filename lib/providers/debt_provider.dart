@@ -28,7 +28,7 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
   Future<void> refreshListDebt() async {
     try {
       final debts = await _databaseService.getAllDebt();
-      appConfig.printLog('i', 'all debts: ${debts.map((e) => e.toJson(),)}');
+      appConfig.printLog('i', 'all debts: ${debts.map((e) => e.toJson())}');
       if (debts != state.value) {
         state = AsyncData(debts);
       }
@@ -50,7 +50,7 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
       bool isLent = debt.type == DebtType.lent;
 
       // Get person name for transaction title
-      final person = ref.watch(personByIdProvider(newDebt.personId));
+      final person = ref.read(personByIdProvider(newDebt.personId));
       final personName = person?.name ?? 'Unknown';
 
       final lendTransaction = TransactionModel(
@@ -141,8 +141,7 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
       await _databaseService.updateDebt(newDebt);
 
       // Get person name for transaction title
-      final person = ref.watch(personByIdProvider(newDebt.personId));
-      // final person = await _databaseService.getPersonById(newDebt.personId);
+      final person = ref.read(personByIdProvider(newDebt.personId));
       final personName = person?.name ?? 'Unknown';
 
       final transaction = TransactionModel(
@@ -195,8 +194,7 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
       await _databaseService.updateDebt(newDebt);
 
       // Get person name for transaction title
-      final person = ref.watch(personByIdProvider(newDebt.personId));
-      // final person = await _databaseService.getPersonById(newDebt.personId);
+      final person = ref.read(personByIdProvider(newDebt.personId));
       final personName = person?.name ?? 'Unknown';
 
       final transaction = TransactionModel(
@@ -235,37 +233,60 @@ final debtByPersonProvider = Provider.family<List<Debt>, int>((ref, personId) {
   return debts.where((debt) => debt.personId == personId).toList();
 });
 
+final totalDebtByPersonProvider = Provider.family<DebtInfo, int>((ref, personId) {
+  final debts = ref.watch(debtByPersonProvider(personId));
+  double totalDebt = 0;
+  double totalDebtPaid = 0;
+  double totalDebtRemaining = 0;
+  for (var debt in debts) {
+    totalDebt += debt.amount;
+    totalDebtPaid += debt.paidAmount;
+    totalDebtRemaining += debt.remainingAmount;
+  }
+  return DebtInfo(totalDebt: totalDebt, totalDebtPaid: totalDebtPaid, totalDebtRemaining: totalDebtRemaining);
+});
+
 final debtByTypeProvider = Provider.family<List<Debt>, DebtType>((ref, type) {
   final debts = ref.watch(debtProvider).value ?? [];
   return debts.where((debt) => debt.type == type).toList();
 });
 
+/// Map<personId, remainingAmount> cho các debts CHƯA hoàn thành (active / partial)
 final debtSummaryByTypeProvider = Provider.family<Map<int, double>, DebtType>((ref, type) {
   final debts = ref.watch(debtByTypeProvider(type));
   final summary = <int, double>{};
   for (var debt in debts) {
-    final remaining = debt.remainingAmount;
-    summary[debt.personId] = (summary[debt.personId] ?? 0) + remaining;
+    if (debt.status == DebtStatus.paid) continue; // bỏ qua debts đã hoàn thành
+    summary[debt.personId] = (summary[debt.personId] ?? 0) + debt.remainingAmount;
   }
   return summary;
 });
 
-final totalDebtProvider = Provider<Map<String, double>>((ref) {
-  final debts = ref.watch(debtProvider).value ?? [];
-  double totalLent = 0;
-  double totalBorrowed = 0;
+/// Map<personId, totalAmount> cho các debts ĐÃ hoàn thành (paid)
+final debtSummaryPaidByTypeProvider = Provider.family<Map<int, double>, DebtType>((ref, type) {
+  final debts = ref.watch(debtByTypeProvider(type));
+  final summary = <int, double>{};
+  for (var debt in debts) {
+    if (debt.status != DebtStatus.paid) continue;
+    summary[debt.personId] = (summary[debt.personId] ?? 0) + debt.amount;
+  }
+  return summary;
+});
 
-  for (final debt in debts) {
-    if (debt.status != DebtStatus.paid) {
-      final remaining = debt.amount - debt.paidAmount;
-      if (debt.type == DebtType.lent) {
-        totalLent += remaining;
-      } else {
-        totalBorrowed += remaining;
-      }
+final totalDebtByTypeProvider = Provider.family<DebtInfo, DebtType>((ref, type) {
+  final debts = ref.watch(debtProvider).value ?? [];
+  double totalDebt = 0;
+  double totalDebtPaid = 0;
+  double totalDebtRemaining = 0;
+
+  for (var debt in debts) {
+    if (debt.type == type) {
+      totalDebt += debt.amount;
+      totalDebtRemaining += debt.remainingAmount;
+      totalDebtPaid += debt.paidAmount;
     }
   }
-  return {'lent': totalLent, 'borrowed': totalBorrowed};
+  return DebtInfo(totalDebt: totalDebt, totalDebtPaid: totalDebtPaid, totalDebtRemaining: totalDebtRemaining);
 });
 
 // Provider to hold selected debt for repayment/collection

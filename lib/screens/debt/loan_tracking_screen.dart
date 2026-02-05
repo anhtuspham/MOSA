@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mosa/config/section_container_config.dart';
+import 'package:mosa/models/debt.dart';
 import 'package:mosa/providers/debt_provider.dart';
+import 'package:mosa/providers/person_provider.dart';
 import 'package:mosa/widgets/common_scaffold.dart';
 import 'package:mosa/widgets/section_container.dart';
 
@@ -26,28 +27,47 @@ class LoanTrackingScreen extends ConsumerStatefulWidget {
 class _LoanTrackingScreenState extends ConsumerState<LoanTrackingScreen> {
   @override
   Widget build(BuildContext context) {
-    final totalDebt = ref.watch(totalDebtProvider);
+    final totalLentDebt = ref.watch(totalDebtByTypeProvider(DebtType.lent));
+    final totalBorrowedDebt = ref.watch(totalDebtByTypeProvider(DebtType.borrowed));
+
     return CommonScaffold(
       title: Text("Theo dõi vay nợ"),
-      leading: IconButton(
-        onPressed: () => context.pop(),
-        icon: const Icon(Icons.arrow_back),
-      ),
+      leading: IconButton(onPressed: () => context.pop(), icon: const Icon(Icons.arrow_back)),
       actions: const [Icon(Icons.search)],
       appBarBackgroundColor: AppColors.background,
       tabs: [Tab(text: "Cho vay"), Tab(text: "Còn Nợ")],
       children: [
-        loanTrackingContent('loan', totalAmount: totalDebt['lent'] ?? 0),
-        loanTrackingContent('debt', totalAmount: totalDebt['borrowed'] ?? 0)
+        _loanTrackingContent(
+          DebtType.lent,
+          totalDebt: totalLentDebt.totalDebt,
+          totalDebtPaid: totalLentDebt.totalDebtPaid,
+          totalDebtRemaining: totalLentDebt.totalDebtRemaining,
+        ),
+        _loanTrackingContent(
+          DebtType.borrowed,
+          totalDebt: totalBorrowedDebt.totalDebt,
+          totalDebtPaid: totalBorrowedDebt.totalDebtPaid,
+          totalDebtRemaining: totalBorrowedDebt.totalDebtRemaining,
+        ),
       ],
     );
   }
 
-  Widget loanTrackingContent(String typeLoan, {required double totalAmount}) {
-    bool isLoan = typeLoan == 'loan';
-    // Calculate collected/paid amount (for demo, using 80% progress)
-    double collectedOrPaid = totalAmount * 0.8;
-    double progress = totalAmount > 0 ? collectedOrPaid / totalAmount : 0;
+  Widget _loanTrackingContent(
+    DebtType type, {
+    required double totalDebt,
+    required double totalDebtPaid,
+    required double totalDebtRemaining,
+  }) {
+    final bool isLoan = type == DebtType.lent;
+
+    // Debts chưa hoàn thành: Map<personId, remainingAmount>
+    final activeDebtSummary = ref.watch(debtSummaryByTypeProvider(type));
+
+    // Debts đã hoàn thành: Map<personId, totalAmount>
+    final paidDebtSummary = ref.watch(debtSummaryPaidByTypeProvider(type));
+
+    double progress = totalDebt != 0 ? totalDebtPaid / totalDebt : 0;
 
     return SectionContainer(
       child: Column(
@@ -59,9 +79,9 @@ class _LoanTrackingScreenState extends ConsumerState<LoanTrackingScreen> {
             trailing: Row(
               children: [
                 Text(
-                  Helpers.formatCurrency(totalAmount - collectedOrPaid),
+                  Helpers.formatCurrency(totalDebtRemaining),
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
-                )
+                ),
               ],
             ),
             bottomContent: Row(
@@ -72,7 +92,7 @@ class _LoanTrackingScreenState extends ConsumerState<LoanTrackingScreen> {
                   children: [
                     Text(isLoan ? 'Đã thu' : 'Đã trả', style: TextStyle(fontSize: 12.sp)),
                     Text(
-                      Helpers.formatCurrency(collectedOrPaid),
+                      Helpers.formatCurrency(totalDebtPaid),
                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp),
                     ),
                   ],
@@ -82,7 +102,7 @@ class _LoanTrackingScreenState extends ConsumerState<LoanTrackingScreen> {
                   children: [
                     Text(isLoan ? 'Tổng cho vay' : 'Tổng đi vay', style: TextStyle(fontSize: 12.sp)),
                     Text(
-                      Helpers.formatCurrency(totalAmount),
+                      Helpers.formatCurrency(totalDebt),
                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp),
                     ),
                   ],
@@ -90,116 +110,122 @@ class _LoanTrackingScreenState extends ConsumerState<LoanTrackingScreen> {
               ],
             ),
           ),
+
+          // --- Đang theo dõi: debts active / partial ---
           CustomExpansionTile(
             initialExpand: true,
-            header: Text('Đang theo dõi', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp, color: AppColors.textHighlight)),
-            children: [
-              CustomListTile(
-                leading: CircleAvatar(child: Text('T')),
-                title: Text('wallet.name', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-                trailing: Row(
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          Helpers.formatCurrency(10000),
-                          style: TextStyle(
-                            fontSize: 16.sp,
-                            color: AppColors.textPrimary
-                          ),
-                        ),
-                        Text(
-                          Helpers.formatCurrency(totalAmount - collectedOrPaid),
-                          style: TextStyle(
-                            fontSize: 15.sp,
-                            color: AppColors.expense,
-                          ),
-                        ),
-                      ],
-                    ),
-                    IconButton(onPressed: () => _handleShowBottomSheet(isLoan ? 'Thu nợ' : 'Trả nợ'), icon: Icon(Icons.more_vert, color: AppColors.textPrimary)),
-                  ],
-                ),
-              ),
-            ],
+            header: Text(
+              'Đang theo dõi',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp, color: AppColors.textHighlight),
+            ),
+            children: activeDebtSummary.entries
+                .map((e) => _personActiveItem(personId: e.key, remainingAmount: e.value, isLoan: isLoan))
+                .toList(),
           ),
+
+          // --- Đã hoàn thành: debts paid ---
           CustomExpansionTile(
             initialExpand: false,
-            header: Text('Đã hoàn thành', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp, color: AppColors.success)),
-            children: [
-              CustomListTile(
-                leading: CircleAvatar(child: Text('T')),
-                title: Text('wallet.name', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-                trailing: Row(
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          Helpers.formatCurrency(10000),
-                          style: TextStyle(
-                              fontSize: 16.sp,
-                              color: AppColors.textPrimary
-                          ),
-                        ),
-                        Text(
-                          Helpers.formatCurrency(10000),
-                          style: TextStyle(
-                            fontSize: 15.sp,
-                            color: AppColors.expense,
-                          ),
-                        ),
-                      ],
-                    ),
-                    IconButton(onPressed: () => _handleShowBottomSheet(isLoan ? 'Thu nợ' : 'Trả nợ'), icon: Icon(Icons.more_vert, color: AppColors.textPrimary)),
-                  ],
-                ),
-              ),
-            ],
+            header: Text(
+              'Đã hoàn thành',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp, color: AppColors.success),
+            ),
+            children: paidDebtSummary.entries
+                .map((e) => _personPaidItem(personId: e.key, totalAmount: e.value))
+                .toList(),
           ),
         ],
       ),
     );
   }
 
-  void _handleShowBottomSheet(String title) {
-    showCustomBottomSheet(
-        context: context,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            child: Text(
-              title,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
+  /// Item trong section "Đang theo dõi" -- hiển thị tổng nợ và còn lại của 1 person
+  Widget _personActiveItem({required int personId, required double remainingAmount, required bool isLoan}) {
+    final person = ref.watch(personByIdProvider(personId));
+    final debtInfo = ref.watch(totalDebtByPersonProvider(personId));
 
-          CustomListTile(
-            leading: Icon(Icons.swap_horiz, size: 20),
-            title: Text(Helpers.formatCurrency(10000), style: TextStyle(fontSize: 16)),
-            onTap: () async {
-              Navigator.pop(context); // Close bottom sheet with Navigator
-              await Future.delayed(Duration(milliseconds: 150)); // Wait for close animation
-              if (mounted) {
-                context.go(AppRoutes.addTransaction);
-              }
-            },
-            backgroundColor: Colors.transparent,
+    return CustomListTile(
+      leading: CircleAvatar(child: Text(person?.name.substring(0, 1).toUpperCase() ?? 'T')),
+      title: Text(person?.name ?? 'Unknown', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.sp)),
+      trailing: Row(
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              // Tổng nợ của person này (amount gốc)
+              Text(
+                Helpers.formatCurrency(debtInfo.totalDebt),
+                style: TextStyle(fontSize: 16.sp, color: AppColors.textPrimary),
+              ),
+              // Còn lại cần thu/trả
+              Text(
+                Helpers.formatCurrency(remainingAmount),
+                style: TextStyle(fontSize: 15.sp, color: AppColors.expense),
+              ),
+            ],
           ),
-          CustomListTile(
-            leading: Icon(Icons.currency_exchange, size: 20),
-            title: Text('Số tiền khác', style: TextStyle(fontSize: 16)),
-            onTap: () {
-              context.pop(); // Close bottom sheet first
-              showInfoToast('Tính năng đang trong giai đoạn phát triển.');
-            },
-            backgroundColor: Colors.transparent,
+          IconButton(
+            onPressed: () => _handleShowBottomSheet(
+              title: isLoan ? 'Thu nợ' : 'Trả nợ',
+              totalDebtRemaining: remainingAmount,
+            ),
+            icon: Icon(Icons.more_vert, color: AppColors.textPrimary),
           ),
-        ]
+        ],
+      ),
+    );
+  }
+
+  /// Item trong section "Đã hoàn thành" -- chỉ hiển thị tổng và icon check
+  Widget _personPaidItem({required int personId, required double totalAmount}) {
+    final person = ref.watch(personByIdProvider(personId));
+
+    return CustomListTile(
+      leading: CircleAvatar(child: Text(person?.name.substring(0, 1).toUpperCase() ?? 'T')),
+      title: Text(person?.name ?? 'Unknown', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.sp)),
+      trailing: Row(
+        children: [
+          Text(
+            Helpers.formatCurrency(totalAmount),
+            style: TextStyle(fontSize: 16.sp, color: AppColors.textPrimary),
+          ),
+          SizedBox(width: 8.w),
+          Icon(Icons.check_circle, color: AppColors.success),
+        ],
+      ),
+    );
+  }
+
+  void _handleShowBottomSheet({required String title, required double totalDebtRemaining}) {
+    showCustomBottomSheet(
+      context: context,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(16),
+          child: Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        ),
+        CustomListTile(
+          leading: Icon(Icons.swap_horiz, size: 20),
+          title: Text(Helpers.formatCurrency(totalDebtRemaining), style: TextStyle(fontSize: 16)),
+          onTap: () async {
+            Navigator.pop(context);
+            await Future.delayed(Duration(milliseconds: 150));
+            if (mounted) {
+              context.go(AppRoutes.addTransaction);
+            }
+          },
+          backgroundColor: Colors.transparent,
+        ),
+        CustomListTile(
+          leading: Icon(Icons.currency_exchange, size: 20),
+          title: Text('Số tiền khác', style: TextStyle(fontSize: 16)),
+          onTap: () {
+            context.pop();
+            showInfoToast('Tính năng đang trong giai đoạn phát triển.');
+          },
+          backgroundColor: Colors.transparent,
+        ),
+      ],
     );
   }
 }

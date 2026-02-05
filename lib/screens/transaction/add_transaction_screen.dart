@@ -146,20 +146,29 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         case TransactionType.borrowing:
           // Validate person selection
           final selectedPerson = ref.read(selectedPersonProvider);
+
           if (selectedPerson == null) {
             showResultToast('Vui lòng chọn người', isError: true);
             return;
           }
-          Debt debt = Debt(
-            personId: selectedPerson.id,
-            amount: amount,
-            type: selectedTransactionType == TransactionType.lend ? DebtType.lent : DebtType.borrowed,
-            description: _noteController.text.isNotEmpty ? _noteController.text : 'Giao dịch với ${selectedPerson.name}',
-            createdDate: _selectedDateTime,
-            walletId: effectiveWallet.id ?? -1,
-            dueDate: _selectedLoanDateTime,
-          );
-          await debtController.createDebt(debt);
+
+          final debtByPerson = ref.read(totalDebtByPersonProvider(selectedPerson.id));
+
+          if(debtByPerson.totalDebtRemaining > 0){
+
+          } else {
+            Debt debt = Debt(
+              personId: selectedPerson.id,
+              amount: amount,
+              type: selectedTransactionType == TransactionType.lend ? DebtType.lent : DebtType.borrowed,
+              description: _noteController.text.isNotEmpty ? _noteController.text : 'Giao dịch với ${selectedPerson.name}',
+              createdDate: _selectedDateTime,
+              walletId: effectiveWallet.id ?? -1,
+              dueDate: _selectedLoanDateTime,
+            );
+            await debtController.createDebt(debt);
+          }
+
         case TransactionType.transfer:
           final transactionOut = TransactionModel(
             title: 'Chuyển khoản đến ${transferInWalletState?.name ?? 'Chưa chọn'}',

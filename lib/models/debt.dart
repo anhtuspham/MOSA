@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 enum DebtType { lent, borrowed }
+
 enum DebtStatus { active, paid, partial }
 
 class Debt {
@@ -29,7 +30,9 @@ class Debt {
   });
 
   double get remainingAmount => amount - paidAmount;
+
   bool get isPaid => status == DebtStatus.paid;
+
   bool get isOverdue => dueDate != null && DateTime.now().isAfter(dueDate!) && !isPaid;
 
   factory Debt.fromJson(Map<String, dynamic> json) {
@@ -89,12 +92,16 @@ class Debt {
   }
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is Debt &&
-          runtimeType == other.runtimeType &&
-          id == other.id;
+  bool operator ==(Object other) => identical(this, other) || other is Debt && runtimeType == other.runtimeType && id == other.id;
 
   @override
   int get hashCode => id.hashCode;
+}
+
+class DebtInfo {
+  final double totalDebt;
+  final double totalDebtPaid;
+  final double totalDebtRemaining;
+
+  DebtInfo({required this.totalDebt,required this.totalDebtPaid, required this.totalDebtRemaining});
 }
