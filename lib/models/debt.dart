@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 enum DebtType { lent, borrowed }
 
 enum DebtStatus { active, paid, partial }

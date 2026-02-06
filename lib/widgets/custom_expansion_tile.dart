@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:mosa/config/section_container_config.dart';
-import 'package:mosa/utils/app_colors.dart';
 import 'package:mosa/widgets/section_container.dart';
 
 class CustomExpansionTile extends StatelessWidget {

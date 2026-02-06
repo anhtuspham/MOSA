@@ -9,7 +9,6 @@ import 'package:path/path.dart';
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import '../models/transaction.dart';
-import '../models/enums.dart';
 import '../services/category_service.dart';
 import '../services/person_service.dart';
 import '../utils/constants.dart';
@@ -396,7 +395,7 @@ class DatabaseService {
     try {
       final db = await database;
       final id = await db.insert(AppConstants.tableDebts, debt.toJson(), conflictAlgorithm: ConflictAlgorithm.replace);
-      await _updateWalletBalance(debt.walletId ?? -1);
+      await _updateWalletBalance(debt.walletId);
       return id;
     } catch (e) {
       rethrow;
@@ -407,7 +406,7 @@ class DatabaseService {
     try {
       final db = await database;
       await db.update(AppConstants.tableDebts, debt.toJson(), where: 'id = ?', whereArgs: [debt.id]);
-      await _updateWalletBalance(debt.walletId ?? -1);
+      await _updateWalletBalance(debt.walletId);
     } catch (e) {
       rethrow;
     }
@@ -417,7 +416,7 @@ class DatabaseService {
     try {
       final db = await database;
       await db.delete(AppConstants.tableDebts, where: 'id = ?', whereArgs: [debt.id]);
-      await _updateWalletBalance(debt.walletId ?? -1);
+      await _updateWalletBalance(debt.walletId);
     } catch (e) {
       rethrow;
     }
@@ -425,7 +424,7 @@ class DatabaseService {
 
   Future<void> getDebtByPersonId(Debt debt) async {
     try {
-      final db = await database;
+      await database;
     } catch (e) {
       rethrow;
     }

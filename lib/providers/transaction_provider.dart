@@ -180,11 +180,10 @@ final transactionGroupByCategoryProvider = Provider.family<
     _ => ref.watch(totalIncomeProvider),
   };
 
-  return categoryAsync.whenData((enrichedList) {
+    return categoryAsync.whenData((enrichedList) {
     final grouped = CollectionUtils.groupBy(enrichedList, (item) => item.category?.id);
     final result =
         grouped.entries.map((entry) {
-          final categoryId = entry.key;
           final items = entry.value;
 
           final transaction = items.map((e) => e.transaction).toList();

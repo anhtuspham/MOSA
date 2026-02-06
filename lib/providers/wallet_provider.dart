@@ -4,10 +4,8 @@ import 'dart:developer';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:mosa/models/wallets.dart';
-import 'package:mosa/providers/transaction_provider.dart';
 import 'package:mosa/services/database_service.dart';
 import 'package:mosa/services/type_wallet_service.dart';
-import 'package:mosa/utils/app_icons.dart';
 
 import 'database_service_provider.dart';
 

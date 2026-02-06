@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:mosa/models/enums.dart';
 import 'package:mosa/models/transaction.dart';
 import 'package:mosa/models/transaction_type_config.dart';

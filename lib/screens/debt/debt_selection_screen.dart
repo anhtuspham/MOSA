@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mosa/models/debt.dart';
-import 'package:mosa/models/enums.dart';
 import 'package:mosa/providers/debt_provider.dart';
 import 'package:mosa/providers/person_provider.dart';
 import 'package:mosa/utils/app_colors.dart';

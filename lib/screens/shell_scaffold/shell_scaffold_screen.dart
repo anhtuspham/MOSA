@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mosa/providers/transaction_provider.dart';
 import 'package:mosa/router/app_routes.dart';
 
 class ShellScaffoldScreen extends ConsumerStatefulWidget {

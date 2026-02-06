@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mosa/utils/app_colors.dart';
 import 'package:mosa/utils/app_icons.dart';
-import 'package:mosa/widgets/custom_list_tile.dart';
 import 'package:mosa/widgets/progress_info_item.dart';
 
 class AccumulatedTabScreen extends StatefulWidget {

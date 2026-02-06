@@ -10,7 +10,6 @@ import 'package:mosa/models/transaction.dart';
 import 'package:mosa/providers/person_provider.dart';
 import 'package:mosa/utils/utils.dart';
 
-import '../models/category.dart';
 import '../services/database_service.dart';
 import 'category_provider.dart';
 import 'database_service_provider.dart';

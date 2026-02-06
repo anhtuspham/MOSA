@@ -3,7 +3,6 @@ import 'dart:developer';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:mosa/config/app_config.dart';
 import 'package:mosa/models/category.dart';
 import 'package:mosa/models/enums.dart';
 import 'package:mosa/providers/database_service_provider.dart';

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mosa/models/debt.dart';
-import 'package:mosa/models/transaction.dart';
 import 'package:timezone/timezone.dart' as tz;
-import 'package:flutter/foundation.dart';
 
 class NotificationHelper {
   static final FlutterLocalNotificationsPlugin _notifications =
