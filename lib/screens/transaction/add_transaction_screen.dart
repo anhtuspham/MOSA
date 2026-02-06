@@ -2,44 +2,37 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:mosa/config/app_config.dart';
-import 'package:mosa/models/category.dart';
-import 'package:mosa/models/debt.dart';
 import 'package:mosa/models/enums.dart';
-import 'package:mosa/models/transaction.dart';
 import 'package:mosa/providers/category_provider.dart';
 import 'package:mosa/providers/debt_provider.dart';
+import 'package:mosa/providers/person_provider.dart';
 import 'package:mosa/providers/transaction_provider.dart';
 import 'package:mosa/providers/wallet_provider.dart';
-import 'package:mosa/router/app_routes.dart';
-import 'package:mosa/utils/app_icons.dart';
+import 'package:mosa/services/transaction_service.dart';
+import 'package:mosa/utils/app_colors.dart';
 import 'package:mosa/utils/constants.dart';
 import 'package:mosa/utils/toast.dart';
-import 'package:mosa/widgets/custom_list_tile.dart';
-import 'package:mosa/widgets/date_time_selector_section.dart';
-import 'package:mosa/widgets/error_widget.dart';
-import 'package:mosa/widgets/loading_widget.dart';
-import 'package:mosa/widgets/section_container.dart';
-import 'package:mosa/widgets/card_section.dart';
-import 'package:mosa/widgets/amount_text_field.dart';
-import 'package:mosa/widgets/media_action_bar.dart';
+import 'package:mosa/utils/transaction_constants.dart';
 import 'package:mosa/widgets/common_scaffold.dart';
-import 'package:toastification/toastification.dart';
-
-import '../../providers/bank_provider.dart';
-import '../../providers/person_provider.dart';
-import '../../utils/app_colors.dart';
-import '../../utils/helpers.dart';
-import '../../utils/number_input_formatter.dart';
-import '../../utils/utils.dart';
-import '../../widgets/text_selector_section.dart';
+import 'package:mosa/widgets/date_time_selector_section.dart';
+import 'package:mosa/widgets/media_action_bar.dart';
+import 'package:mosa/widgets/section_container.dart';
+import 'package:mosa/widgets/text_selector_section.dart';
+import 'package:mosa/widgets/transaction/adjust_balance_section.dart';
+import 'package:mosa/widgets/transaction/amount_input_section.dart';
+import 'package:mosa/widgets/transaction/category_selector_section.dart';
+import 'package:mosa/widgets/transaction/person_selector_section.dart';
+import 'package:mosa/widgets/transaction/transaction_type_dropdown.dart';
+import 'package:mosa/widgets/transaction/transfer_wallet_section.dart';
+import 'package:mosa/widgets/transaction/wallet_selector_section.dart';
+import 'package:mosa/widgets/card_section.dart';
 
 class AddTransactionScreen extends ConsumerStatefulWidget {
   const AddTransactionScreen({super.key});
 
   @override
-  ConsumerState<AddTransactionScreen> createState() => _AddTransactionScreenState();
+  ConsumerState<AddTransactionScreen> createState() =>
+      _AddTransactionScreenState();
 }
 
 class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
@@ -53,7 +46,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(currentTransactionByTypeProvider.notifier).state = TransactionType.expense;
+      ref.read(currentTransactionByTypeProvider.notifier).state =
+          TransactionType.expense;
     });
   }
 
@@ -67,496 +61,404 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final selectedTransactionType = ref.watch(currentTransactionByTypeProvider) ?? TransactionType.expense;
-    appConfig.printLog('e', 'transactionType: ${selectedTransactionType}');
+    final selectedTransactionType =
+        ref.watch(currentTransactionByTypeProvider) ?? TransactionType.expense;
 
     return CommonScaffold(
       title: Container(
-        decoration: BoxDecoration(border: Border.all(width: 2, color: AppColors.lightBorder), borderRadius: BorderRadius.circular(8)),
+        decoration: BoxDecoration(
+          border: Border.all(width: 2, color: AppColors.lightBorder),
+          borderRadius: BorderRadius.circular(8),
+        ),
         alignment: Alignment.center,
-        constraints: BoxConstraints(maxWidth: 180),
-        child: transactionTypeDropdown(),
+        constraints: const BoxConstraints(maxWidth: 180),
+        child: TransactionTypeDropdown(
+          onTypeChanged: (_) => _clearTransaction(),
+        ),
       ),
       centerTitle: true,
-      leading: Icon(Icons.history),
-      actions: [IconButton(onPressed: _saveTransaction, icon: Icon(Icons.check))],
+      leading: const Icon(Icons.history),
+      actions: [
+        IconButton(
+          onPressed: _saveTransaction,
+          icon: const Icon(Icons.check),
+        )
+      ],
       appBarBackgroundColor: AppColors.primaryBackground,
-      body: SectionContainer(child: detailTransactionSection(transactionType: selectedTransactionType)),
+      body: SectionContainer(
+        child: _buildTransactionDetail(selectedTransactionType),
+      ),
     );
   }
 
-  void _clearTransaction() async {
+  /// Clear all form inputs
+  void _clearTransaction() {
     _amountController.clear();
     _noteController.clear();
     _actualBalanceController.clear();
+    _selectedLoanDateTime = null;
     ref.read(selectedCategoryProvider.notifier).selectCategory(null);
     ref.read(selectedDebtProvider.notifier).state = null;
     ref.read(selectedPersonProvider.notifier).state = null;
   }
 
+  /// Main save transaction method - delegates to appropriate handler
   Future<void> _saveTransaction() async {
+    if (!mounted) return;
+
     try {
-      final selectedCategory = ref.read(selectedCategoryProvider);
-      final selectedTransactionType = ref.read(currentTransactionByTypeProvider) ?? TransactionType.expense;
-      final transactionController = ref.read(transactionProvider.notifier);
-      final debtController = ref.read(debtProvider.notifier);
-      final effectiveWallet = await ref.read(effectiveWalletProvider.future);
-      final transferOutWalletState = ref.read(transferOutWalletProvider);
-      final transferInWalletState = ref.read(transferInWalletProvider);
-      double? amount = 0;
+      final selectedTransactionType =
+          ref.read(currentTransactionByTypeProvider) ?? TransactionType.expense;
+      final transactionService = ref.read(transactionServiceProvider);
 
-      if (!mounted) return;
-      if (selectedTransactionType != TransactionType.adjustBalance) {
-        if (_amountController.text.isEmpty) {
-          showResultToast('Vui lòng nhập số tiền', isError: true);
-          return;
-        }
-
-        amount = double.tryParse(_amountController.text.replaceAll('.', ''));
-        if (amount == null || amount <= 0) {
-          showResultToast('Số tiền không hợp lệ', isError: true);
-          return;
-        }
-      }
       switch (selectedTransactionType) {
         case TransactionType.adjustBalance:
-          // For balance adjustment, calculate the difference between actual and current balance
-          final actualBalance = double.tryParse(_actualBalanceController.text.replaceAll('.', '')) ?? 0;
-          final adjustmentAmount = actualBalance - effectiveWallet.balance;
-
-          if (adjustmentAmount == 0) {
-            showResultToast('Số dư thực tế giống với số dư hiện tại', isError: true);
-            return;
-          }
-
-          final transaction = TransactionModel(
-            title: 'Điều chỉnh số dư',
-            amount: adjustmentAmount,
-            date: _selectedDateTime,
-            type: selectedTransactionType,
-            categoryId: 'adjustment',
-            note: _noteController.text.isNotEmpty ? _noteController.text : null,
-            createAt: DateTime.now(),
-            syncId: generateSyncId(),
-            walletId: effectiveWallet.id ?? -1,
-          );
-
-          await transactionController.addTransaction(transaction);
+          await _saveAdjustBalance(transactionService);
+          break;
         case TransactionType.lend:
         case TransactionType.borrowing:
-          // Validate person selection
-          final selectedPerson = ref.read(selectedPersonProvider);
-
-          if (selectedPerson == null) {
-            showResultToast('Vui lòng chọn người', isError: true);
-            return;
-          }
-
-          final debtByPerson = ref.read(totalDebtByPersonProvider(selectedPerson.id));
-
-          if(debtByPerson.totalDebtRemaining > 0){
-
-          } else {
-            Debt debt = Debt(
-              personId: selectedPerson.id,
-              amount: amount,
-              type: selectedTransactionType == TransactionType.lend ? DebtType.lent : DebtType.borrowed,
-              description: _noteController.text.isNotEmpty ? _noteController.text : 'Giao dịch với ${selectedPerson.name}',
-              createdDate: _selectedDateTime,
-              walletId: effectiveWallet.id ?? -1,
-              dueDate: _selectedLoanDateTime,
-            );
-            await debtController.createDebt(debt);
-          }
-
+          await _saveLendOrBorrow(transactionService, selectedTransactionType);
+          break;
         case TransactionType.transfer:
-          final transactionOut = TransactionModel(
-            title: 'Chuyển khoản đến ${transferInWalletState?.name ?? 'Chưa chọn'}',
-            // sử dụng transferIn để gửi title
-            // nơi chuyển đến
-            amount: amount ?? 0,
-            date: _selectedDateTime,
-            type: TransactionType.transferOut,
-            categoryId: 'transfer',
-            note: _noteController.text.isNotEmpty ? _noteController.text : null,
-            createAt: DateTime.now(),
-            syncId: generateSyncId(),
-            walletId: transferOutWalletState?.id ?? -1,
-          );
-
-          final transactionIn = TransactionModel(
-            title: 'Nhận chuyển khoản từ ${transferOutWalletState?.name ?? 'Chưa chọn'}',
-            amount: amount ?? 0,
-            date: _selectedDateTime,
-            type: TransactionType.transferIn,
-            categoryId: 'transfer',
-            note: _noteController.text.isNotEmpty ? _noteController.text : null,
-            createAt: DateTime.now(),
-            syncId: generateSyncId(),
-            walletId: transferInWalletState?.id ?? -1,
-          );
-
-          await transactionController.addTransaction(transactionOut);
-          await transactionController.addTransaction(transactionIn);
-
+          await _saveTransfer(transactionService);
+          break;
         default:
-          if (selectedCategory == null) {
-            showResultToast('Vui lòng chọn hạng mục', isError: true);
-            return;
-          }
-
-          if (selectedCategory.type == 'lend' && selectedTransactionType == TransactionType.income) {
-            // debtCollection
-            final selectedDebt = ref.read(selectedDebtProvider);
-            if (selectedDebt == null || selectedDebt.id == null) {
-              showResultToast('Vui lòng chọn khoản nợ cần thu', isError: true);
-              return;
-            }
-
-            await debtController.collectDebt(selectedDebt.id!, amount ?? 0, effectiveWallet.id!);
-          } else if (selectedCategory.type == 'lend' && selectedTransactionType == TransactionType.expense) {
-            // repayment
-            final selectedDebt = ref.read(selectedDebtProvider);
-            if (selectedDebt == null || selectedDebt.id == null) {
-              showResultToast('Vui lòng chọn khoản nợ cần trả', isError: true);
-              return;
-            }
-
-            await debtController.payDebt(selectedDebt.id!, amount ?? 0, effectiveWallet.id!);
-          } else {
-            final transaction = TransactionModel(
-              title: selectedCategory.name,
-              amount: amount,
-              date: _selectedDateTime,
-              type: selectedTransactionType,
-              categoryId: selectedCategory.id,
-              note: _noteController.text.isNotEmpty ? _noteController.text : null,
-              createAt: DateTime.now(),
-              syncId: generateSyncId(),
-              walletId: effectiveWallet.id ?? -1,
-            );
-
-            await transactionController.addTransaction(transaction);
-          }
+          await _saveRegularTransaction(
+            transactionService,
+            selectedTransactionType,
+          );
       }
+
       _clearTransaction();
-
-      if (mounted) {
-        toastification.show(
-          type: ToastificationType.success,
-          style: ToastificationStyle.fillColored,
-          title: Text('Thành công', style: TextStyle(fontWeight: FontWeight.w600)),
-          description: Text('Đã lưu giao dịch', style: TextStyle(fontWeight: FontWeight.w600)),
-          alignment: Alignment.topCenter,
-          autoCloseDuration: Duration(seconds: 3),
-        );
-      }
+      _showSuccessToast();
     } catch (e) {
       log('Error saving transaction: $e');
-      if (mounted) {
-        toastification.show(
-          type: ToastificationType.error,
-          style: ToastificationStyle.flatColored,
-          title: Text('Thất bại', style: TextStyle(fontWeight: FontWeight.w600)),
-          description: Text('Lỗi khi lưu giao dịch', style: TextStyle(fontWeight: FontWeight.w600)),
-          alignment: Alignment.topCenter,
-          autoCloseDuration: Duration(seconds: 3),
-        );
-      }
+      _showErrorToast(e.toString());
     }
   }
 
-  Widget detailTransactionSection({TransactionType transactionType = TransactionType.expense}) {
+  /// Save adjust balance transaction
+  Future<void> _saveAdjustBalance(TransactionService service) async {
+    final actualBalance = double.tryParse(
+          _actualBalanceController.text.replaceAll('.', ''),
+        ) ??
+        0;
+    final effectiveWallet = await ref.read(effectiveWalletProvider.future);
+
+    await service.saveAdjustBalanceTransaction(
+      actualBalance: actualBalance,
+      wallet: effectiveWallet,
+      date: _selectedDateTime,
+      note: _noteController.text.isNotEmpty ? _noteController.text : null,
+    );
+  }
+
+  /// Save lend or borrow transaction
+  Future<void> _saveLendOrBorrow(
+    TransactionService service,
+    TransactionType type,
+  ) async {
+    final selectedPerson = ref.read(selectedPersonProvider);
+    service.validatePerson(selectedPerson);
+    service.validateAmount(_amountController.text);
+
+    final amount = double.parse(_amountController.text.replaceAll('.', ''));
+    final effectiveWallet = await ref.read(effectiveWalletProvider.future);
+
+    await service.saveLendOrBorrowTransaction(
+      amount: amount,
+      date: _selectedDateTime,
+      type: type,
+      person: selectedPerson!,
+      wallet: effectiveWallet,
+      note: _noteController.text.isNotEmpty ? _noteController.text : null,
+      dueDate: _selectedLoanDateTime,
+    );
+  }
+
+  /// Save transfer transaction
+  Future<void> _saveTransfer(TransactionService service) async {
+    service.validateAmount(_amountController.text);
+
+    final amount = double.parse(_amountController.text.replaceAll('.', ''));
+    final transferOutWallet = ref.read(transferOutWalletProvider);
+    final transferInWallet = ref.read(transferInWalletProvider);
+
+    service.validateTransferWallets(transferOutWallet, transferInWallet);
+
+    await service.saveTransferTransaction(
+      amount: amount,
+      date: _selectedDateTime,
+      fromWallet: transferOutWallet!,
+      toWallet: transferInWallet!,
+      note: _noteController.text.isNotEmpty ? _noteController.text : null,
+    );
+  }
+
+  /// Save regular income/expense transaction or debt collection/repayment
+  Future<void> _saveRegularTransaction(
+    TransactionService service,
+    TransactionType type,
+  ) async {
+    final selectedCategory = ref.read(selectedCategoryProvider);
+    service.validateCategory(selectedCategory);
+    service.validateAmount(_amountController.text);
+
+    final amount = double.parse(_amountController.text.replaceAll('.', ''));
+    final effectiveWallet = await ref.read(effectiveWalletProvider.future);
+
+    // Check if this is a debt collection or repayment
+    if (selectedCategory!.type == 'lend') {
+      await _saveDebtCollectionOrRepayment(
+        service,
+        type,
+        amount,
+        effectiveWallet,
+      );
+    } else {
+      // Regular transaction
+      await service.saveRegularTransaction(
+        amount: amount,
+        date: _selectedDateTime,
+        type: type,
+        category: selectedCategory,
+        wallet: effectiveWallet,
+        note: _noteController.text.isNotEmpty ? _noteController.text : null,
+      );
+    }
+  }
+
+  /// Save debt collection or repayment
+  Future<void> _saveDebtCollectionOrRepayment(
+    TransactionService service,
+    TransactionType type,
+    double amount,
+    dynamic wallet,
+  ) async {
+    final selectedPerson = ref.read(selectedPersonProvider);
+    final selectedDebt = ref.read(selectedDebtProvider);
+
+    service.validatePerson(selectedPerson);
+    service.validateDebt(selectedDebt);
+
+    if (type == TransactionType.income) {
+      // Debt collection
+      await service.saveDebtCollectionTransaction(
+        amount: amount,
+        person: selectedPerson!,
+        wallet: wallet,
+        debt: selectedDebt!,
+      );
+    } else if (type == TransactionType.expense) {
+      // Debt repayment
+      await service.saveDebtRepaymentTransaction(
+        amount: amount,
+        person: selectedPerson!,
+        wallet: wallet,
+        debt: selectedDebt!,
+      );
+    }
+  }
+
+  /// Show success toast
+  void _showSuccessToast() {
+    if (!mounted) return;
+    showResultToast(TransactionConstants.successSaveTransaction);
+  }
+
+  /// Show error toast
+  void _showErrorToast(String error) {
+    if (!mounted) return;
+    showResultToast(error, isError: true);
+  }
+
+  /// Build transaction detail based on type
+  Widget _buildTransactionDetail(TransactionType transactionType) {
     switch (transactionType) {
       case TransactionType.lend:
       case TransactionType.borrowing:
-        return loanTransactionDetail(transactionType: transactionType);
+        return _buildLoanTransactionDetail(
+          transactionType: transactionType,
+        );
       case TransactionType.transfer:
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    amountInputSection(),
-                    const SizedBox(height: 12),
-                    transactionTypeSection(title: 'Từ tài khoản', isTransferOut: true),
-                    transactionTypeSection(title: 'Đến tài khoản', isTransferOut: false),
-                    const SizedBox(height: 12),
-                    DateTimeSelectorSection(
-                      selectedDateTime: _selectedDateTime,
-                      onDateTimeChanged: (newDateTime) {
-                        setState(() {
-                          _selectedDateTime = newDateTime;
-                        });
-                      },
-                    ),
-                    TextSelectorSection(controller: _noteController, leading: Icon(Icons.notes_sharp), hintText: 'Diễn giải'),
-                  ],
-                ),
-              ),
-            ),
-            saveButtonSection(),
-          ],
-        );
+        return _buildTransferDetail();
       case TransactionType.adjustBalance:
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    walletSelectorSection(),
-                    const SizedBox(height: 12),
-                    adjustTransactionBalanceSection(),
-                    const SizedBox(height: 12),
-                    DateTimeSelectorSection(
-                      selectedDateTime: _selectedDateTime,
-                      onDateTimeChanged: (newDateTime) {
-                        setState(() {
-                          _selectedDateTime = newDateTime;
-                        });
-                      },
-                    ),
-                    TextSelectorSection(controller: _noteController, leading: Icon(Icons.notes_sharp), hintText: 'Diễn giải'),
-                  ],
-                ),
-              ),
-            ),
-            saveButtonSection(),
-          ],
-        );
+        return _buildAdjustBalanceDetail();
       default:
-        // Handle repayment, debt collection cause they are expense, income transaction type
-        final selectedCategory = ref.watch(selectedCategoryProvider);
-        if (selectedCategory != null && selectedCategory.type == 'lend') {
-          return loanTransactionDetail(transactionType: transactionType, isRepaymentOrCollection: true);
-        }
-        return defaultTransactionDetail();
+        return _buildDefaultTransactionDetail(transactionType);
     }
   }
 
-  Widget transactionTypeDropdown() {
-    final selectedTransactionType = ref.read(currentTransactionByTypeProvider) ?? TransactionType.expense;
-    return DropdownButtonFormField(
-      decoration: InputDecoration(
-        floatingLabelBehavior: FloatingLabelBehavior.never,
-        floatingLabelAlignment: FloatingLabelAlignment.center,
-        contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 4),
-        border: OutlineInputBorder(borderSide: BorderSide.none),
-      ),
-      isExpanded: true,
-      alignment: Alignment.center,
-      initialValue: selectedTransactionType,
-      items: [
-        DropdownMenuItem(value: TransactionType.expense, child: Text('Chi tiền')),
-        DropdownMenuItem(value: TransactionType.income, child: Text('Thu tiền')),
-        DropdownMenuItem(value: TransactionType.lend, child: Text('Cho vay')),
-        DropdownMenuItem(value: TransactionType.borrowing, child: Text('Đi vay')),
-        DropdownMenuItem(value: TransactionType.transfer, child: Text('Chuyển khoản')),
-        DropdownMenuItem(value: TransactionType.adjustBalance, child: Text('Điều chỉnh số dư')),
-      ],
-      onChanged: (value) async {
-        if (value != null) {
-          ref.read(currentTransactionByTypeProvider.notifier).state = value;
-
-          setState(() {
-            _clearTransaction();
-          });
-
-          final categoryName = getCategoryNameForTransactionType(value);
-
-          if (categoryName != null) {
-            try {
-              final category = await ref.read(categoryByNameProvider(categoryName).future);
-              if (mounted) {
-                ref.read(selectedCategoryProvider.notifier).selectCategory(category);
-              }
-            } catch (e) {
-              if (mounted) {
-                ref.read(selectedCategoryProvider.notifier).selectCategory(null);
-              }
-            }
-          } else {
-            ref.read(selectedCategoryProvider.notifier).selectCategory(null);
-          }
-        }
-      },
-    );
-  }
-
-  Widget amountInputSection() {
-    final selectedTransactionType = ref.read(currentTransactionByTypeProvider) ?? TransactionType.expense;
-    return CardSection(
-      child: Column(
-        children: [
-          Text('Số tiền'),
-          AmountTextField(controller: _amountController, amountColor: getTransactionTypeColor(type: selectedTransactionType)),
-        ],
-      ),
-    );
-  }
-
-  Widget adjustTransactionBalanceSection() {
-    final effectiveWallet = ref.watch(effectiveWalletProvider);
-    return effectiveWallet.when(
-      data: (wallet) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          _actualBalanceController.text = Helpers.formatNumber(wallet.balance);
-        });
-
-        return CardSection(
-          child: Column(
-            children: [
-              CustomListTile(title: Text('Số dư trên tài khoản'), trailing: Text(Helpers.formatCurrency(wallet.balance))),
-              const SizedBox(height: 12),
-              CustomListTile(
-                title: Text('Số dư thực tế'),
-                trailing: SizedBox(
-                  width: 200,
-                  child: TextField(
-                    controller: _actualBalanceController,
-                    decoration: InputDecoration(
-                      counterText: '',
-                      border: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.borderLight)),
-                      contentPadding: const EdgeInsets.symmetric(vertical: 4),
-                      hintText: 'Nhập số dư thực tế',
-                      hintStyle: TextStyle(fontSize: 12, color: AppColors.textHint),
-                      suffix: Text('đ', style: TextStyle(color: AppColors.textPrimary, fontSize: 16, fontWeight: FontWeight.w600)),
-                    ),
-                    maxLength: 16,
-                    textAlign: TextAlign.right,
-                    keyboardType: TextInputType.numberWithOptions(decimal: true),
-                    inputFormatters: [ThousandSeparatorFormatter(separator: '.')],
-                  ),
+  /// Build loan transaction detail (lend/borrow)
+  Widget _buildLoanTransactionDetail({
+    required TransactionType? transactionType,
+    bool isRepaymentOrCollection = false,
+  }) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                AmountInputSection(
+                  controller: _amountController,
+                  transactionType: transactionType,
                 ),
-              ),
-              ValueListenableBuilder(
-                valueListenable: _actualBalanceController,
-                builder: (context, value, child) {
-                  final actualBalance = double.tryParse(_actualBalanceController.text.replaceAll('.', '')) ?? 0;
-                  final different = actualBalance - wallet.balance;
-                  return CustomListTile(
-                    title: Text(different > 0 ? 'Đã thu' : 'Đã chi'),
-                    trailing: Text(
-                      Helpers.formatCurrency(different),
-                      style: TextStyle(color: different > 0 ? AppColors.income : AppColors.expense, fontSize: 18),
-                    ),
-                  );
-                },
-              ),
-            ],
+                const SizedBox(height: 12),
+                const CategorySelectorSection(),
+                const PersonSelectorSection(),
+                const SizedBox(height: 12),
+                _buildWalletAndDetailSection(),
+                if (!isRepaymentOrCollection)
+                  DateOnlySelectorSection(
+                    selectedDateOnly: _selectedLoanDateTime,
+                    onDateTimeChanged: (newDateTime) {
+                      setState(() {
+                        _selectedLoanDateTime = newDateTime;
+                      });
+                    },
+                    defaultTitle: transactionType == TransactionType.lend
+                        ? TransactionConstants.debtCollectionDate
+                        : TransactionConstants.debtRepaymentDate,
+                  ),
+                const SizedBox(height: 12),
+                _buildMediaActionSection(),
+              ],
+            ),
           ),
-        );
-      },
-      error: (error, stackTrace) => ErrorSectionWidget(error: error),
-      loading: () => LoadingSectionWidget(),
+        ),
+        _buildSaveButton(),
+      ],
     );
   }
 
-  Widget categorySelectorSection() {
-    final selectedCategory = ref.watch(selectedCategoryProvider);
-    return CardSection(
-      child: Column(
-        children: [
-          CustomListTile(
-            leading: selectedCategory != null ? selectedCategory.getIcon() : Icon(Icons.add_circle_rounded),
-            title: Text(selectedCategory != null ? (selectedCategory.name) : 'Chọn hạng mục'),
-            trailing: Row(children: [Text('Tất cả'), const SizedBox(width: 12), Icon(Icons.chevron_right)]),
-            onTap: () async {
-              await context.push(AppRoutes.categoryList);
-              // Auto-update transaction type based on selected category
-              final autoType = ref.read(autoTransactionTypeProvider);
-              if (autoType != null) {
-                ref.read(currentTransactionByTypeProvider.notifier).state = autoType;
-              }
-            },
+  /// Build transfer detail
+  Widget _buildTransferDetail() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                AmountInputSection(
+                  controller: _amountController,
+                  transactionType: TransactionType.transfer,
+                ),
+                const SizedBox(height: 12),
+                TransferWalletSection(
+                  title: TransactionConstants.fromAccountLabel,
+                  isTransferOut: true,
+                ),
+                TransferWalletSection(
+                  title: TransactionConstants.toAccountLabel,
+                  isTransferOut: false,
+                ),
+                const SizedBox(height: 12),
+                DateTimeSelectorSection(
+                  selectedDateTime: _selectedDateTime,
+                  onDateTimeChanged: (newDateTime) {
+                    setState(() {
+                      _selectedDateTime = newDateTime;
+                    });
+                  },
+                ),
+                TextSelectorSection(
+                  controller: _noteController,
+                  leading: const Icon(Icons.notes_sharp),
+                  hintText: TransactionConstants.notes,
+                ),
+              ],
+            ),
           ),
-        ],
-      ),
+        ),
+        _buildSaveButton(),
+      ],
     );
   }
 
-  Widget walletSelectorSection() {
-    final effectiveWallet = ref.watch(effectiveWalletProvider);
-    return effectiveWallet.when(
-      data: (walletData) {
-        return CustomListTile(
-          leading: Image.asset(walletData.iconPath, width: 22),
-          title: Text(walletData.name),
-          trailing: Icon(Icons.chevron_right),
-          onTap: () {
-            context.push(AppRoutes.selectWallet);
-          },
-        );
-      },
-      error: (error, stackTrace) => ErrorSectionWidget(error: error),
-      loading: () => LoadingSectionWidget(),
+  /// Build adjust balance detail
+  Widget _buildAdjustBalanceDetail() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                const WalletSelectorSection(),
+                const SizedBox(height: 12),
+                AdjustBalanceSection(
+                  actualBalanceController: _actualBalanceController,
+                ),
+                const SizedBox(height: 12),
+                DateTimeSelectorSection(
+                  selectedDateTime: _selectedDateTime,
+                  onDateTimeChanged: (newDateTime) {
+                    setState(() {
+                      _selectedDateTime = newDateTime;
+                    });
+                  },
+                ),
+                TextSelectorSection(
+                  controller: _noteController,
+                  leading: const Icon(Icons.notes_sharp),
+                  hintText: TransactionConstants.notes,
+                ),
+              ],
+            ),
+          ),
+        ),
+        _buildSaveButton(),
+      ],
     );
   }
 
-  Widget personLoanSelectorSection() {
-    final selectedPerson = ref.watch(selectedPersonProvider);
-
-    return CustomListTile(
-      leading:
-          selectedPerson != null
-              ? Image.asset(
-                selectedPerson.iconPath ?? 'assets/images/icon.png',
-                width: 22,
-                errorBuilder: (_, __, ___) => Icon(Icons.person, size: 22),
-              )
-              : Icon(Icons.person_add_outlined),
-      title: Text(selectedPerson?.name ?? 'Chọn người'),
-
-      trailing: Icon(Icons.chevron_right),
-      onTap: () {
-        context.push(AppRoutes.personList);
-      },
-    );
-  }
-
-  Widget selectedDebtInfoSection() {
-    final selectedDebt = ref.watch(selectedDebtProvider);
+  /// Build default transaction detail (income/expense)
+  Widget _buildDefaultTransactionDetail(TransactionType transactionType) {
     final selectedCategory = ref.watch(selectedCategoryProvider);
-
-    if (selectedDebt == null) {
-      return CustomListTile(
-        leading: Icon(Icons.receipt_long_outlined),
-        title: Text('Chưa chọn khoản nợ'),
-        subTitle: Text('Vui lòng chọn từ danh mục'),
-        trailing: Icon(Icons.info_outline, color: Colors.orange),
+    
+    // Check if this is debt collection or repayment
+    if (selectedCategory != null && selectedCategory.type == 'lend') {
+      return _buildLoanTransactionDetail(
+        transactionType: transactionType,
+        isRepaymentOrCollection: true,
       );
     }
 
-    final person = ref.watch(personByIdProvider(selectedDebt.personId));
-
-    return CustomListTile(
-      leading: CircleAvatar(child: Text(person?.name.substring(0, 1).toUpperCase() ?? 'A')),
-      title: Text(person?.name ?? 'Unknown'),
-      subTitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(height: 4),
-          Text(selectedDebt.description, style: TextStyle(fontSize: 13)),
-          SizedBox(height: 2),
-          Text(
-            'Còn lại: ${Helpers.formatCurrency(selectedDebt.remainingAmount)}',
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.expense),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                AmountInputSection(
+                  controller: _amountController,
+                  transactionType: transactionType,
+                ),
+                const SizedBox(height: 12),
+                const CategorySelectorSection(),
+                const SizedBox(height: 12),
+                _buildWalletAndDetailSection(),
+                const SizedBox(height: 12),
+                _buildMediaActionSection(),
+              ],
+            ),
           ),
-        ],
-      ),
-      trailing: Icon(Icons.check_circle, color: AppColors.success),
+        ),
+        _buildSaveButton(),
+      ],
     );
   }
 
-  Widget walletAndDetailSection() {
+  /// Build wallet and detail section
+  Widget _buildWalletAndDetailSection() {
     return CardSection(
       child: Column(
         children: [
-          walletSelectorSection(),
+          const WalletSelectorSection(),
           const SizedBox(height: 8),
           DateTimeSelectorSection(
             selectedDateTime: _selectedDateTime,
@@ -566,13 +468,18 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
               });
             },
           ),
-          TextSelectorSection(controller: _noteController, leading: Icon(Icons.notes_sharp), hintText: 'Diễn giải'),
+          TextSelectorSection(
+            controller: _noteController,
+            leading: const Icon(Icons.notes_sharp),
+            hintText: TransactionConstants.notes,
+          ),
         ],
       ),
     );
   }
 
-  Widget mediaActionSection() {
+  /// Build media action section
+  Widget _buildMediaActionSection() {
     return CardSection(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       child: MediaActionBar(
@@ -589,31 +496,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     );
   }
 
-  Widget transactionTypeSection({String? title, bool isTransferOut = false}) {
-    final wallet = isTransferOut ? ref.watch(transferOutWalletProvider) : ref.watch(transferInWalletProvider);
-    final route = isTransferOut ? AppRoutes.selectTransferOutWallet : AppRoutes.selectTransferInWallet;
-
-    return CardSection(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (title != null)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-              child: Text(title, style: TextStyle(color: AppColors.textSecondary)),
-            ),
-          CustomListTile(
-            leading: Image.asset(wallet?.iconPath ?? AppIcons.plusIcon, width: 22),
-            title: Text(wallet?.name ?? 'Chọn tài khoản'),
-            trailing: Icon(Icons.chevron_right),
-            onTap: () => context.push(route),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget saveButtonSection() {
+  /// Build save button
+  Widget _buildSaveButton() {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
@@ -622,71 +506,12 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
           backgroundColor: AppColors.buttonPrimary,
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(vertical: 14),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
         ),
-        child: Text(AppConstants.save),
+        child: const Text(AppConstants.save),
       ),
-    );
-  }
-
-  Widget loanTransactionDetail({required TransactionType? transactionType, bool isRepaymentOrCollection = false}) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Expanded(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                amountInputSection(),
-                const SizedBox(height: 12),
-                categorySelectorSection(),
-                // Show debt info for repayment/collection, person selector for lend/borrow
-                isRepaymentOrCollection ? selectedDebtInfoSection() : personLoanSelectorSection(),
-                const SizedBox(height: 12),
-                walletAndDetailSection(),
-                // Only show due date for lend/borrow, not for repayment/collection
-                if (!isRepaymentOrCollection)
-                  DateOnlySelectorSection(
-                    selectedDateOnly: _selectedLoanDateTime,
-                    onDateTimeChanged: (newDateTime) {
-                      setState(() {
-                        _selectedLoanDateTime = newDateTime;
-                      });
-                    },
-                    defaultTitle: transactionType == TransactionType.lend ? 'Ngày thu nợ' : 'Ngày trả nợ',
-                  ),
-                const SizedBox(height: 12),
-                mediaActionSection(),
-              ],
-            ),
-          ),
-        ),
-        saveButtonSection(),
-      ],
-    );
-  }
-
-  Widget defaultTransactionDetail() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Expanded(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                amountInputSection(),
-                const SizedBox(height: 12),
-                categorySelectorSection(),
-                const SizedBox(height: 12),
-                walletAndDetailSection(),
-                const SizedBox(height: 12),
-                mediaActionSection(),
-              ],
-            ),
-          ),
-        ),
-        saveButtonSection(),
-      ],
     );
   }
 }
