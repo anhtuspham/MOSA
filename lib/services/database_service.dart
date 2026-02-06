@@ -431,6 +431,30 @@ class DatabaseService {
     }
   }
 
+  /// Get all debts for a person with specific type, ordered by createdDate (oldest first)
+  Future<List<Debt>> getDebtsByPersonAndType(int personId, DebtType type) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      AppConstants.tableDebts,
+      where: 'personId = ? AND type = ?',
+      whereArgs: [personId, type.name],
+      orderBy: 'createdDate ASC', // oldest first for FIFO distribution
+    );
+    return List.generate(maps.length, (index) => Debt.fromJson(maps[index]));
+  }
+
+  /// Get all active/partial debts for a person with specific type
+  Future<List<Debt>> getActiveDebtsByPersonAndType(int personId, DebtType type) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      AppConstants.tableDebts,
+      where: 'personId = ? AND type = ? AND status != ?',
+      whereArgs: [personId, type.name, DebtStatus.paid.name],
+      orderBy: 'createdDate ASC',
+    );
+    return List.generate(maps.length, (index) => Debt.fromJson(maps[index]));
+  }
+
   // ==================== PERSON OPERATIONS ====================
 
   /// Get all persons ordered by name
