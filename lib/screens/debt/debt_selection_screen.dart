@@ -15,9 +15,10 @@ class DebtSelectionScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final debtSummaryByType = ref.watch(debtSummaryByTypeProvider(debtType));
+    final isLent = debtType == DebtType.lent;
 
     return CommonScaffold(
-      title: Text(debtType == DebtType.borrowed ? 'Chọn khoản nợ cần trả' : 'Chọn khoản nợ cần thu'),
+      title: Text(isLent ? 'Chọn khoản nợ cần thu' : 'Chọn khoản nợ cần trả'),
       leading: IconButton(onPressed: () => context.pop(), icon: const Icon(Icons.arrow_back)),
       appBarBackgroundColor: AppColors.background,
       body: ListView.builder(
@@ -25,6 +26,7 @@ class DebtSelectionScreen extends ConsumerWidget {
         itemBuilder: (context, index) {
           final debt = debtSummaryByType.entries.elementAt(index);
           return PersonDebtItem(
+            isLent: isLent,
             personId: debt.key,
             onTap: () => context.pop<Map<String, dynamic>>({'personId': debt.key, 'debtAmount': debt.value}),
           );

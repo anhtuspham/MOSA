@@ -8,20 +8,19 @@ import 'package:mosa/utils/helpers.dart';
 import 'package:mosa/widgets/custom_list_tile.dart';
 
 class PersonDebtItem extends ConsumerWidget {
+  final bool isLent;
   final int personId;
   final VoidCallback? handleShowBottomSheet;
   final VoidCallback? onTap;
-  const PersonDebtItem({
-    super.key,
-    required this.personId,
-    this.handleShowBottomSheet,
-    this.onTap,
-  });
+  const PersonDebtItem({super.key, required this.isLent, required this.personId, this.handleShowBottomSheet, this.onTap});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final person = ref.watch(personByIdProvider(personId));
-    final debtInfo = ref.watch(totalDebtByPersonProvider(personId));
+    final debtLent = ref.watch(totalDebtLentByPersonProvider(personId));
+    final debtBorrowed = ref.watch(totalDebtBorrowedByPersonProvider(personId));
+
+    final debt = isLent ? debtLent : debtBorrowed;
 
     return CustomListTile(
       leading: CircleAvatar(child: Text(person?.name.substring(0, 1).toUpperCase() ?? 'T')),
@@ -33,12 +32,12 @@ class PersonDebtItem extends ConsumerWidget {
             children: [
               handleShowBottomSheet != null
                   ? Text(
-                    Helpers.formatCurrency(debtInfo.totalDebt),
+                    Helpers.formatCurrency(debt.totalDebt),
                     style: TextStyle(fontSize: 16.sp, color: AppColors.textPrimary),
                   )
                   : const SizedBox(),
               Text(
-                Helpers.formatCurrency(debtInfo.totalDebtRemaining),
+                Helpers.formatCurrency(debt.totalDebtRemaining),
                 style: TextStyle(fontSize: 15.sp, color: AppColors.expense),
               ),
             ],
@@ -49,7 +48,7 @@ class PersonDebtItem extends ConsumerWidget {
                 icon: Icon(Icons.more_vert, color: AppColors.textPrimary),
               )
               : const SizedBox(),
-        ],  
+        ],
       ),
       onTap: () => onTap?.call(),
     );
