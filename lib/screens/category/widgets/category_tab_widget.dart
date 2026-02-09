@@ -8,6 +8,7 @@ import 'package:mosa/providers/person_provider.dart';
 import 'package:mosa/providers/transaction_prefill_data_provider.dart';
 import 'package:mosa/router/app_routes.dart';
 import 'package:mosa/utils/app_colors.dart';
+import 'package:mosa/utils/utils.dart';
 import 'package:mosa/widgets/custom_expansion_tile.dart';
 import 'package:mosa/widgets/item_widget.dart';
 import 'package:mosa/widgets/search_bar_widget.dart';
@@ -36,6 +37,12 @@ class _CategoryTabState extends ConsumerState<CategoryTab> {
     final categoryId = category.id;
     final categoryName = category.name?.toLowerCase() ?? '';
 
+    // Select category
+    ref.read(selectedCategoryProvider.notifier).selectCategory(category);
+    
+    // Get transaction type from category
+    final transactionType = ref.read(autoTransactionTypeProvider);
+
     if (categoryId == 'lend_payback' || categoryName == 'trả nợ') {
       // Repayment - show borrowed debts
       final result = await context.push('${AppRoutes.debtSelection}?type=borrowed');
@@ -50,6 +57,7 @@ class _CategoryTabState extends ConsumerState<CategoryTab> {
           amount: debtAmount,
           person: person,
           category: category,
+          type: transactionType,
         );
         if (context.mounted) context.pop();
       }
@@ -67,13 +75,13 @@ class _CategoryTabState extends ConsumerState<CategoryTab> {
           amount: debtAmount,
           person: person,
           category: category,
+          type: transactionType,
         );
         if (context.mounted) context.pop();
       }
     } else {
       // Regular category - normal flow
-      // ref.read(transactionPrefillDataProvider.notifier).state = TransactionPrefill(category: category);
-      ref.read(selectedCategoryProvider.notifier).selectCategory(category);
+      ref.read(transactionPrefillDataProvider.notifier).state = TransactionPrefill(category: category, type: transactionType);
       context.pop();
     }
   }

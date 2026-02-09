@@ -114,13 +114,11 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
   /// Clear all form inputs
   void _clearTransaction() {
-    _amountController.clear();
     _noteController.clear();
     _actualBalanceController.clear();
+    _selectedDateTime = DateTime.now();
     _selectedLoanDateTime = null;
-    ref.read(selectedCategoryProvider.notifier).selectCategory(null);
-    ref.read(selectedDebtProvider.notifier).state = null;
-    ref.read(selectedPersonProvider.notifier).state = null;
+    ref.read(transactionPrefillDataProvider.notifier).state = TransactionPrefill(amount: 0, person: null, category: null);
   }
 
   /// Main save transaction method - delegates to appropriate handler

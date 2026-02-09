@@ -64,6 +64,7 @@ class CategoryNotifier extends Notifier<Category?> {
 
   void selectCategory(Category? category) {
     state = category;
+    log('state: ${state?.name}');
   }
 }
 
@@ -74,7 +75,6 @@ final categoryMapProvider = FutureProvider<Map<String, Category>>((ref) async {
   final categories = await ref.watch(flattenedCategoryProvider.future);
   return {for (var category in categories) category.id: category};
 });
-
 
 final autoTransactionTypeProvider = StateProvider<TransactionType?>((ref) {
   final selectCategory = ref.watch(selectedCategoryProvider);

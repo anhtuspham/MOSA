@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mosa/models/enums.dart';
@@ -10,15 +12,11 @@ import 'package:mosa/utils/utils.dart';
 class TransactionTypeDropdown extends ConsumerWidget {
   final Function(TransactionType)? onTypeChanged;
 
-  const TransactionTypeDropdown({
-    super.key,
-    this.onTypeChanged,
-  });
+  const TransactionTypeDropdown({super.key, this.onTypeChanged});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final selectedTransactionType = ref.watch(currentTransactionByTypeProvider) 
-        ?? TransactionType.expense;
+    final selectedTransactionType = ref.watch(currentTransactionByTypeProvider) ?? TransactionType.expense;
 
     return DropdownButtonFormField<TransactionType>(
       decoration: const InputDecoration(
@@ -31,42 +29,24 @@ class TransactionTypeDropdown extends ConsumerWidget {
       alignment: Alignment.center,
       initialValue: selectedTransactionType,
       items: [
-        DropdownMenuItem(
-          value: TransactionType.expense,
-          child: Text(TransactionConstants.expense),
-        ),
-        DropdownMenuItem(
-          value: TransactionType.income,
-          child: Text(TransactionConstants.income),
-        ),
-        DropdownMenuItem(
-          value: TransactionType.lend,
-          child: Text(TransactionConstants.lend),
-        ),
-        DropdownMenuItem(
-          value: TransactionType.borrowing,
-          child: Text(TransactionConstants.borrowing),
-        ),
-        DropdownMenuItem(
-          value: TransactionType.transfer,
-          child: Text(TransactionConstants.transfer),
-        ),
-        DropdownMenuItem(
-          value: TransactionType.adjustBalance,
-          child: Text(TransactionConstants.adjustBalance),
-        ),
+        DropdownMenuItem(value: TransactionType.expense, child: Text(TransactionConstants.expense)),
+        DropdownMenuItem(value: TransactionType.income, child: Text(TransactionConstants.income)),
+        DropdownMenuItem(value: TransactionType.lend, child: Text(TransactionConstants.lend)),
+        DropdownMenuItem(value: TransactionType.borrowing, child: Text(TransactionConstants.borrowing)),
+        DropdownMenuItem(value: TransactionType.transfer, child: Text(TransactionConstants.transfer)),
+        DropdownMenuItem(value: TransactionType.adjustBalance, child: Text(TransactionConstants.adjustBalance)),
       ],
       onChanged: (value) async {
         if (value != null) {
           ref.read(currentTransactionByTypeProvider.notifier).state = value;
-          
+
           final categoryName = getCategoryNameForTransactionType(value);
-          
+          onTypeChanged?.call(value);
+
           if (categoryName != null) {
             try {
-              final category = await ref.read(
-                categoryByNameProvider(categoryName).future
-              );
+              final category = await ref.read(categoryByNameProvider(categoryName).future);
+              log('category: ${category?.name}');
               ref.read(selectedCategoryProvider.notifier).selectCategory(category);
             } catch (e) {
               ref.read(selectedCategoryProvider.notifier).selectCategory(null);
@@ -74,8 +54,6 @@ class TransactionTypeDropdown extends ConsumerWidget {
           } else {
             ref.read(selectedCategoryProvider.notifier).selectCategory(null);
           }
-          
-          onTypeChanged?.call(value);
         }
       },
     );
