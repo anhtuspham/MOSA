@@ -2,10 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mosa/models/category.dart';
 import 'package:mosa/models/debt.dart';
+import 'package:mosa/models/enums.dart';
+import 'package:mosa/providers/category_provider.dart';
 import 'package:mosa/providers/debt_provider.dart';
 import 'package:mosa/providers/person_provider.dart';
+import 'package:mosa/providers/transaction_prefill_data_provider.dart';
 import 'package:mosa/widgets/common_scaffold.dart';
+import 'package:mosa/widgets/debt/person_debt_item.dart';
 import 'package:mosa/widgets/section_container.dart';
 
 import '../../router/app_routes.dart';
@@ -118,9 +123,16 @@ class _LoanTrackingScreenState extends ConsumerState<LoanTrackingScreen> {
               'Đang theo dõi',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp, color: AppColors.textHighlight),
             ),
-            children: activeDebtSummary.entries
-                .map((e) => _personActiveItem(personId: e.key, remainingAmount: e.value, isLoan: isLoan))
-                .toList(),
+            children:
+                activeDebtSummary.entries
+                    .map(
+                      (e) => PersonDebtItem(
+                        personId: e.key,
+                        handleShowBottomSheet:
+                            () => _handleShowBottomSheet(isLoan: isLoan, personId: e.key, totalDebtRemaining: e.value),
+                      ),
+                    )
+                    .toList(),
           ),
 
           // --- Đã hoàn thành: debts paid ---
@@ -130,46 +142,8 @@ class _LoanTrackingScreenState extends ConsumerState<LoanTrackingScreen> {
               'Đã hoàn thành',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp, color: AppColors.success),
             ),
-            children: paidDebtSummary.entries
-                .map((e) => _personPaidItem(personId: e.key, totalAmount: e.value))
-                .toList(),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// Item trong section "Đang theo dõi" -- hiển thị tổng nợ và còn lại của 1 person
-  Widget _personActiveItem({required int personId, required double remainingAmount, required bool isLoan}) {
-    final person = ref.watch(personByIdProvider(personId));
-    final debtInfo = ref.watch(totalDebtByPersonProvider(personId));
-
-    return CustomListTile(
-      leading: CircleAvatar(child: Text(person?.name.substring(0, 1).toUpperCase() ?? 'T')),
-      title: Text(person?.name ?? 'Unknown', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.sp)),
-      trailing: Row(
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              // Tổng nợ của person này (amount gốc)
-              Text(
-                Helpers.formatCurrency(debtInfo.totalDebt),
-                style: TextStyle(fontSize: 16.sp, color: AppColors.textPrimary),
-              ),
-              // Còn lại cần thu/trả
-              Text(
-                Helpers.formatCurrency(remainingAmount),
-                style: TextStyle(fontSize: 15.sp, color: AppColors.expense),
-              ),
-            ],
-          ),
-          IconButton(
-            onPressed: () => _handleShowBottomSheet(
-              title: isLoan ? 'Thu nợ' : 'Trả nợ',
-              totalDebtRemaining: remainingAmount,
-            ),
-            icon: Icon(Icons.more_vert, color: AppColors.textPrimary),
+            children:
+                paidDebtSummary.entries.map((e) => _personPaidItem(personId: e.key, totalAmount: e.value)).toList(),
           ),
         ],
       ),
@@ -185,10 +159,7 @@ class _LoanTrackingScreenState extends ConsumerState<LoanTrackingScreen> {
       title: Text(person?.name ?? 'Unknown', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.sp)),
       trailing: Row(
         children: [
-          Text(
-            Helpers.formatCurrency(totalAmount),
-            style: TextStyle(fontSize: 16.sp, color: AppColors.textPrimary),
-          ),
+          Text(Helpers.formatCurrency(totalAmount), style: TextStyle(fontSize: 16.sp, color: AppColors.textPrimary)),
           SizedBox(width: 8.w),
           Icon(Icons.check_circle, color: AppColors.success),
         ],
@@ -196,7 +167,12 @@ class _LoanTrackingScreenState extends ConsumerState<LoanTrackingScreen> {
     );
   }
 
-  void _handleShowBottomSheet({required String title, required double totalDebtRemaining}) {
+  void _handleShowBottomSheet({required bool isLoan, required int personId, required double totalDebtRemaining}) async {
+    final title = isLoan ? 'Thu nợ' : 'Trả nợ';
+    final debtCollectionCategory = await ref.read(categoryByNameProvider('Thu nợ').future);
+    final debtRepaymentCategory = await ref.read(categoryByNameProvider('Trả nợ').future);
+    final person = ref.read(personByIdProvider(personId));
+    if (!mounted) return;
     showCustomBottomSheet(
       context: context,
       children: [
@@ -211,6 +187,13 @@ class _LoanTrackingScreenState extends ConsumerState<LoanTrackingScreen> {
             Navigator.pop(context);
             await Future.delayed(Duration(milliseconds: 150));
             if (mounted) {
+              final category = isLoan ? debtCollectionCategory : debtRepaymentCategory;
+              ref.read(transactionPrefillDataProvider.notifier).state = TransactionPrefill(
+                person: person,
+                amount: totalDebtRemaining,
+                type: TransactionType.income,
+                category: category,
+              );
               context.go(AppRoutes.addTransaction);
             }
           },
@@ -221,7 +204,16 @@ class _LoanTrackingScreenState extends ConsumerState<LoanTrackingScreen> {
           title: Text('Số tiền khác', style: TextStyle(fontSize: 16)),
           onTap: () {
             context.pop();
-            showInfoToast('Tính năng đang trong giai đoạn phát triển.');
+            if (mounted) {
+              final category = isLoan ? debtCollectionCategory : debtRepaymentCategory;
+              ref.read(transactionPrefillDataProvider.notifier).state = TransactionPrefill(
+                person: person,
+                amount: 0,
+                type: TransactionType.income,
+                category: category,
+              );
+              context.go(AppRoutes.addTransaction);
+            }
           },
           backgroundColor: Colors.transparent,
         ),

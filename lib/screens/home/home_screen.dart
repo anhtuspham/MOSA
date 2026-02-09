@@ -1,22 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mosa/providers/refresh_provider.dart';
+import 'package:mosa/utils/toast.dart';
 
 import '../overview/income_screen.dart';
 import '../overview/outcome_screen.dart';
 import '../overview/overview_screen.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> {
   int currentPageIndex = 0;
 
   @override
   Widget build(BuildContext context) {
+    final refreshState = ref.watch(refreshAllProvider);
+    ref.listen(refreshAllProvider, (_, next) {
+      next.whenOrNull(
+        data: (data) => showResultToast('Lấy dữ liệu thành công'),
+        error: (error, stackTrace) => showResultToast('Lấy dữ liệu thất bại'),
+      );
+    });
     return DefaultTabController(
       length: 3,
       child: Scaffold(
@@ -25,23 +35,19 @@ class _HomeScreenState extends State<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('Xin chào!', style: TextStyle(fontSize: 12.sp)),
-              Text(
-                'Pham Anh Tu',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.sp),
-              ),
+              Text('Pham Anh Tu', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.sp)),
             ],
           ),
           leading: Container(
             margin: EdgeInsets.only(left: 8.w),
-            child: CircleAvatar(
-              radius: 20,
-              backgroundColor: Colors.blueAccent,
-              child: Text('P'),
-            ),
+            child: CircleAvatar(radius: 20, backgroundColor: Colors.blueAccent, child: Text('P')),
           ),
           actionsPadding: EdgeInsets.symmetric(horizontal: 12.w),
           actions: [
-            Icon(Icons.sync, color: Colors.white),
+            IconButton(
+              onPressed: refreshState.isLoading ? null : () => ref.read(refreshAllProvider.notifier).refresh(),
+              icon: Icon(Icons.sync, color: Colors.white),
+            ),
             const SizedBox(width: 8),
             Stack(
               clipBehavior: Clip.none,
@@ -52,15 +58,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   top: -8,
                   child: Container(
                     padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: Colors.redAccent,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Text(
-                      '3',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.white, fontSize: 12),
-                    ),
+                    decoration: BoxDecoration(color: Colors.redAccent, shape: BoxShape.circle),
+                    child: Text('3', textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 12)),
                   ),
                 ),
               ],
@@ -71,20 +70,11 @@ class _HomeScreenState extends State<HomeScreen> {
             indicatorColor: Colors.black,
             indicatorSize: TabBarIndicatorSize.tab,
             unselectedLabelStyle: TextStyle(color: Colors.white),
-            labelStyle: TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.bold,
-            ),
-            tabs: [
-              Tab(child: Text('Tất cả')),
-              Tab(child: Text('Thu nhập ')),
-              Tab(child: Text('Chi tiêu')),
-            ],
+            labelStyle: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+            tabs: [Tab(child: Text('Tất cả')), Tab(child: Text('Thu nhập ')), Tab(child: Text('Chi tiêu'))],
           ),
         ),
-        body: TabBarView(
-          children: [OverviewScreen(), IncomeScreen(), OutcomeScreen()],
-        ),
+        body: TabBarView(children: [OverviewScreen(), IncomeScreen(), OutcomeScreen()]),
       ),
     );
   }

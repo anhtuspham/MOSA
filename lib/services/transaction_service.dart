@@ -136,37 +136,23 @@ class TransactionService {
   }
 
   /// Save a debt collection transaction (when someone pays you back)
-  /// Uses single-debt payment to pay the specific selected debt
   Future<void> saveDebtCollectionTransaction({
     required double amount,
     required Person person,
     required Wallet wallet,
-    required Debt debt,
   }) async {
-    if (debt.id == null) {
-      throw Exception('Invalid debt: ID is null');
-    }
-
     final debtController = ref.read(debtProvider.notifier);
-    // Use single-debt collection method to pay the specific debt selected by user
-    await debtController.collectSingleDebt(debt.id!, amount, wallet.id!);
+    await debtController.collectDebtByPerson(person.id, amount, wallet.id!);
   }
 
   /// Save a debt repayment transaction (when you pay someone back)
-  /// Uses single-debt payment to pay the specific selected debt
   Future<void> saveDebtRepaymentTransaction({
     required double amount,
     required Person person,
     required Wallet wallet,
-    required Debt debt,
   }) async {
-    if (debt.id == null) {
-      throw Exception('Invalid debt: ID is null');
-    }
-
     final debtController = ref.read(debtProvider.notifier);
-    // Use single-debt payment method to pay the specific debt selected by user
-    await debtController.paySingleDebt(debt.id!, amount, wallet.id!);
+    await debtController.payDebtByPerson(person.id, amount, wallet.id!);
   }
 
   /// Validate amount input
@@ -195,12 +181,17 @@ class TransactionService {
     }
   }
 
-  /// Validate debt selection
-  void validateDebt(Debt? debt) {
-    if (debt == null || debt.id == null) {
-      throw Exception('Vui lòng chọn khoản nợ');
-    }
+  /// Validate debt person selection
+  void validatePersonDebt(Person? person, DebtType debtType) {
+  if (person == null) {
+    throw Exception('Vui lòng chọn người');
   }
+  
+  final summary = ref.read(debtSummaryByTypeProvider(debtType));
+  if (!summary.containsKey(person.id)) {
+    throw Exception('Người này không có khoản nợ ${debtType == DebtType.lent ? "cần thu" : "cần trả"}');
+  }
+}
 
   /// Validate transfer wallets
   void validateTransferWallets(Wallet? fromWallet, Wallet? toWallet) {

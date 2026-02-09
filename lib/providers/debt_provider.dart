@@ -310,6 +310,10 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
 
       double remainingCollection = paymentAmount;
       final List<Debt> updatedDebts = [];
+      final allDebtRemaining = allDebts.fold(0.0, (previousValue, element) => previousValue + element.remainingAmount);
+      if(allDebtRemaining < paymentAmount){
+        throw 'Số tiền thu vượt quá tổng nợ';
+      }
 
       // FIFO: collect from oldest debts first
       for (final debt in allDebts) {

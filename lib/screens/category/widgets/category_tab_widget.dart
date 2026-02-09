@@ -3,9 +3,9 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mosa/models/debt.dart';
 import 'package:mosa/providers/category_provider.dart';
-import 'package:mosa/providers/debt_provider.dart';
+import 'package:mosa/providers/person_provider.dart';
+import 'package:mosa/providers/transaction_prefill_data_provider.dart';
 import 'package:mosa/router/app_routes.dart';
 import 'package:mosa/utils/app_colors.dart';
 import 'package:mosa/widgets/custom_expansion_tile.dart';
@@ -38,30 +38,41 @@ class _CategoryTabState extends ConsumerState<CategoryTab> {
 
     if (categoryId == 'lend_payback' || categoryName == 'trả nợ') {
       // Repayment - show borrowed debts
-      final result = await context.push(
-        '${AppRoutes.debtSelection}?type=borrowed',
-      );
+      final result = await context.push('${AppRoutes.debtSelection}?type=borrowed');
 
-      if (result != null && result is Debt) {
+      if (result != null && result is Map) {
+        final personId = result['personId'];
+        final debtAmount = result['debtAmount'];
+
+        final person = ref.watch(personByIdProvider(personId));
         // User selected a debt
-        ref.read(selectedDebtProvider.notifier).state = result;
-        ref.read(selectedCategoryProvider.notifier).selectCategory(category);
+        ref.read(transactionPrefillDataProvider.notifier).state = TransactionPrefill(
+          amount: debtAmount,
+          person: person,
+          category: category,
+        );
         if (context.mounted) context.pop();
       }
     } else if (categoryId == 'lend_collect' || categoryName == 'thu nợ') {
       // Debt collection - show lent debts
-      final result = await context.push(
-        '${AppRoutes.debtSelection}?type=lent',
-      );
+      final result = await context.push('${AppRoutes.debtSelection}?type=lent');
 
-      if (result != null && result is Debt) {
+      if (result != null && result is Map<String, dynamic>) {
+        final personId = result['personId'];
+        final debtAmount = result['debtAmount'];
+
+        final person = ref.watch(personByIdProvider(personId));
         // User selected a debt
-        ref.read(selectedDebtProvider.notifier).state = result;
-        ref.read(selectedCategoryProvider.notifier).selectCategory(category);
+        ref.read(transactionPrefillDataProvider.notifier).state = TransactionPrefill(
+          amount: debtAmount,
+          person: person,
+          category: category,
+        );
         if (context.mounted) context.pop();
       }
     } else {
       // Regular category - normal flow
+      // ref.read(transactionPrefillDataProvider.notifier).state = TransactionPrefill(category: category);
       ref.read(selectedCategoryProvider.notifier).selectCategory(category);
       context.pop();
     }
@@ -123,10 +134,7 @@ class _CategoryTabState extends ConsumerState<CategoryTab> {
                           ),
                           itemBuilder: (context, index) {
                             final child = category.children![index];
-                            return ItemWidget(
-                              category: child,
-                              onTap: () => _handleCategorySelection(context, child),
-                            );
+                            return ItemWidget(category: child, onTap: () => _handleCategorySelection(context, child));
                           },
                         ),
                       ],
