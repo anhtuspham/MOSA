@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 
+/// Model lưu trữ thông tin danh mục giao dịch
 class Category {
   final String id;
   final String name;
 
   /// income / expense / lend / borrowing / repayment / debtCollection
   final String type;
-
-  /// custom / material
-  final String iconType; // custom / material
+  final String iconType;
   final String iconPath;
   final String? color;
   final String? parentId;
@@ -29,6 +28,7 @@ class Category {
 
   bool get isChild => parentId != null;
 
+  /// Tạo Category từ JSON
   factory Category.fromJson(Map<String, dynamic> json) {
     return Category(
       id: json['id'] as String,
@@ -47,8 +47,16 @@ class Category {
     );
   }
 
-  factory Category.empty() => Category(id: 'unknown', name: 'unknown', type: 'unknown', iconType: 'custom', iconPath: 'assets/icons/default.png');
+  /// Tạo Category rỗng
+  factory Category.empty() => Category(
+    id: 'unknown',
+    name: 'unknown',
+    type: 'unknown',
+    iconType: 'custom',
+    iconPath: 'assets/icons/default.png',
+  );
 
+  /// Chuyển Category sang JSON
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -62,6 +70,7 @@ class Category {
     };
   }
 
+  /// Chuyển Category sang Map (database)
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -71,9 +80,11 @@ class Category {
       'iconPath': iconPath,
       'color': color,
       'parentId': parentId,
+      'children': children?.map((e) => e.toMap()).toList(),
     };
   }
 
+  /// Tạo Category từ Map (database)
   factory Category.fromMap(Map<String, dynamic> map) {
     return Category(
       id: map['id'] as String,
@@ -87,6 +98,7 @@ class Category {
     );
   }
 
+  /// Lấy icon của danh mục
   Widget getIcon({double size = 24}) {
     final color =
         this.color != null
@@ -128,6 +140,7 @@ class Category {
   //   return null;
   // }
 
+  /// Chuyển tên icon thành IconData
   static IconData _getMaterialIcon(String iconName) {
     const iconMap = {
       // Income

@@ -19,7 +19,10 @@ class DebtSelectionScreen extends ConsumerWidget {
 
     return CommonScaffold(
       title: Text(isLent ? 'Chọn khoản nợ cần thu' : 'Chọn khoản nợ cần trả'),
-      leading: IconButton(onPressed: () => context.pop(), icon: const Icon(Icons.arrow_back)),
+      leading: IconButton(
+        onPressed: () => context.pop(),
+        icon: const Icon(Icons.arrow_back),
+      ),
       appBarBackgroundColor: AppColors.background,
       body: ListView.builder(
         itemCount: debtSummaryByType.values.length,
@@ -28,7 +31,11 @@ class DebtSelectionScreen extends ConsumerWidget {
           return PersonDebtItem(
             isLent: isLent,
             personId: debt.key,
-            onTap: () => context.pop<Map<String, dynamic>>({'personId': debt.key, 'debtAmount': debt.value}),
+            onTap:
+                () => context.pop<Map<String, dynamic>>({
+                  'personId': debt.key,
+                  'debtAmount': debt.value,
+                }),
           );
         },
       ),

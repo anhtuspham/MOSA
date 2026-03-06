@@ -7,6 +7,7 @@ import 'package:mosa/services/database_service.dart';
 import 'package:mosa/utils/collection_utils.dart';
 import 'database_service_provider.dart';
 
+/// Quản lý trạng thái danh sách người cho vay/đi vay
 class PersonNotifier extends AsyncNotifier<List<Person>> {
   DatabaseService get _databaseService => ref.read(databaseServiceProvider);
 
@@ -15,7 +16,7 @@ class PersonNotifier extends AsyncNotifier<List<Person>> {
     return await _databaseService.getAllPersons();
   }
 
-  /// Add new person
+  /// Thêm người mới
   Future<void> addPerson(Person person) async {
     state = const AsyncLoading();
 
@@ -35,7 +36,7 @@ class PersonNotifier extends AsyncNotifier<List<Person>> {
     }
   }
 
-  /// Update existing person
+  /// Cập nhật thông tin người
   Future<void> updatePerson(Person person) async {
     state = const AsyncLoading();
 
@@ -58,7 +59,7 @@ class PersonNotifier extends AsyncNotifier<List<Person>> {
     }
   }
 
-  /// Refresh person list from database
+  /// Làm mới danh sách người từ database
   Future<void> refreshPersons() async {
     try {
       final persons = await _databaseService.getAllPersons();
@@ -72,12 +73,15 @@ class PersonNotifier extends AsyncNotifier<List<Person>> {
   }
 }
 
-// Main provider - AsyncNotifier for full CRUD
-final personProvider = AsyncNotifierProvider<PersonNotifier, List<Person>>(PersonNotifier.new);
+/// Provider chính quản lý danh sách người
+final personProvider = AsyncNotifierProvider<PersonNotifier, List<Person>>(
+  PersonNotifier.new,
+);
 
-// Selection provider - tracks currently selected person
+/// Provider lưu trữ người được chọn hiện tại
 final selectedPersonProvider = StateProvider<Person?>((ref) => null);
 
+/// Lấy người theo ID
 final personByIdProvider = Provider.family<Person?, int>((ref, personId) {
   final persons = ref.watch(personProvider).value ?? [];
   return CollectionUtils.safeLookup(persons, (person) => person.id == personId);

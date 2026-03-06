@@ -12,10 +12,7 @@ import 'package:mosa/utils/tree_utils.dart';
 
 import '../utils/utils.dart';
 
-// final categoriesProvider = FutureProvider<List<Category>>((ref) {
-//   return CategoryService.loadCategories();
-// });
-
+/// Quản lý trạng thái danh sách danh mục
 class CategoriesNotifier extends AsyncNotifier<List<Category>> {
   DatabaseService get _databaseService => ref.read(databaseServiceProvider);
 
@@ -24,6 +21,7 @@ class CategoriesNotifier extends AsyncNotifier<List<Category>> {
     return await _databaseService.getAllCategories();
   }
 
+  /// Làm mới danh sách danh mục từ database
   Future<void> refreshCategories() async {
     try {
       final categories = await _databaseService.getAllCategories();
@@ -36,28 +34,49 @@ class CategoriesNotifier extends AsyncNotifier<List<Category>> {
   }
 }
 
+/// Provider chính quản lý danh sách danh mục
 final categoriesProvider = AsyncNotifierProvider(CategoriesNotifier.new);
 
-final categoryByTypeProvider = FutureProvider.family<List<Category>, String>((ref, categoryType) async {
+/// Lấy danh sách danh mục theo loại
+final categoryByTypeProvider = FutureProvider.family<List<Category>, String>((
+  ref,
+  categoryType,
+) async {
   final categories = await ref.watch(categoriesProvider.future);
   return categories.where((element) => element.type == categoryType).toList();
 });
 
+/// Lấy danh sách danh mục phẳng (không có cây phân cấp)
 final flattenedCategoryProvider = FutureProvider<List<Category>>((ref) async {
   final categories = await ref.watch(categoriesProvider.future);
   return TreeUtils.flatten(categories, (category) => category.children);
 });
 
-final categoryByIdProvider = FutureProvider.family<Category?, String>((ref, categoryId) async {
+/// Lấy danh mục theo ID
+final categoryByIdProvider = FutureProvider.family<Category?, String>((
+  ref,
+  categoryId,
+) async {
   final categories = await ref.watch(flattenedCategoryProvider.future);
-  return CollectionUtils.safeLookup(categories, (category) => category.id == categoryId);
+  return CollectionUtils.safeLookup(
+    categories,
+    (category) => category.id == categoryId,
+  );
 });
 
-final categoryByNameProvider = FutureProvider.family<Category?, String>((ref, categoryName) async {
+/// Lấy danh mục theo tên
+final categoryByNameProvider = FutureProvider.family<Category?, String>((
+  ref,
+  categoryName,
+) async {
   final categories = await ref.watch(flattenedCategoryProvider.future);
-  return CollectionUtils.safeLookup(categories, (category) => category.name == categoryName);
+  return CollectionUtils.safeLookup(
+    categories,
+    (category) => category.name == categoryName,
+  );
 });
 
+/// Quản lý trạng thái danh mục được chọn
 class CategoryNotifier extends Notifier<Category?> {
   @override
   Category? build() => null;
@@ -68,20 +87,27 @@ class CategoryNotifier extends Notifier<Category?> {
   }
 }
 
-final selectedCategoryProvider = NotifierProvider<CategoryNotifier, Category?>(CategoryNotifier.new);
+/// Provider lưu trữ danh mục được chọn
+final selectedCategoryProvider = NotifierProvider<CategoryNotifier, Category?>(
+  CategoryNotifier.new,
+);
 
-// map category base on category id lookup O(1)
+/// Map danh mục theo ID để tra cứu O(1)
 final categoryMapProvider = FutureProvider<Map<String, Category>>((ref) async {
   final categories = await ref.watch(flattenedCategoryProvider.future);
   return {for (var category in categories) category.id: category};
 });
 
+/// Tự động xác định loại giao dịch dựa trên danh mục được chọn
 final autoTransactionTypeProvider = StateProvider<TransactionType?>((ref) {
   final selectCategory = ref.watch(selectedCategoryProvider);
   if (selectCategory == null) return null;
 
   // First try to get transaction type from category ID/name (handles special cases like lending)
-  final transactionType = getTransactionTypeFromCategory(selectCategory.id, selectCategory.name);
+  final transactionType = getTransactionTypeFromCategory(
+    selectCategory.id,
+    selectCategory.name,
+  );
 
   // If it's unknown, fall back to the generic type mapping
   if (transactionType == TransactionType.unknown) {

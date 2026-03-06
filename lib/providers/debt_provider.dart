@@ -16,6 +16,7 @@ import 'database_service_provider.dart';
 import 'package:mosa/providers/wallet_provider.dart';
 import 'package:mosa/providers/transaction_provider.dart';
 
+/// Quản lý trạng thái danh sách nợ/cho vay
 class DebtNotifier extends AsyncNotifier<List<Debt>> {
   DatabaseService get _databaseService => ref.read(databaseServiceProvider);
 
@@ -43,8 +44,12 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
 
     try {
       int id = await _databaseService.createDebt(debt);
-      final lendCategory = await ref.read(categoryByNameProvider('Cho vay').future);
-      final borrowCategory = await ref.read(categoryByNameProvider('Mượn').future);
+      final lendCategory = await ref.read(
+        categoryByNameProvider('Cho vay').future,
+      );
+      final borrowCategory = await ref.read(
+        categoryByNameProvider('Mượn').future,
+      );
       final newDebt = debt.copyWith(id: id);
       bool isLent = debt.type == DebtType.lent;
 
@@ -76,7 +81,9 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
         syncId: generateSyncId(),
       );
 
-      await _databaseService.insertTransaction(isLent ? lendTransaction : borrowingTransaction);
+      await _databaseService.insertTransaction(
+        isLent ? lendTransaction : borrowingTransaction,
+      );
 
       // Refresh wallet provider to update balance
       await ref.read(walletProvider.notifier).refreshWallet();
@@ -99,7 +106,11 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
       await _databaseService.updateDebt(debt);
       final index = state.requireValue.indexWhere((element) => element == debt);
       if (index != -1) {
-        state = AsyncData([...state.requireValue.sublist(0, index), debt, ...state.requireValue.sublist(index + 1)]);
+        state = AsyncData([
+          ...state.requireValue.sublist(0, index),
+          debt,
+          ...state.requireValue.sublist(index + 1),
+        ]);
       }
     } catch (e) {
       log('Error when update debt $e');
@@ -112,7 +123,9 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
     state = const AsyncLoading();
     try {
       await _databaseService.deleteDebt(debt);
-      state = AsyncData(state.requireValue.where((element) => element != debt).toList());
+      state = AsyncData(
+        state.requireValue.where((element) => element != debt).toList(),
+      );
     } catch (e) {
       log('Error when delete debt $e');
       state = AsyncError(e, StackTrace.current);
@@ -123,19 +136,30 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
   Future<void> payDebt(int debtId, double paymentAmount, int walletId) async {
     state = const AsyncLoading();
     try {
-      final payBackCategory = await ref.read(categoryByNameProvider('Trả nợ').future);
+      final payBackCategory = await ref.read(
+        categoryByNameProvider('Trả nợ').future,
+      );
 
       final currentDebts = state.requireValue;
-      final debtIndex = currentDebts.indexWhere((element) => element.id == debtId);
+      final debtIndex = currentDebts.indexWhere(
+        (element) => element.id == debtId,
+      );
       if (debtIndex == -1) throw 'Không tìm thấy khoản nợ';
       final currentDebt = currentDebts[debtIndex];
 
       final remainingAmount = currentDebt.amount - currentDebt.paidAmount;
-      if (paymentAmount > remainingAmount) throw 'Số tiền thanh toán vượt quá khoản nợ';
+      if (paymentAmount > remainingAmount)
+        throw 'Số tiền thanh toán vượt quá khoản nợ';
 
       final newPaidAmount = currentDebt.paidAmount + paymentAmount;
-      final newStatus = newPaidAmount >= currentDebt.amount ? DebtStatus.paid : DebtStatus.partial;
-      final newDebt = currentDebt.copyWith(paidAmount: newPaidAmount, status: newStatus);
+      final newStatus =
+          newPaidAmount >= currentDebt.amount
+              ? DebtStatus.paid
+              : DebtStatus.partial;
+      final newDebt = currentDebt.copyWith(
+        paidAmount: newPaidAmount,
+        status: newStatus,
+      );
 
       await _databaseService.updateDebt(newDebt);
 
@@ -172,23 +196,38 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
     }
   }
 
-  Future<void> collectDebt(int debtId, double paymentAmount, int walletId) async {
+  Future<void> collectDebt(
+    int debtId,
+    double paymentAmount,
+    int walletId,
+  ) async {
     state = const AsyncLoading();
     try {
-      final collectCategory = await ref.read(categoryByNameProvider('Thu nợ').future);
+      final collectCategory = await ref.read(
+        categoryByNameProvider('Thu nợ').future,
+      );
 
       final currentDebts = state.requireValue;
-      final debtIndex = currentDebts.indexWhere((element) => element.id == debtId);
+      final debtIndex = currentDebts.indexWhere(
+        (element) => element.id == debtId,
+      );
       if (debtIndex == -1) throw 'Không tìm thấy khoản nợ';
 
       final currentDebt = currentDebts[debtIndex];
 
       final remainingAmount = currentDebt.amount - currentDebt.paidAmount;
-      if (paymentAmount > remainingAmount) throw 'Số tiền thanh toán vượt quá khoản nợ';
+      if (paymentAmount > remainingAmount)
+        throw 'Số tiền thanh toán vượt quá khoản nợ';
 
       final newPaidAmount = currentDebt.paidAmount + paymentAmount;
-      final newStatus = newPaidAmount >= currentDebt.amount ? DebtStatus.paid : DebtStatus.partial;
-      final newDebt = currentDebt.copyWith(paidAmount: newPaidAmount, status: newStatus);
+      final newStatus =
+          newPaidAmount >= currentDebt.amount
+              ? DebtStatus.paid
+              : DebtStatus.partial;
+      final newDebt = currentDebt.copyWith(
+        paidAmount: newPaidAmount,
+        status: newStatus,
+      );
 
       await _databaseService.updateDebt(newDebt);
 
@@ -224,21 +263,33 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
     }
   }
 
-  /// Pay debt by person - auto-distribute payment across all active debts of that person (FIFO)
-  /// Used when user wants to pay off what they borrowed (Debts.Borrowed)
-  Future<void> payDebtByPerson(int personId, double paymentAmount, int walletId) async {
+  /// Trả nợ theo người - tự động phân bổ số tiền trả cho tất cả các khoản nợ đang hoạt động của người đó (FIFO)
+  /// Sử dụng khi người dùng muốn trả hết những gì đã vay
+  Future<void> payDebtByPerson(
+    int personId,
+    double paymentAmount,
+    int walletId,
+  ) async {
     state = const AsyncLoading();
     try {
-      final payBackCategory = await ref.read(categoryByNameProvider('Trả nợ').future);
+      final payBackCategory = await ref.read(
+        categoryByNameProvider('Trả nợ').future,
+      );
       final person = ref.read(personByIdProvider(personId));
       final personName = person?.name ?? 'Unknown';
 
       // Get all active debts for this person (borrowed type)
-      final allDebts = await _databaseService.getActiveDebtsByPersonAndType(personId, DebtType.borrowed);
+      final allDebts = await _databaseService.getActiveDebtsByPersonAndType(
+        personId,
+        DebtType.borrowed,
+      );
 
       if (allDebts.isEmpty) throw 'Không có khoản nợ nào với người này';
 
-      final allDebtRemaining = allDebts.fold(0.0, (previousValue, element) => previousValue + element.remainingAmount);
+      final allDebtRemaining = allDebts.fold(
+        0.0,
+        (previousValue, element) => previousValue + element.remainingAmount,
+      );
       if (allDebtRemaining < paymentAmount) {
         throw 'Số tiền trả vượt quá tổng nợ';
       }
@@ -250,11 +301,18 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
         if (remainingPayment <= 0) break;
 
         final debtRemaining = debt.amount - debt.paidAmount;
-        final paymentForThisDebt = remainingPayment >= debtRemaining ? debtRemaining : remainingPayment;
+        final paymentForThisDebt =
+            remainingPayment >= debtRemaining
+                ? debtRemaining
+                : remainingPayment;
 
         final newPaidAmount = debt.paidAmount + paymentForThisDebt;
-        final newStatus = newPaidAmount >= debt.amount ? DebtStatus.paid : DebtStatus.partial;
-        final updatedDebt = debt.copyWith(paidAmount: newPaidAmount, status: newStatus);
+        final newStatus =
+            newPaidAmount >= debt.amount ? DebtStatus.paid : DebtStatus.partial;
+        final updatedDebt = debt.copyWith(
+          paidAmount: newPaidAmount,
+          status: newStatus,
+        );
 
         await _databaseService.updateDebt(updatedDebt);
         updatedDebts.add(updatedDebt);
@@ -289,7 +347,10 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
       final currentDebts = state.requireValue;
       final updatedState =
           currentDebts.map((debt) {
-            return updatedDebts.firstWhere((u) => u.id == debt.id, orElse: () => debt);
+            return updatedDebts.firstWhere(
+              (u) => u.id == debt.id,
+              orElse: () => debt,
+            );
           }).toList();
       state = AsyncData(updatedState);
     } catch (e) {
@@ -299,21 +360,33 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
     }
   }
 
-  /// Collect debt by person - auto-distribute collection across all active debts of that person (FIFO)
-  /// Used when user wants to collect what they lent (Debts.Lent)
-  Future<void> collectDebtByPerson(int personId, double paymentAmount, int walletId) async {
+  /// Thu nợ theo người - tự động phân bổ số tiền thu cho tất cả các khoản nợ đang hoạt động của người đó (FIFO)
+  /// Sử dụng khi người dùng muốn thu hết những gì đã cho vay
+  Future<void> collectDebtByPerson(
+    int personId,
+    double paymentAmount,
+    int walletId,
+  ) async {
     state = const AsyncLoading();
     try {
-      final collectCategory = await ref.read(categoryByNameProvider('Thu nợ').future);
+      final collectCategory = await ref.read(
+        categoryByNameProvider('Thu nợ').future,
+      );
       final person = ref.read(personByIdProvider(personId));
       final personName = person?.name ?? 'Unknown';
 
       // Get all active debts for this person (lent type)
-      final allDebts = await _databaseService.getActiveDebtsByPersonAndType(personId, DebtType.lent);
+      final allDebts = await _databaseService.getActiveDebtsByPersonAndType(
+        personId,
+        DebtType.lent,
+      );
 
       if (allDebts.isEmpty) throw 'Không có khoản nợ nào từ người này';
 
-      final allDebtRemaining = allDebts.fold(0.0, (previousValue, element) => previousValue + element.remainingAmount);
+      final allDebtRemaining = allDebts.fold(
+        0.0,
+        (previousValue, element) => previousValue + element.remainingAmount,
+      );
       if (allDebtRemaining < paymentAmount) {
         throw 'Số tiền thu vượt quá tổng nợ';
       }
@@ -326,11 +399,18 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
         if (remainingCollection <= 0) break;
 
         final debtRemaining = debt.amount - debt.paidAmount;
-        final collectionForThisDebt = remainingCollection >= debtRemaining ? debtRemaining : remainingCollection;
+        final collectionForThisDebt =
+            remainingCollection >= debtRemaining
+                ? debtRemaining
+                : remainingCollection;
 
         final newPaidAmount = debt.paidAmount + collectionForThisDebt;
-        final newStatus = newPaidAmount >= debt.amount ? DebtStatus.paid : DebtStatus.partial;
-        final updatedDebt = debt.copyWith(paidAmount: newPaidAmount, status: newStatus);
+        final newStatus =
+            newPaidAmount >= debt.amount ? DebtStatus.paid : DebtStatus.partial;
+        final updatedDebt = debt.copyWith(
+          paidAmount: newPaidAmount,
+          status: newStatus,
+        );
 
         await _databaseService.updateDebt(updatedDebt);
         updatedDebts.add(updatedDebt);
@@ -365,7 +445,10 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
       final currentDebts = state.requireValue;
       final updatedState =
           currentDebts.map((debt) {
-            return updatedDebts.firstWhere((u) => u.id == debt.id, orElse: () => debt);
+            return updatedDebts.firstWhere(
+              (u) => u.id == debt.id,
+              orElse: () => debt,
+            );
           }).toList();
       state = AsyncData(updatedState);
     } catch (e) {
@@ -375,12 +458,18 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
     }
   }
 
-  /// Pay a SINGLE specific debt (for when user selects a specific debt to pay)
-  /// Used when user wants to pay back what they borrowed (Debts.Borrowed)
-  Future<void> paySingleDebt(int debtId, double paymentAmount, int walletId) async {
+  /// Trả một khoản nợ cụ thể (khi người dùng chọn một khoản nợ cụ thể để trả)
+  /// Sử dụng khi người dùng muốn trả lại những gì đã vay
+  Future<void> paySingleDebt(
+    int debtId,
+    double paymentAmount,
+    int walletId,
+  ) async {
     state = const AsyncLoading();
     try {
-      final payCategory = await ref.read(categoryByNameProvider('Trả nợ').future);
+      final payCategory = await ref.read(
+        categoryByNameProvider('Trả nợ').future,
+      );
 
       // Get the specific debt
       final currentDebts = state.requireValue;
@@ -401,8 +490,12 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
 
       // Update debt
       final newPaidAmount = debt.paidAmount + paymentAmount;
-      final newStatus = newPaidAmount >= debt.amount ? DebtStatus.paid : DebtStatus.partial;
-      final updatedDebt = debt.copyWith(paidAmount: newPaidAmount, status: newStatus);
+      final newStatus =
+          newPaidAmount >= debt.amount ? DebtStatus.paid : DebtStatus.partial;
+      final updatedDebt = debt.copyWith(
+        paidAmount: newPaidAmount,
+        status: newStatus,
+      );
 
       await _databaseService.updateDebt(updatedDebt);
 
@@ -434,12 +527,18 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
     }
   }
 
-  /// Collect a SINGLE specific debt (for when user selects a specific debt to collect)
-  /// Used when user wants to collect what they lent (Debts.Lent)
-  Future<void> collectSingleDebt(int debtId, double collectionAmount, int walletId) async {
+  /// Thu một khoản nợ cụ thể (khi người dùng chọn một khoản nợ cụ thể để thu)
+  /// Sử dụng khi người dùng muốn thu hồi những gì đã cho vay
+  Future<void> collectSingleDebt(
+    int debtId,
+    double collectionAmount,
+    int walletId,
+  ) async {
     state = const AsyncLoading();
     try {
-      final collectCategory = await ref.read(categoryByNameProvider('Thu nợ').future);
+      final collectCategory = await ref.read(
+        categoryByNameProvider('Thu nợ').future,
+      );
 
       // Get the specific debt
       final currentDebts = state.requireValue;
@@ -460,8 +559,12 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
 
       // Update debt
       final newPaidAmount = debt.paidAmount + collectionAmount;
-      final newStatus = newPaidAmount >= debt.amount ? DebtStatus.paid : DebtStatus.partial;
-      final updatedDebt = debt.copyWith(paidAmount: newPaidAmount, status: newStatus);
+      final newStatus =
+          newPaidAmount >= debt.amount ? DebtStatus.paid : DebtStatus.partial;
+      final updatedDebt = debt.copyWith(
+        paidAmount: newPaidAmount,
+        status: newStatus,
+      );
 
       await _databaseService.updateDebt(updatedDebt);
 
@@ -494,41 +597,57 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
   }
 }
 
-final debtProvider = AsyncNotifierProvider<DebtNotifier, List<Debt>>(DebtNotifier.new);
+final debtProvider = AsyncNotifierProvider<DebtNotifier, List<Debt>>(
+  DebtNotifier.new,
+);
 
 final debtByPersonProvider = Provider.family<List<Debt>, int>((ref, personId) {
   final debts = ref.watch(debtProvider).value ?? [];
   return debts.where((debt) => debt.personId == personId).toList();
 });
 
-final totalDebtLentByPersonProvider = Provider.family<DebtInfo, int>((ref, personId) {
+final totalDebtLentByPersonProvider = Provider.family<DebtInfo, int>((
+  ref,
+  personId,
+) {
   final debts = ref.watch(debtByPersonProvider(personId));
   double totalDebt = 0;
   double totalDebtPaid = 0;
   double totalDebtRemaining = 0;
   for (var debt in debts) {
-    if(debt.type == DebtType.lent){
+    if (debt.type == DebtType.lent) {
       totalDebt += debt.amount;
       totalDebtPaid += debt.paidAmount;
       totalDebtRemaining += debt.remainingAmount;
     }
   }
-  return DebtInfo(totalDebt: totalDebt, totalDebtPaid: totalDebtPaid, totalDebtRemaining: totalDebtRemaining);
+  return DebtInfo(
+    totalDebt: totalDebt,
+    totalDebtPaid: totalDebtPaid,
+    totalDebtRemaining: totalDebtRemaining,
+  );
 });
 
-final totalDebtBorrowedByPersonProvider = Provider.family<DebtInfo, int>((ref, personId) {
+final totalDebtBorrowedByPersonProvider = Provider.family<DebtInfo, int>((
+  ref,
+  personId,
+) {
   final debts = ref.watch(debtByPersonProvider(personId));
   double totalDebt = 0;
   double totalDebtPaid = 0;
   double totalDebtRemaining = 0;
   for (var debt in debts) {
-    if(debt.type == DebtType.borrowed){
+    if (debt.type == DebtType.borrowed) {
       totalDebt += debt.amount;
       totalDebtPaid += debt.paidAmount;
       totalDebtRemaining += debt.remainingAmount;
     }
   }
-  return DebtInfo(totalDebt: totalDebt, totalDebtPaid: totalDebtPaid, totalDebtRemaining: totalDebtRemaining);
+  return DebtInfo(
+    totalDebt: totalDebt,
+    totalDebtPaid: totalDebtPaid,
+    totalDebtRemaining: totalDebtRemaining,
+  );
 });
 
 final debtByTypeProvider = Provider.family<List<Debt>, DebtType>((ref, type) {
@@ -537,28 +656,36 @@ final debtByTypeProvider = Provider.family<List<Debt>, DebtType>((ref, type) {
 });
 
 /// Map<personId, remainingAmount> cho các debts CHƯA hoàn thành (active / partial)
-final debtSummaryByTypeProvider = Provider.family<Map<int, double>, DebtType>((ref, type) {
+final debtSummaryByTypeProvider = Provider.family<Map<int, double>, DebtType>((
+  ref,
+  type,
+) {
   final debts = ref.watch(debtByTypeProvider(type));
   final summary = <int, double>{};
   for (var debt in debts) {
     if (debt.status == DebtStatus.paid) continue;
-    summary[debt.personId] = (summary[debt.personId] ?? 0) + debt.remainingAmount;
+    summary[debt.personId] =
+        (summary[debt.personId] ?? 0) + debt.remainingAmount;
   }
   return summary;
 });
 
 /// Map<personId, totalAmount> cho các debts ĐÃ hoàn thành (paid)
-final debtSummaryPaidByTypeProvider = Provider.family<Map<int, double>, DebtType>((ref, type) {
-  final debts = ref.watch(debtByTypeProvider(type));
-  final summary = <int, double>{};
-  for (var debt in debts) {
-    if (debt.status != DebtStatus.paid) continue;
-    summary[debt.personId] = (summary[debt.personId] ?? 0) + debt.amount;
-  }
-  return summary;
-});
+final debtSummaryPaidByTypeProvider =
+    Provider.family<Map<int, double>, DebtType>((ref, type) {
+      final debts = ref.watch(debtByTypeProvider(type));
+      final summary = <int, double>{};
+      for (var debt in debts) {
+        if (debt.status != DebtStatus.paid) continue;
+        summary[debt.personId] = (summary[debt.personId] ?? 0) + debt.amount;
+      }
+      return summary;
+    });
 
-final totalDebtByTypeProvider = Provider.family<DebtInfo, DebtType>((ref, type) {
+final totalDebtByTypeProvider = Provider.family<DebtInfo, DebtType>((
+  ref,
+  type,
+) {
   final debts = ref.watch(debtProvider).value ?? [];
   double totalDebt = 0;
   double totalDebtPaid = 0;
@@ -571,23 +698,41 @@ final totalDebtByTypeProvider = Provider.family<DebtInfo, DebtType>((ref, type) 
       totalDebtPaid += debt.paidAmount;
     }
   }
-  return DebtInfo(totalDebt: totalDebt, totalDebtPaid: totalDebtPaid, totalDebtRemaining: totalDebtRemaining);
+  return DebtInfo(
+    totalDebt: totalDebt,
+    totalDebtPaid: totalDebtPaid,
+    totalDebtRemaining: totalDebtRemaining,
+  );
 });
 
-// Provider to hold selected debt for repayment/collection
+/// Provider lưu trữ khoản nợ được chọn để trả/thu
 final selectedDebtProvider = StateProvider<Debt?>((ref) => null);
 
-/// Helper function to pay debt by person (auto-distribute across all debts of that person)
+/// Hàm hỗ trợ trả nợ theo người (tự động phân bổ cho tất cả các khoản nợ của người đó)
 /// Returns a void function that can be used with FutureProvider or called directly
-void Function() payDebtByPersonFn(WidgetRef ref, int personId, double paymentAmount, int walletId) {
+void Function() payDebtByPersonFn(
+  WidgetRef ref,
+  int personId,
+  double paymentAmount,
+  int walletId,
+) {
   return () async {
-    await ref.read(debtProvider.notifier).payDebtByPerson(personId, paymentAmount, walletId);
+    await ref
+        .read(debtProvider.notifier)
+        .payDebtByPerson(personId, paymentAmount, walletId);
   };
 }
 
-/// Helper function to collect debt by person (auto-distribute across all debts of that person)
-void Function() collectDebtByPersonFn(WidgetRef ref, int personId, double paymentAmount, int walletId) {
+/// Hàm hỗ trợ thu nợ theo người (tự động phân bổ cho tất cả các khoản nợ của người đó)
+void Function() collectDebtByPersonFn(
+  WidgetRef ref,
+  int personId,
+  double paymentAmount,
+  int walletId,
+) {
   return () async {
-    await ref.read(debtProvider.notifier).collectDebtByPerson(personId, paymentAmount, walletId);
+    await ref
+        .read(debtProvider.notifier)
+        .collectDebtByPerson(personId, paymentAmount, walletId);
   };
 }

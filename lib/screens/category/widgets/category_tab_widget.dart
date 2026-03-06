@@ -8,7 +8,6 @@ import 'package:mosa/providers/person_provider.dart';
 import 'package:mosa/providers/transaction_prefill_data_provider.dart';
 import 'package:mosa/router/app_routes.dart';
 import 'package:mosa/utils/app_colors.dart';
-import 'package:mosa/utils/utils.dart';
 import 'package:mosa/widgets/custom_expansion_tile.dart';
 import 'package:mosa/widgets/item_widget.dart';
 import 'package:mosa/widgets/search_bar_widget.dart';
@@ -39,13 +38,15 @@ class _CategoryTabState extends ConsumerState<CategoryTab> {
 
     // Select category
     ref.read(selectedCategoryProvider.notifier).selectCategory(category);
-    
+
     // Get transaction type from category
     final transactionType = ref.read(autoTransactionTypeProvider);
 
     if (categoryId == 'lend_payback' || categoryName == 'trả nợ') {
       // Repayment - show borrowed debts
-      final result = await context.push('${AppRoutes.debtSelection}?type=borrowed');
+      final result = await context.push(
+        '${AppRoutes.debtSelection}?type=borrowed',
+      );
 
       if (result != null && result is Map) {
         final personId = result['personId'];
@@ -53,7 +54,9 @@ class _CategoryTabState extends ConsumerState<CategoryTab> {
 
         final person = ref.watch(personByIdProvider(personId));
         // User selected a debt
-        ref.read(transactionPrefillDataProvider.notifier).state = TransactionPrefill(
+        ref
+            .read(transactionPrefillDataProvider.notifier)
+            .state = TransactionPrefill(
           amount: debtAmount,
           person: person,
           category: category,
@@ -71,7 +74,9 @@ class _CategoryTabState extends ConsumerState<CategoryTab> {
 
         final person = ref.watch(personByIdProvider(personId));
         // User selected a debt
-        ref.read(transactionPrefillDataProvider.notifier).state = TransactionPrefill(
+        ref
+            .read(transactionPrefillDataProvider.notifier)
+            .state = TransactionPrefill(
           amount: debtAmount,
           person: person,
           category: category,
@@ -81,14 +86,17 @@ class _CategoryTabState extends ConsumerState<CategoryTab> {
       }
     } else {
       // Regular category - normal flow
-      ref.read(transactionPrefillDataProvider.notifier).state = TransactionPrefill(category: category, type: transactionType);
+      ref.read(transactionPrefillDataProvider.notifier).state =
+          TransactionPrefill(category: category, type: transactionType);
       context.pop();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final asyncCategories = ref.watch(categoryByTypeProvider(widget.categoryType));
+    final asyncCategories = ref.watch(
+      categoryByTypeProvider(widget.categoryType),
+    );
 
     return Container(
       decoration: BoxDecoration(color: AppColors.secondaryBackground),
@@ -114,12 +122,19 @@ class _CategoryTabState extends ConsumerState<CategoryTab> {
                   if (category.children?.isEmpty ?? true) {
                     return Container(
                       color: AppColors.background,
-                      margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 3),
-                      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 0,
+                        vertical: 3,
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 18,
+                        vertical: 8,
+                      ),
                       child: ItemWidget(
                         category: category,
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        onTap: () => _handleCategorySelection(context, category),
+                        onTap:
+                            () => _handleCategorySelection(context, category),
                       ),
                     );
                   } else {
@@ -128,21 +143,28 @@ class _CategoryTabState extends ConsumerState<CategoryTab> {
                       header: ItemWidget(
                         category: category,
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        onTap: () => _handleCategorySelection(context, category),
+                        onTap:
+                            () => _handleCategorySelection(context, category),
                       ),
                       children: [
                         GridView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: category.children!.length,
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 4,
-                            crossAxisSpacing: 10,
-                            childAspectRatio: 1.4,
-                          ),
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 4,
+                                crossAxisSpacing: 10,
+                                childAspectRatio: 1.4,
+                              ),
                           itemBuilder: (context, index) {
                             final child = category.children![index];
-                            return ItemWidget(category: child, onTap: () => _handleCategorySelection(context, child));
+                            return ItemWidget(
+                              category: child,
+                              onTap:
+                                  () =>
+                                      _handleCategorySelection(context, child),
+                            );
                           },
                         ),
                       ],

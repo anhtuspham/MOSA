@@ -16,7 +16,8 @@ class TransactionTypeDropdown extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final selectedTransactionType = ref.watch(currentTransactionByTypeProvider) ?? TransactionType.expense;
+    final selectedTransactionType =
+        ref.watch(currentTransactionByTypeProvider) ?? TransactionType.expense;
 
     return DropdownButtonFormField<TransactionType>(
       decoration: const InputDecoration(
@@ -29,12 +30,30 @@ class TransactionTypeDropdown extends ConsumerWidget {
       alignment: Alignment.center,
       initialValue: selectedTransactionType,
       items: [
-        DropdownMenuItem(value: TransactionType.expense, child: Text(TransactionConstants.expense)),
-        DropdownMenuItem(value: TransactionType.income, child: Text(TransactionConstants.income)),
-        DropdownMenuItem(value: TransactionType.lend, child: Text(TransactionConstants.lend)),
-        DropdownMenuItem(value: TransactionType.borrowing, child: Text(TransactionConstants.borrowing)),
-        DropdownMenuItem(value: TransactionType.transfer, child: Text(TransactionConstants.transfer)),
-        DropdownMenuItem(value: TransactionType.adjustBalance, child: Text(TransactionConstants.adjustBalance)),
+        DropdownMenuItem(
+          value: TransactionType.expense,
+          child: Text(TransactionConstants.expense),
+        ),
+        DropdownMenuItem(
+          value: TransactionType.income,
+          child: Text(TransactionConstants.income),
+        ),
+        DropdownMenuItem(
+          value: TransactionType.lend,
+          child: Text(TransactionConstants.lend),
+        ),
+        DropdownMenuItem(
+          value: TransactionType.borrowing,
+          child: Text(TransactionConstants.borrowing),
+        ),
+        DropdownMenuItem(
+          value: TransactionType.transfer,
+          child: Text(TransactionConstants.transfer),
+        ),
+        DropdownMenuItem(
+          value: TransactionType.adjustBalance,
+          child: Text(TransactionConstants.adjustBalance),
+        ),
       ],
       onChanged: (value) async {
         if (value != null) {
@@ -45,9 +64,13 @@ class TransactionTypeDropdown extends ConsumerWidget {
 
           if (categoryName != null) {
             try {
-              final category = await ref.read(categoryByNameProvider(categoryName).future);
+              final category = await ref.read(
+                categoryByNameProvider(categoryName).future,
+              );
               log('category: ${category?.name}');
-              ref.read(selectedCategoryProvider.notifier).selectCategory(category);
+              ref
+                  .read(selectedCategoryProvider.notifier)
+                  .selectCategory(category);
             } catch (e) {
               ref.read(selectedCategoryProvider.notifier).selectCategory(null);
             }

@@ -54,7 +54,9 @@ class DatabaseService {
 
     try {
       // Drop all existing tables
-      await db.execute('DROP TABLE IF EXISTS ${AppConstants.tableTransactions}');
+      await db.execute(
+        'DROP TABLE IF EXISTS ${AppConstants.tableTransactions}',
+      );
       await db.execute('DROP TABLE IF EXISTS ${AppConstants.tableWallets}');
       await db.execute('DROP TABLE IF EXISTS ${AppConstants.tableTypeWallets}');
 
@@ -69,7 +71,11 @@ class DatabaseService {
   }
 
   Future<void> _seedTypeWallets(Database db) async {
-    final count = Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM ${AppConstants.tableTypeWallets}'));
+    final count = Sqflite.firstIntValue(
+      await db.rawQuery(
+        'SELECT COUNT(*) FROM ${AppConstants.tableTypeWallets}',
+      ),
+    );
 
     if (count! > 0) {
       log('Type wallets existed, skip');
@@ -81,7 +87,11 @@ class DatabaseService {
       {'id': 1, 'name': 'Tiền mặt', 'iconPath': 'assets/icons/cash.png'},
       {'id': 2, 'name': 'Ngân hàng', 'iconPath': 'assets/icons/bank.png'},
       {'id': 3, 'name': 'Ví điện tử', 'iconPath': 'assets/icons/ewallet.png'},
-      {'id': 4, 'name': 'Thẻ tín dụng', 'iconPath': 'assets/icons/credit_card.png'},
+      {
+        'id': 4,
+        'name': 'Thẻ tín dụng',
+        'iconPath': 'assets/icons/credit_card.png',
+      },
     ];
 
     for (var data in typeWallets) {
@@ -91,7 +101,9 @@ class DatabaseService {
   }
 
   Future<void> _seedWallets(Database db) async {
-    final count = Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM ${AppConstants.tableWallets}'));
+    final count = Sqflite.firstIntValue(
+      await db.rawQuery('SELECT COUNT(*) FROM ${AppConstants.tableWallets}'),
+    );
 
     if (count! > 0) {
       log('Wallets existed, skip');
@@ -100,7 +112,9 @@ class DatabaseService {
 
     // Check if wallets.json exists, if not create default wallet
     try {
-      final jsonString = await rootBundle.loadString('assets/data/wallets.json');
+      final jsonString = await rootBundle.loadString(
+        'assets/data/wallets.json',
+      );
       final List<dynamic> jsonData = jsonDecode(jsonString);
 
       for (var data in jsonData) {
@@ -123,12 +137,21 @@ class DatabaseService {
         'isSynced': 0,
         'syncId': DateTime.now().millisecondsSinceEpoch.toString(),
       });
-      log('Default wallet created cuz have bug', name: 'DatabaseService', error: e, stackTrace: stackTrace);
+      log(
+        'Default wallet created cuz have bug',
+        name: 'DatabaseService',
+        error: e,
+        stackTrace: stackTrace,
+      );
     }
   }
 
   Future<void> _seedTransactions(Database db) async {
-    final count = Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM ${AppConstants.tableTransactions}'));
+    final count = Sqflite.firstIntValue(
+      await db.rawQuery(
+        'SELECT COUNT(*) FROM ${AppConstants.tableTransactions}',
+      ),
+    );
 
     if (count! > 0) {
       log('Transactions existed, skip');
@@ -136,17 +159,28 @@ class DatabaseService {
     }
 
     try {
-      final jsonString = await rootBundle.loadString('assets/data/transactions.json');
+      final jsonString = await rootBundle.loadString(
+        'assets/data/transactions.json',
+      );
       final List<dynamic> jsonData = jsonDecode(jsonString);
 
       for (final json in jsonData) {
         final transaction = _parseTransactionFromJson(json);
-        await db.insert(AppConstants.tableTransactions, transaction.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+        await db.insert(
+          AppConstants.tableTransactions,
+          transaction.toMap(),
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
       }
 
       log('Transactions seeded from JSON');
     } catch (e, stackTrace) {
-      log('Transactions seeding failed', name: 'DatabaseService', error: e, stackTrace: stackTrace);
+      log(
+        'Transactions seeding failed',
+        name: 'DatabaseService',
+        error: e,
+        stackTrace: stackTrace,
+      );
     }
   }
 
@@ -172,8 +206,12 @@ class DatabaseService {
       }
       log('Persons seeded from JSON: ${persons.length} entries');
     } catch (e, stackTrace) {
-      log('Person seeding failed',
-          name: 'DatabaseService', error: e, stackTrace: stackTrace);
+      log(
+        'Person seeding failed',
+        name: 'DatabaseService',
+        error: e,
+        stackTrace: stackTrace,
+      );
     }
   }
 
@@ -209,8 +247,12 @@ class DatabaseService {
 
       log('Categories seeded: ${flatCategories.length} entries');
     } catch (e, stackTrace) {
-      log('Person seeding failed',
-          name: 'DatabaseService', error: e, stackTrace: stackTrace);
+      log(
+        'Person seeding failed',
+        name: 'DatabaseService',
+        error: e,
+        stackTrace: stackTrace,
+      );
     }
   }
 
@@ -281,7 +323,9 @@ class DatabaseService {
       CREATE TABLE ${AppConstants.tablePersons}(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL UNIQUE,
-        iconPath TEXT NOT NULL
+        iconPath TEXT NOT NULL,
+        createAt TEXT,
+        updateAt TEXT
         )
     ''');
 
@@ -294,8 +338,8 @@ class DatabaseService {
         type TEXT NOT NULL,
         status TEXT NOT NULL,
         description TEXT NOT NULL,
-        createdDate INTEGER NOT NULL,
-        dueDate INTEGER,
+        createdDate TEXT NOT NULL,
+        dueDate TEXT,
         walletId INTEGER NOT NULL,
         FOREIGN KEY (personId) REFERENCES ${AppConstants.tablePersons}(id) ON DELETE RESTRICT,
         FOREIGN KEY (walletId) REFERENCES ${AppConstants.tableWallets}(id) ON DELETE RESTRICT
@@ -316,15 +360,33 @@ class DatabaseService {
     ''');
 
     // Create indexes for fast lookup
-    await db.execute('CREATE INDEX idx_type_wallet_name ON ${AppConstants.tableTypeWallets}(name)');
-    await db.execute('CREATE INDEX idx_wallet_name ON ${AppConstants.tableWallets}(name)');
-    await db.execute('CREATE INDEX idx_wallet_typeWalletId ON ${AppConstants.tableWallets}(typeWalletId)');
-    await db.execute('CREATE INDEX idx_wallet_default ON ${AppConstants.tableWallets}(isDefault)');
-    await db.execute('CREATE INDEX idx_wallet_active ON ${AppConstants.tableWallets}(isActive)');
-    await db.execute('CREATE INDEX idx_transaction_walletId ON ${AppConstants.tableTransactions}(walletId)');
-    await db.execute('CREATE INDEX idx_transaction_date ON ${AppConstants.tableTransactions}(date)');
-    await db.execute('CREATE INDEX idx_debt_personId ON ${AppConstants.tableDebts}(personId)');
-    await db.execute('CREATE INDEX idx_debt_categoriesId ON ${AppConstants.tableCategories}(id)');
+    await db.execute(
+      'CREATE INDEX idx_type_wallet_name ON ${AppConstants.tableTypeWallets}(name)',
+    );
+    await db.execute(
+      'CREATE INDEX idx_wallet_name ON ${AppConstants.tableWallets}(name)',
+    );
+    await db.execute(
+      'CREATE INDEX idx_wallet_typeWalletId ON ${AppConstants.tableWallets}(typeWalletId)',
+    );
+    await db.execute(
+      'CREATE INDEX idx_wallet_default ON ${AppConstants.tableWallets}(isDefault)',
+    );
+    await db.execute(
+      'CREATE INDEX idx_wallet_active ON ${AppConstants.tableWallets}(isActive)',
+    );
+    await db.execute(
+      'CREATE INDEX idx_transaction_walletId ON ${AppConstants.tableTransactions}(walletId)',
+    );
+    await db.execute(
+      'CREATE INDEX idx_transaction_date ON ${AppConstants.tableTransactions}(date)',
+    );
+    await db.execute(
+      'CREATE INDEX idx_debt_personId ON ${AppConstants.tableDebts}(personId)',
+    );
+    await db.execute(
+      'CREATE INDEX idx_debt_categoriesId ON ${AppConstants.tableCategories}(id)',
+    );
 
     // Seed default data
     await _seedTypeWallets(db);
@@ -349,10 +411,15 @@ class DatabaseService {
   }
 
   // CREATE
+  /// Tạo mới giao dịch
   Future<int> insertTransaction(TransactionModel transaction) async {
     try {
       final db = await database;
-      final id = await db.insert(AppConstants.tableTransactions, transaction.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+      final id = await db.insert(
+        AppConstants.tableTransactions,
+        transaction.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
 
       await _updateWalletBalance(transaction.walletId);
 
@@ -369,15 +436,20 @@ class DatabaseService {
     }
   }
 
+  /// Lấy tất cả các khoản nợ
   Future<List<Debt>> getAllDebt() async {
     final db = await database;
-    final List<Map<String, dynamic>> map = await db.query(AppConstants.tableDebts, orderBy: 'createdDate DESC');
+    final List<Map<String, dynamic>> map = await db.query(
+      AppConstants.tableDebts,
+      orderBy: 'createdDate DESC',
+    );
 
     return List.generate(map.length, (index) {
-      return Debt.fromJson(map[index]);
+      return Debt.fromMap(map[index]);
     });
   }
 
+  /// Lấy các khoản nợ theo loại
   Future<List<Debt>> getDebtByType(DebtType type) async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
@@ -387,63 +459,97 @@ class DatabaseService {
       orderBy: 'createdDate DESC',
     );
     return List.generate(maps.length, (index) {
-      return Debt.fromJson(maps[index]);
+      return Debt.fromMap(maps[index]);
     });
   }
 
+  /// Tạo mới khoản nợ
   Future<int> createDebt(Debt debt) async {
     try {
       final db = await database;
-      final id = await db.insert(AppConstants.tableDebts, debt.toJson(), conflictAlgorithm: ConflictAlgorithm.replace);
+      final id = await db.insert(
+        AppConstants.tableDebts,
+        debt.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
       await _updateWalletBalance(debt.walletId);
       return id;
     } catch (e) {
+      log('Tạo khoản nợ thất bại: $e');
       rethrow;
     }
   }
 
+  /// Cập nhật khoản nợ
   Future<void> updateDebt(Debt debt) async {
     try {
       final db = await database;
-      await db.update(AppConstants.tableDebts, debt.toJson(), where: 'id = ?', whereArgs: [debt.id]);
+      await db.update(
+        AppConstants.tableDebts,
+        debt.toMap(),
+        where: 'id = ?',
+        whereArgs: [debt.id],
+      );
       await _updateWalletBalance(debt.walletId);
     } catch (e) {
+      log('Cập nhật khoản nợ thất bại: $e');
       rethrow;
     }
   }
 
+  /// Xóa khoản nợ
   Future<void> deleteDebt(Debt debt) async {
     try {
       final db = await database;
-      await db.delete(AppConstants.tableDebts, where: 'id = ?', whereArgs: [debt.id]);
+      await db.delete(
+        AppConstants.tableDebts,
+        where: 'id = ?',
+        whereArgs: [debt.id],
+      );
       await _updateWalletBalance(debt.walletId);
     } catch (e) {
+      log('Xóa khoản nợ thất bại: $e');
       rethrow;
     }
   }
 
-  Future<void> getDebtByPersonId(Debt debt) async {
+  /// Lấy khoản nợ theo ID người
+  Future<List<Debt>> getDebtByPersonId(int personId) async {
     try {
-      await database;
+      final db = await database;
+      final List<Map<String, dynamic>> maps = await db.query(
+        AppConstants.tableDebts,
+        where: 'personId = ?',
+        whereArgs: [personId],
+        orderBy: 'createdDate DESC',
+      );
+      return List.generate(maps.length, (index) => Debt.fromMap(maps[index]));
     } catch (e) {
+      log('Lấy khoản nợ theo người thất bại: $e');
       rethrow;
     }
   }
 
-  /// Get all debts for a person with specific type, ordered by createdDate (oldest first)
-  Future<List<Debt>> getDebtsByPersonAndType(int personId, DebtType type) async {
+  /// Lấy tất cả khoản nợ của một người theo loại, sắp xếp theo ngày tạo (cũ nhất trước)
+  Future<List<Debt>> getDebtsByPersonAndType(
+    int personId,
+    DebtType type,
+  ) async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
       AppConstants.tableDebts,
       where: 'personId = ? AND type = ?',
       whereArgs: [personId, type.name],
-      orderBy: 'createdDate ASC', // oldest first for FIFO distribution
+      orderBy: 'createdDate ASC',
     );
-    return List.generate(maps.length, (index) => Debt.fromJson(maps[index]));
+    return List.generate(maps.length, (index) => Debt.fromMap(maps[index]));
   }
 
-  /// Get all active/partial debts for a person with specific type
-  Future<List<Debt>> getActiveDebtsByPersonAndType(int personId, DebtType type) async {
+  /// Lấy các khoản nợ đang hoạt động/chưa trả hết của một người theo loại
+  Future<List<Debt>> getActiveDebtsByPersonAndType(
+    int personId,
+    DebtType type,
+  ) async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
       AppConstants.tableDebts,
@@ -451,12 +557,12 @@ class DatabaseService {
       whereArgs: [personId, type.name, DebtStatus.paid.name],
       orderBy: 'createdDate ASC',
     );
-    return List.generate(maps.length, (index) => Debt.fromJson(maps[index]));
+    return List.generate(maps.length, (index) => Debt.fromMap(maps[index]));
   }
 
   // ==================== PERSON OPERATIONS ====================
 
-  /// Get all persons ordered by name
+  /// Lấy tất cả người, sắp xếp theo tên
   Future<List<Person>> getAllPersons() async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
@@ -466,7 +572,7 @@ class DatabaseService {
     return List.generate(maps.length, (i) => Person.fromJson(maps[i]));
   }
 
-  /// Get person by ID
+  /// Lấy người theo ID
   Future<Person?> getPersonById(int id) async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
@@ -478,7 +584,7 @@ class DatabaseService {
     return Person.fromJson(maps.first);
   }
 
-  /// Insert new person
+  /// Thêm người mới
   Future<int> insertPerson(Person person) async {
     try {
       final db = await database;
@@ -505,7 +611,7 @@ class DatabaseService {
     }
   }
 
-  /// Update person (name and iconPath only, cannot change id)
+  /// Cập nhật thông tin người
   Future<int> updatePerson(Person person) async {
     try {
       final db = await database;
@@ -536,7 +642,7 @@ class DatabaseService {
 
   // ==================== CATEGORIES OPERATIONS ====================
 
-  /// Get all category ordered by name
+  /// Lấy tất cả danh mục, sắp xếp theo tên
   Future<List<Category>> getAllCategories() async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
@@ -546,7 +652,7 @@ class DatabaseService {
     return List.generate(maps.length, (i) => Category.fromJson(maps[i]));
   }
 
-  /// Insert new category
+  /// Thêm danh mục mới
   Future<int> insertCategory(Category category) async {
     try {
       final db = await database;
@@ -573,7 +679,7 @@ class DatabaseService {
     }
   }
 
-  /// Update category (name and iconPath only, cannot change id)
+  /// Cập nhật danh mục
   Future<int> updateCategory(Category category) async {
     try {
       final db = await database;
@@ -611,9 +717,13 @@ class DatabaseService {
   }
 
   // READ ALL
+  /// Lấy tất cả giao dịch
   Future<List<TransactionModel>> getAllTransactions() async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query(AppConstants.tableTransactions, orderBy: 'date DESC');
+    final List<Map<String, dynamic>> maps = await db.query(
+      AppConstants.tableTransactions,
+      orderBy: 'date DESC',
+    );
 
     return List.generate(maps.length, (i) {
       return TransactionModel.fromMap(maps[i]);
@@ -621,9 +731,14 @@ class DatabaseService {
   }
 
   // READ BY ID
+  /// Lấy giao dịch theo ID
   Future<TransactionModel?> getTransactionById(int id) async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query(AppConstants.tableTransactions, where: 'id = ?', whereArgs: [id]);
+    final List<Map<String, dynamic>> maps = await db.query(
+      AppConstants.tableTransactions,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
 
     if (maps.isEmpty) return null;
     return TransactionModel.fromMap(maps.first);
@@ -642,6 +757,7 @@ class DatabaseService {
   }
 
   // UPDATE
+  /// Cập nhật giao dịch
   Future<int> updateTransaction(TransactionModel transaction) async {
     try {
       // we have 2 case, 1 is update in current wallet, another one is update using another wallet
@@ -649,12 +765,18 @@ class DatabaseService {
 
       // get old transaction with old walletId
       final oldTransaction = await getTransactionById(transaction.id ?? -1);
-      final count = await db.update(AppConstants.tableTransactions, transaction.toMap(), where: 'id = ?', whereArgs: [transaction.id]);
+      final count = await db.update(
+        AppConstants.tableTransactions,
+        transaction.toMap(),
+        where: 'id = ?',
+        whereArgs: [transaction.id],
+      );
 
       // update wallet balance
       await _updateWalletBalance(transaction.walletId);
 
-      if (oldTransaction != null && oldTransaction.walletId != transaction.walletId) {
+      if (oldTransaction != null &&
+          oldTransaction.walletId != transaction.walletId) {
         await _updateWalletBalance(oldTransaction.walletId);
       }
       log('Transaction updated: $count rows affected');
@@ -670,13 +792,18 @@ class DatabaseService {
   }
 
   // DELETE
+  /// Xóa giao dịch
   Future<int> deleteTransaction(int id) async {
     try {
       final db = await database;
 
       // find transaction
       final transaction = await getTransactionById(id);
-      final count = await db.delete(AppConstants.tableTransactions, where: 'id = ?', whereArgs: [id]);
+      final count = await db.delete(
+        AppConstants.tableTransactions,
+        where: 'id = ?',
+        whereArgs: [id],
+      );
 
       if (transaction != null && count > 0) {
         await _updateWalletBalance(transaction.walletId);
@@ -694,6 +821,7 @@ class DatabaseService {
   }
 
   // CLEAR DATABASE - Delete entire database file
+  /// Xóa toàn bộ database
   Future<void> clearDatabase() async {
     try {
       // Close the current database connection if it exists
@@ -707,7 +835,9 @@ class DatabaseService {
       final path = join(dbPath, AppConstants.dbName);
       await deleteDatabase(path);
 
-      log('Database file deleted successfully. Will be recreated on next access.');
+      log(
+        'Database file deleted successfully. Will be recreated on next access.',
+      );
     } catch (e) {
       log('Clear database failed: $e');
       rethrow;
@@ -715,6 +845,7 @@ class DatabaseService {
   }
 
   // IMPORT DATABASE - Load transactions from JSON file in assets
+  /// Nhập giao dịch từ file JSON trong assets
   Future<void> importTransactionsFromAssets(String assetPath) async {
     try {
       // Load JSON file
@@ -766,7 +897,10 @@ class DatabaseService {
 
       await db.update(
         AppConstants.tableWallets,
-        {'balance': calculatedBalance, 'updateAt': DateTime.now().toIso8601String()},
+        {
+          'balance': calculatedBalance,
+          'updateAt': DateTime.now().toIso8601String(),
+        },
         where: 'id = ?',
         whereArgs: [walletId],
       );
@@ -780,7 +914,7 @@ class DatabaseService {
 
   // ==================== WALLET OPERATIONS ====================
 
-  /// Get all wallets (active only by default)
+  /// Lấy tất cả ví (mặc định chỉ lấy ví đang hoạt động)
   Future<List<Wallet>> getAllWallets({bool includeInactive = false}) async {
     final db = await database;
 
@@ -810,16 +944,20 @@ class DatabaseService {
     });
   }
 
-  /// Get wallet by ID
+  /// Lấy ví theo ID
   Future<Wallet?> getWalletById(int id) async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query(AppConstants.tableWallets, where: 'id = ?', whereArgs: [id]);
+    final List<Map<String, dynamic>> maps = await db.query(
+      AppConstants.tableWallets,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
 
     if (maps.isEmpty) return null;
     return Wallet.fromMap(maps.first);
   }
 
-  /// Get default wallet
+  /// Lấy ví mặc định
   Future<Wallet?> getDefaultWallet() async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
@@ -831,7 +969,12 @@ class DatabaseService {
 
     if (maps.isEmpty) {
       // Fallback: return first active wallet
-      final allMaps = await db.query(AppConstants.tableWallets, where: 'isActive = ?', whereArgs: [1], limit: 1);
+      final allMaps = await db.query(
+        AppConstants.tableWallets,
+        where: 'isActive = ?',
+        whereArgs: [1],
+        limit: 1,
+      );
       if (allMaps.isEmpty) return null;
       return Wallet.fromMap(allMaps.first);
     }
@@ -870,7 +1013,11 @@ class DatabaseService {
     try {
       final db = await database;
 
-      final existing = await db.query(AppConstants.tableWallets, where: 'name = ?', whereArgs: [wallet.name]);
+      final existing = await db.query(
+        AppConstants.tableWallets,
+        where: 'name = ?',
+        whereArgs: [wallet.name],
+      );
       if (existing.isNotEmpty) {
         throw 'Tên ví đã tồn tại';
       }
@@ -904,7 +1051,12 @@ class DatabaseService {
   Future<int> updateWallet(Wallet wallet) async {
     try {
       final db = await database;
-      final count = await db.update(AppConstants.tableWallets, wallet.toMap(), where: 'id = ?', whereArgs: [wallet.id]);
+      final count = await db.update(
+        AppConstants.tableWallets,
+        wallet.toMap(),
+        where: 'id = ?',
+        whereArgs: [wallet.id],
+      );
       log('Wallet updated: $count rows affected');
       return count;
     } catch (e) {
@@ -937,7 +1089,10 @@ class DatabaseService {
       final db = await database;
 
       // Check if wallet has transactions
-      final result = await db.rawQuery('SELECT COUNT(*) as count FROM ${AppConstants.tableTransactions} WHERE walletId = ?', [id]);
+      final result = await db.rawQuery(
+        'SELECT COUNT(*) as count FROM ${AppConstants.tableTransactions} WHERE walletId = ?',
+        [id],
+      );
       final transactionCount = Sqflite.firstIntValue(result) ?? 0;
 
       if (transactionCount > 0) {
@@ -947,7 +1102,11 @@ class DatabaseService {
         );
       }
 
-      final count = await db.delete(AppConstants.tableWallets, where: 'id = ?', whereArgs: [id]);
+      final count = await db.delete(
+        AppConstants.tableWallets,
+        where: 'id = ?',
+        whereArgs: [id],
+      );
       log('Wallet deleted: $count rows affected');
       return count;
     } catch (e) {
@@ -1020,7 +1179,10 @@ class DatabaseService {
   /// Get all type wallets
   Future<List<TypeWallet>> getAllTypeWallets() async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query(AppConstants.tableTypeWallets, orderBy: 'id ASC');
+    final List<Map<String, dynamic>> maps = await db.query(
+      AppConstants.tableTypeWallets,
+      orderBy: 'id ASC',
+    );
 
     return List.generate(maps.length, (i) => TypeWallet.fromMap(maps[i]));
   }
@@ -1028,7 +1190,11 @@ class DatabaseService {
   /// Get type wallet by ID
   Future<TypeWallet?> getTypeWalletById(int id) async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query(AppConstants.tableTypeWallets, where: 'id = ?', whereArgs: [id]);
+    final List<Map<String, dynamic>> maps = await db.query(
+      AppConstants.tableTypeWallets,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
 
     if (maps.isEmpty) return null;
     return TypeWallet.fromMap(maps.first);
@@ -1038,7 +1204,11 @@ class DatabaseService {
   Future<int> insertTypeWallet(TypeWallet typeWallet) async {
     try {
       final db = await database;
-      final id = await db.insert(AppConstants.tableTypeWallets, typeWallet.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+      final id = await db.insert(
+        AppConstants.tableTypeWallets,
+        typeWallet.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
       log('Type wallet inserted with id: $id');
       return id;
     } catch (e) {
@@ -1053,7 +1223,10 @@ class DatabaseService {
       final db = await database;
 
       // Check if any wallets are using this type
-      final result = await db.rawQuery('SELECT COUNT(*) as count FROM ${AppConstants.tableWallets} WHERE typeWalletId = ?', [id]);
+      final result = await db.rawQuery(
+        'SELECT COUNT(*) as count FROM ${AppConstants.tableWallets} WHERE typeWalletId = ?',
+        [id],
+      );
       final walletCount = Sqflite.firstIntValue(result) ?? 0;
 
       if (walletCount > 0) {
@@ -1063,7 +1236,11 @@ class DatabaseService {
         );
       }
 
-      final count = await db.delete(AppConstants.tableTypeWallets, where: 'id = ?', whereArgs: [id]);
+      final count = await db.delete(
+        AppConstants.tableTypeWallets,
+        where: 'id = ?',
+        whereArgs: [id],
+      );
       log('Type wallet deleted: $count rows affected');
       return count;
     } catch (e) {

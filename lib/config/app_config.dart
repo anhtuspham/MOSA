@@ -6,8 +6,9 @@ import 'package:logger/logger.dart';
 const bool isDev = true;
 const bool app_encryption = false;
 final EncryptSys.IV app_iv = EncryptSys.IV.fromUtf8('iAXXbkdFDu7L3WnT');
-final EncryptSys.Key app_key =
-EncryptSys.Key.fromUtf8('VnXNJr14j5QMRtyLHfJzjRUjURPzWnLc');
+final EncryptSys.Key app_key = EncryptSys.Key.fromUtf8(
+  'VnXNJr14j5QMRtyLHfJzjRUjURPzWnLc',
+);
 
 final logger = Logger(
   filter: null, // Use the default LogFilter (-> only log in debug mode)
@@ -44,7 +45,6 @@ class AppConfig {
       }
     }
   }
-
 }
 
 final AppConfig appConfig = AppConfig();

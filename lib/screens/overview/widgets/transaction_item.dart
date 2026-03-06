@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -61,9 +60,7 @@ class TransactionItem extends ConsumerWidget {
                 Helpers.formatCurrency(transaction.amount),
                 style: TextStyle(
                   fontSize: 16.sp,
-                  color: getTransactionTypeColor(
-                    type: transaction.type,
-                  ),
+                  color: getTransactionTypeColor(type: transaction.type),
                 ),
               ),
               walletController.when(

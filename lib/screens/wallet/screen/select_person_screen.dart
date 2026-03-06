@@ -43,9 +43,16 @@ class _SelectPersonScreenState extends ConsumerState<SelectPersonScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.person_outline, size: 64, color: AppColors.textSecondary),
+                  Icon(
+                    Icons.person_outline,
+                    size: 64,
+                    color: AppColors.textSecondary,
+                  ),
                   const SizedBox(height: 16),
-                  Text('Chưa có người nào', style: TextStyle(color: AppColors.textSecondary)),
+                  Text(
+                    'Chưa có người nào',
+                    style: TextStyle(color: AppColors.textSecondary),
+                  ),
                   const SizedBox(height: 8),
                   ElevatedButton.icon(
                     onPressed: () => _showAddPersonDialog(context),
@@ -70,7 +77,8 @@ class _SelectPersonScreenState extends ConsumerState<SelectPersonScreen> {
                   width: 30,
                   errorBuilder: (_, __, ___) => Icon(Icons.person, size: 30),
                 ),
-                backgroundColor: isSelected ? AppColors.lightBackGroundColor : null,
+                backgroundColor:
+                    isSelected ? AppColors.lightBackGroundColor : null,
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -80,8 +88,7 @@ class _SelectPersonScreenState extends ConsumerState<SelectPersonScreen> {
                       onPressed: () => _showEditPersonDialog(context, person),
                     ),
                     // Selection checkmark
-                    if (isSelected)
-                      Icon(Icons.check, color: AppColors.primary),
+                    if (isSelected) Icon(Icons.check, color: AppColors.primary),
                   ],
                 ),
 
@@ -104,58 +111,61 @@ class _SelectPersonScreenState extends ConsumerState<SelectPersonScreen> {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Thêm người mới'),
-        content: TextField(
-          controller: nameController,
-          decoration: InputDecoration(
-            labelText: 'Tên người',
-            hintText: 'Nhập tên người',
-          ),
-          autofocus: true,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Hủy'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              final name = nameController.text.trim();
-              if (name.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Vui lòng nhập tên')),
-                );
-                return;
-              }
+      builder:
+          (context) => AlertDialog(
+            title: Text('Thêm người mới'),
+            content: TextField(
+              controller: nameController,
+              decoration: InputDecoration(
+                labelText: 'Tên người',
+                hintText: 'Nhập tên người',
+              ),
+              autofocus: true,
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('Hủy'),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  final name = nameController.text.trim();
+                  if (name.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Vui lòng nhập tên')),
+                    );
+                    return;
+                  }
 
-              try {
-                final newPerson = Person(
-                  id: 0, // Will be assigned by database
-                  name: name,
-                  iconPath: 'assets/icons/person_default.png',
-                );
+                  try {
+                    final newPerson = Person(
+                      id: 0, // Will be assigned by database
+                      name: name,
+                      iconPath: 'assets/icons/person_default.png',
+                    );
 
-                await ref.read(personProvider.notifier).addPerson(newPerson);
+                    await ref
+                        .read(personProvider.notifier)
+                        .addPerson(newPerson);
 
-                if (mounted) {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Đã thêm $name')),
-                  );
-                }
-              } catch (e) {
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Lỗi: ${e.toString()}')),
-                  );
-                }
-              }
-            },
-            child: Text('Thêm'),
+                    if (mounted) {
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(
+                        context,
+                      ).showSnackBar(SnackBar(content: Text('Đã thêm $name')));
+                    }
+                  } catch (e) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Lỗi: ${e.toString()}')),
+                      );
+                    }
+                  }
+                },
+                child: Text('Thêm'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
@@ -164,53 +174,56 @@ class _SelectPersonScreenState extends ConsumerState<SelectPersonScreen> {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Sửa thông tin'),
-        content: TextField(
-          controller: nameController,
-          decoration: InputDecoration(
-            labelText: 'Tên người',
-            hintText: 'Nhập tên người',
-          ),
-          autofocus: true,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Hủy'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              final name = nameController.text.trim();
-              if (name.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Vui lòng nhập tên')),
-                );
-                return;
-              }
+      builder:
+          (context) => AlertDialog(
+            title: Text('Sửa thông tin'),
+            content: TextField(
+              controller: nameController,
+              decoration: InputDecoration(
+                labelText: 'Tên người',
+                hintText: 'Nhập tên người',
+              ),
+              autofocus: true,
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('Hủy'),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  final name = nameController.text.trim();
+                  if (name.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Vui lòng nhập tên')),
+                    );
+                    return;
+                  }
 
-              try {
-                final updatedPerson = person.copyWith(name: name);
-                await ref.read(personProvider.notifier).updatePerson(updatedPerson);
+                  try {
+                    final updatedPerson = person.copyWith(name: name);
+                    await ref
+                        .read(personProvider.notifier)
+                        .updatePerson(updatedPerson);
 
-                if (mounted) {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Đã cập nhật')),
-                  );
-                }
-              } catch (e) {
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Lỗi: ${e.toString()}')),
-                  );
-                }
-              }
-            },
-            child: Text('Lưu'),
+                    if (mounted) {
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(
+                        context,
+                      ).showSnackBar(SnackBar(content: Text('Đã cập nhật')));
+                    }
+                  } catch (e) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Lỗi: ${e.toString()}')),
+                      );
+                    }
+                  }
+                },
+                child: Text('Lưu'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 }

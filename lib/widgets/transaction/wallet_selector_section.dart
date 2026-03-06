@@ -14,7 +14,7 @@ class WalletSelectorSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final effectiveWallet = ref.watch(effectiveWalletProvider);
-    
+
     return effectiveWallet.when(
       data: (walletData) {
         return CustomListTile(

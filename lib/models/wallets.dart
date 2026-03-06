@@ -1,11 +1,12 @@
 import 'package:mosa/utils/app_icons.dart';
 
+/// Model lưu trữ thông tin ví/tài khoản
 class Wallet {
   final int? id;
   final String name;
   final String iconPath;
   final double balance;
-  final int typeWalletId; // Foreign key to TypeWallet table
+  final int typeWalletId;
   final bool isDefault;
   final bool isActive;
   final DateTime createAt;
@@ -33,6 +34,7 @@ class Wallet {
     this.initialBalance = 0,
   });
 
+  /// Tạo Wallet từ JSON
   factory Wallet.fromJson(Map<String, dynamic> json) {
     return Wallet(
       name: json['name'] as String,
@@ -47,10 +49,11 @@ class Wallet {
       syncId: json['syncId'] as String? ?? '',
       note: json['note'] ?? '',
       bankId: json['bankId'],
-      initialBalance: (json['initialBalance'] as num?)?.toDouble() ?? 0.0
+      initialBalance: (json['initialBalance'] as num?)?.toDouble() ?? 0.0,
     );
   }
 
+  /// Chuyển Wallet sang JSON
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -70,6 +73,7 @@ class Wallet {
     };
   }
 
+  /// Tạo Wallet từ Map (database)
   factory Wallet.fromMap(Map<String, dynamic> map) {
     return Wallet(
       id: map['id'] as int?,
@@ -88,10 +92,11 @@ class Wallet {
       syncId: map['syncId'] as String,
       note: map['note'] ?? '',
       bankId: map['bankId'],
-      initialBalance: map['initialBalance']
+      initialBalance: map['initialBalance'],
     );
   }
 
+  /// Chuyển Wallet sang Map (database)
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -111,6 +116,7 @@ class Wallet {
     };
   }
 
+  /// Tạo bản sao với các trường được cập nhật
   Wallet copyWith({
     int? id,
     String? name,
@@ -151,6 +157,7 @@ class Wallet {
   // }
 }
 
+/// Model lưu trữ thông tin loại ví
 class TypeWallet {
   final int? id;
   final String? name;
@@ -158,6 +165,7 @@ class TypeWallet {
 
   TypeWallet({this.id, this.name, this.iconPath});
 
+  /// Tạo TypeWallet từ JSON
   factory TypeWallet.fromJson(Map<String, dynamic> json) {
     return TypeWallet(
       id: json['id'] as int,
@@ -166,6 +174,7 @@ class TypeWallet {
     );
   }
 
+  /// Tạo TypeWallet từ Map (database)
   factory TypeWallet.fromMap(Map<String, dynamic> map) {
     return TypeWallet(
       id: map['id'] as int?,
@@ -174,10 +183,12 @@ class TypeWallet {
     );
   }
 
+  /// Chuyển TypeWallet sang Map (database)
   Map<String, dynamic> toMap() {
     return {'id': id, 'name': name, 'iconPath': iconPath};
   }
 
+  /// Tạo bản sao với các trường được cập nhật
   TypeWallet copyWith({int? id, String? name, String? iconPath}) {
     return TypeWallet(
       id: id ?? this.id,

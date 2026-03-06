@@ -128,7 +128,7 @@ class SettingsShellScreen extends StatelessWidget {
                           context.push(AppRoutes.loanTracking);
                         },
                         name: 'Theo dõi vay nợ',
-                      )
+                      ),
                     ],
                   ),
                 ],

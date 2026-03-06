@@ -94,7 +94,8 @@ final goRouter = GoRouter(
               routes: [
                 // Nested routes within Settings branch
                 GoRoute(
-                  path: 'loan-tracking', // Relative path, becomes /settings/loan-tracking
+                  path:
+                      'loan-tracking', // Relative path, becomes /settings/loan-tracking
                   name: 'loanTracking',
                   builder: (context, state) => LoanTrackingScreen(),
                 ),
@@ -178,7 +179,8 @@ final goRouter = GoRouter(
       name: 'debtSelection',
       builder: (context, state) {
         final debtTypeString = state.uri.queryParameters['type'] ?? 'borrowed';
-        final debtType = debtTypeString == 'lent' ? DebtType.lent : DebtType.borrowed;
+        final debtType =
+            debtTypeString == 'lent' ? DebtType.lent : DebtType.borrowed;
         return DebtSelectionScreen(debtType: debtType);
       },
     ),

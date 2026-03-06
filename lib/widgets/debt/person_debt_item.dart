@@ -12,7 +12,13 @@ class PersonDebtItem extends ConsumerWidget {
   final int personId;
   final VoidCallback? handleShowBottomSheet;
   final VoidCallback? onTap;
-  const PersonDebtItem({super.key, required this.isLent, required this.personId, this.handleShowBottomSheet, this.onTap});
+  const PersonDebtItem({
+    super.key,
+    required this.isLent,
+    required this.personId,
+    this.handleShowBottomSheet,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -23,8 +29,13 @@ class PersonDebtItem extends ConsumerWidget {
     final debt = isLent ? debtLent : debtBorrowed;
 
     return CustomListTile(
-      leading: CircleAvatar(child: Text(person?.name.substring(0, 1).toUpperCase() ?? 'T')),
-      title: Text(person?.name ?? 'Unknown', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.sp)),
+      leading: CircleAvatar(
+        child: Text(person?.name.substring(0, 1).toUpperCase() ?? 'T'),
+      ),
+      title: Text(
+        person?.name ?? 'Unknown',
+        style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.sp),
+      ),
       trailing: Row(
         children: [
           Column(
@@ -33,7 +44,10 @@ class PersonDebtItem extends ConsumerWidget {
               handleShowBottomSheet != null
                   ? Text(
                     Helpers.formatCurrency(debt.totalDebt),
-                    style: TextStyle(fontSize: 16.sp, color: AppColors.textPrimary),
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      color: AppColors.textPrimary,
+                    ),
                   )
                   : const SizedBox(),
               Text(

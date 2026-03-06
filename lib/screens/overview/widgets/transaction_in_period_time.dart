@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mosa/utils/helpers.dart';
@@ -95,7 +94,9 @@ class _TransactionInPeriodTimeState
   }
 
   Widget transactionListSection() {
-    final enrichedTransactionGroupState = ref.watch(enrichedTransactionGroupByDateProvider);
+    final enrichedTransactionGroupState = ref.watch(
+      enrichedTransactionGroupByDateProvider,
+    );
     final enrichedTransactionOfDay = enrichedTransactionGroupState.whenData(
       (group) => group[widget.date] ?? [],
     );

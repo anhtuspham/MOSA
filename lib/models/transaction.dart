@@ -1,6 +1,7 @@
 import 'package:mosa/models/enums.dart';
 import 'package:mosa/utils/utils.dart';
 
+/// Model lưu trữ thông tin giao dịch
 class TransactionModel {
   final int? id;
   final String title;
@@ -29,9 +30,10 @@ class TransactionModel {
     this.isSynced = false,
     required this.syncId,
     required this.walletId,
-    this.dueDate
+    this.dueDate,
   });
 
+  /// Tạo TransactionModel từ JSON
   factory TransactionModel.fromJson(Map<String, dynamic> json) {
     return TransactionModel(
       title: json['title'] as String,
@@ -49,6 +51,7 @@ class TransactionModel {
     );
   }
 
+  /// Tạo TransactionModel từ Map (database)
   factory TransactionModel.fromMap(Map<String, dynamic> map) {
     return TransactionModel(
       id: map['id'] as int?,
@@ -69,12 +72,14 @@ class TransactionModel {
       isSynced: (map['isSynced'] as int?) == 1,
       syncId: map['syncId'],
       walletId: map['walletId'] as int,
-      dueDate: map['dueDate'] != null
-          ? DateTime.parse(map['dueDate'] as String)
-          : null,
+      dueDate:
+          map['dueDate'] != null
+              ? DateTime.parse(map['dueDate'] as String)
+              : null,
     );
   }
 
+  /// Chuyển TransactionModel sang Map (database)
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -93,6 +98,7 @@ class TransactionModel {
     };
   }
 
+  /// Tạo bản sao với các trường được cập nhật
   TransactionModel copyWith({
     int? id,
     String? title,
@@ -124,6 +130,7 @@ class TransactionModel {
   }
 
   @override
+  /// Chuyển TransactionModel sang chuỗi
   String toString() {
     return 'Transaction(id: $id, title: $title, amount: $amount, date: $date, type: $type, categoryId: $categoryId, note: $note)';
   }

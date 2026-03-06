@@ -7,12 +7,17 @@ import 'package:mosa/providers/person_provider.dart';
 import 'package:mosa/providers/transaction_provider.dart';
 import 'package:mosa/providers/wallet_provider.dart';
 
-final refreshAllProvider = AsyncNotifierProvider<RefreshAllNotifier, void>(RefreshAllNotifier.new);
+/// Provider làm mới tất cả dữ liệu ứng dụng
+final refreshAllProvider = AsyncNotifierProvider<RefreshAllNotifier, void>(
+  RefreshAllNotifier.new,
+);
 
+/// Quản lý việc làm mới tất cả dữ liệu
 class RefreshAllNotifier extends AsyncNotifier<void> {
   @override
   FutureOr<void> build() async {}
 
+  /// Làm mới tất cả dữ liệu: danh mục, giao dịch, ví, người, nợ
   Future<void> refresh() async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {

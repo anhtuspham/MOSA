@@ -85,10 +85,11 @@ class TransactionService {
     }
 
     final debt = Debt(
-      personId: person.id,
+      personId: person.id ?? -99,
       amount: amount,
       type: type == TransactionType.lend ? DebtType.lent : DebtType.borrowed,
-      description: note?.isNotEmpty == true ? note! : 'Giao dịch với ${person.name}',
+      description:
+          note?.isNotEmpty == true ? note! : 'Giao dịch với ${person.name}',
       createdDate: date,
       walletId: wallet.id ?? -1,
       dueDate: dueDate,
@@ -142,7 +143,7 @@ class TransactionService {
     required Wallet wallet,
   }) async {
     final debtController = ref.read(debtProvider.notifier);
-    await debtController.collectDebtByPerson(person.id, amount, wallet.id!);
+    await debtController.collectDebtByPerson(person.id ?? -99, amount, wallet.id!);
   }
 
   /// Save a debt repayment transaction (when you pay someone back)
@@ -152,7 +153,7 @@ class TransactionService {
     required Wallet wallet,
   }) async {
     final debtController = ref.read(debtProvider.notifier);
-    await debtController.payDebtByPerson(person.id, amount, wallet.id!);
+    await debtController.payDebtByPerson(person.id ?? -99, amount, wallet.id!);
   }
 
   /// Validate amount input
@@ -183,15 +184,17 @@ class TransactionService {
 
   /// Validate debt person selection
   void validatePersonDebt(Person? person, DebtType debtType) {
-  if (person == null) {
-    throw Exception('Vui lòng chọn người');
+    if (person == null) {
+      throw Exception('Vui lòng chọn người');
+    }
+
+    final summary = ref.read(debtSummaryByTypeProvider(debtType));
+    if (!summary.containsKey(person.id)) {
+      throw Exception(
+        'Người này không có khoản nợ ${debtType == DebtType.lent ? "cần thu" : "cần trả"}',
+      );
+    }
   }
-  
-  final summary = ref.read(debtSummaryByTypeProvider(debtType));
-  if (!summary.containsKey(person.id)) {
-    throw Exception('Người này không có khoản nợ ${debtType == DebtType.lent ? "cần thu" : "cần trả"}');
-  }
-}
 
   /// Validate transfer wallets
   void validateTransferWallets(Wallet? fromWallet, Wallet? toWallet) {

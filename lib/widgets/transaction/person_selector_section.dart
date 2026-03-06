@@ -15,13 +15,15 @@ class PersonSelectorSection extends ConsumerWidget {
     final selectedPerson = ref.watch(selectedPersonProvider);
 
     return CustomListTile(
-      leading: selectedPerson != null
-          ? Image.asset(
-              selectedPerson.iconPath ?? 'assets/images/icon.png',
-              width: 22,
-              errorBuilder: (_, __, ___) => const Icon(Icons.person, size: 22),
-            )
-          : const Icon(Icons.person_add_outlined),
+      leading:
+          selectedPerson != null
+              ? Image.asset(
+                selectedPerson.iconPath ?? 'assets/images/icon.png',
+                width: 22,
+                errorBuilder:
+                    (_, __, ___) => const Icon(Icons.person, size: 22),
+              )
+              : const Icon(Icons.person_add_outlined),
       title: Text(selectedPerson?.name ?? TransactionConstants.selectPerson),
       trailing: const Icon(Icons.chevron_right),
       onTap: () {

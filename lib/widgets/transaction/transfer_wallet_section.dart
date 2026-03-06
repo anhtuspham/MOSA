@@ -22,12 +22,14 @@ class TransferWalletSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final wallet = isTransferOut 
-        ? ref.watch(transferOutWalletProvider) 
-        : ref.watch(transferInWalletProvider);
-    final route = isTransferOut 
-        ? AppRoutes.selectTransferOutWallet 
-        : AppRoutes.selectTransferInWallet;
+    final wallet =
+        isTransferOut
+            ? ref.watch(transferOutWalletProvider)
+            : ref.watch(transferInWalletProvider);
+    final route =
+        isTransferOut
+            ? AppRoutes.selectTransferOutWallet
+            : AppRoutes.selectTransferInWallet;
 
     return CardSection(
       child: Column(

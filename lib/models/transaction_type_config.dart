@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mosa/models/enums.dart';
 import 'package:mosa/utils/app_colors.dart';
 
+/// Cấu hình hiển thị cho từng loại giao dịch
 class TransactionTypeConfig {
   final TransactionType type;
   final TransactionCategory category;
@@ -20,6 +21,7 @@ class TransactionTypeConfig {
   });
 }
 
+/// Quản lý cấu hình các loại giao dịch
 class TransactionTypeManager {
   static const Map<TransactionType, TransactionTypeConfig> _configs = {
     TransactionType.income: TransactionTypeConfig(
@@ -108,8 +110,8 @@ class TransactionTypeManager {
       balanceEffect: BalanceEffect.neutral,
       displayName: 'Unknown',
       color: AppColors.textPrimary,
-      description: 'Unknown transaction type'
-    )
+      description: 'Unknown transaction type',
+    ),
   };
 
   static TransactionTypeConfig getConfig(TransactionType type) {

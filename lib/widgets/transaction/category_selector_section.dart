@@ -21,8 +21,15 @@ class CategorySelectorSection extends ConsumerWidget {
       child: Column(
         children: [
           CustomListTile(
-            leading: selectedCategory != null ? selectedCategory.getIcon() : const Icon(Icons.add_circle_rounded),
-            title: Text(selectedCategory != null ? selectedCategory.name : TransactionConstants.selectCategory),
+            leading:
+                selectedCategory != null
+                    ? selectedCategory.getIcon()
+                    : const Icon(Icons.add_circle_rounded),
+            title: Text(
+              selectedCategory != null
+                  ? selectedCategory.name
+                  : TransactionConstants.selectCategory,
+            ),
             trailing: Row(
               children: [
                 Text(TransactionConstants.allCategories),

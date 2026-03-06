@@ -1,16 +1,18 @@
-import 'dart:developer';
-
 import 'package:flutter/cupertino.dart';
 import 'package:mosa/models/enums.dart';
 import 'package:mosa/models/transaction_type_config.dart';
 import 'dart:math' as math;
 
 TextPainter getTextPainter(String text, {BuildContext? context}) {
-  return TextPainter(text: TextSpan(text: text, style: TextStyle(fontSize: 14)), textDirection: TextDirection.ltr)..layout();
+  return TextPainter(
+    text: TextSpan(text: text, style: TextStyle(fontSize: 14)),
+    textDirection: TextDirection.ltr,
+  )..layout();
 }
 
 String generateSyncId() {
-  return DateTime.now().millisecondsSinceEpoch.toString() + math.Random().nextInt(1000).toString();
+  return DateTime.now().millisecondsSinceEpoch.toString() +
+      math.Random().nextInt(1000).toString();
 }
 
 int generateId() {
@@ -31,7 +33,6 @@ TransactionType getTransactionTypeFromString(String type) {
     case 'lend':
       return TransactionType.lend;
     case 'borrowing':
-      log('type borrowing: $type');
       return TransactionType.borrowing;
     case 'transfer':
     case 'transferOut':
@@ -44,7 +45,10 @@ TransactionType getTransactionTypeFromString(String type) {
 
 /// Maps category ID or name to the correct TransactionType
 /// Handles special cases for lending/borrowing categories
-TransactionType getTransactionTypeFromCategory(String categoryId, String categoryName) {
+TransactionType getTransactionTypeFromCategory(
+  String categoryId,
+  String categoryName,
+) {
   // Check by category ID first (more reliable)
   switch (categoryId) {
     case 'lend_borrow': // "Cho vay" - lending money out
@@ -93,6 +97,8 @@ String? getCategoryNameForTransactionType(TransactionType type) {
   }
 }
 
-Color getTransactionTypeColor({TransactionType type = TransactionType.expense}) {
+Color getTransactionTypeColor({
+  TransactionType type = TransactionType.expense,
+}) {
   return TransactionTypeManager.getColor(type);
 }

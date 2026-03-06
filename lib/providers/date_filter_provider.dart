@@ -12,17 +12,37 @@ import 'package:mosa/utils/transaction_utils.dart';
 /// - month: Lọc theo tháng hiện tại
 /// - quarter: Lọc theo quý hiện tại
 /// - year: Lọc theo năm hiện tại
-enum DateRangeFilter { week, month, quarter, year }
+enum DateRangeFilter {
+  /// Lọc theo tuần
+  week,
+  /// Lọc theo tháng
+  month,
+  /// Lọc theo quý
+  quarter,
+  /// Lọc theo năm
+  year;
 
+  /// Chuyển từ String sang DateRangeFilter
+  static DateRangeFilter fromString(String? value) {
+    return DateRangeFilter.values.firstWhere(
+      (e) => e.name == value,
+      orElse: () => DateRangeFilter.month,
+    );
+  }
+}
+
+/// Provider lưu trữ bộ lọc khoảng thời gian được chọn
 final dateRangeFilterProvider = StateProvider<DateRangeFilter>(
-    (ref) => DateRangeFilter.month,
+  (ref) => DateRangeFilter.month,
 );
 
+/// Lấy khoảng thời gian dựa trên bộ lọc
 final _getDateRangeProvider = Provider<DateTimeRange>((ref) {
   final filter = ref.watch(dateRangeFilterProvider);
   return DateRangeUtils.getRange(filter);
 });
 
+/// Lọc giao dịch theo khoảng thời gian
 final filteredTransactionByDateRangeProvider =
     Provider<AsyncValue<List<TransactionModel>>>((ref) {
       final transactions = ref.watch(transactionProvider);
@@ -43,6 +63,7 @@ final filteredTransactionByDateRangeProvider =
       return filtered;
     });
 
+/// Nhóm giao dịch theo ngày
 final transactionGroupByDateProvider =
     Provider<AsyncValue<Map<DateTime, List<TransactionModel>>>>((ref) {
       final transactionAsync = ref.watch(
@@ -58,6 +79,7 @@ final transactionGroupByDateProvider =
       });
     });
 
+/// Tính tổng thu chi theo ngày
 final totalByDateProvider =
     Provider.family<AsyncValue<({double income, double expense})>, DateTime>((
       ref,

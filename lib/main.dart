@@ -6,7 +6,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mosa/firebase_options.dart';
 import 'package:mosa/router/app_router.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:mosa/services/database_service.dart';
 import 'package:mosa/services/fcm_service.dart';
 import 'package:mosa/utils/notification_helper.dart';
 import 'package:toastification/toastification.dart';
@@ -43,7 +42,8 @@ class MyApp extends StatelessWidget {
       splitScreenMode: true,
       child: ToastificationWrapper(
         config: ToastificationConfig(
-          marginBuilder: (context, alignment) => EdgeInsets.fromLTRB(0, 16, 0, 110),
+          marginBuilder:
+              (context, alignment) => EdgeInsets.fromLTRB(0, 16, 0, 110),
           alignment: Alignment.center,
           itemWidth: 440,
           animationDuration: Duration(milliseconds: 500),

@@ -31,11 +31,16 @@ class _LoanTrackingScreenState extends ConsumerState<LoanTrackingScreen> {
   @override
   Widget build(BuildContext context) {
     final totalLentDebt = ref.watch(totalDebtByTypeProvider(DebtType.lent));
-    final totalBorrowedDebt = ref.watch(totalDebtByTypeProvider(DebtType.borrowed));
+    final totalBorrowedDebt = ref.watch(
+      totalDebtByTypeProvider(DebtType.borrowed),
+    );
 
     return CommonScaffold(
       title: Text("Theo dõi vay nợ"),
-      leading: IconButton(onPressed: () => context.pop(), icon: const Icon(Icons.arrow_back)),
+      leading: IconButton(
+        onPressed: () => context.pop(),
+        icon: const Icon(Icons.arrow_back),
+      ),
       actions: const [Icon(Icons.search)],
       appBarBackgroundColor: AppColors.background,
       tabs: [Tab(text: "Cho vay"), Tab(text: "Còn Nợ")],
@@ -83,7 +88,10 @@ class _LoanTrackingScreenState extends ConsumerState<LoanTrackingScreen> {
               children: [
                 Text(
                   Helpers.formatCurrency(totalDebtRemaining),
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16.sp,
+                  ),
                 ),
               ],
             ),
@@ -93,20 +101,32 @@ class _LoanTrackingScreenState extends ConsumerState<LoanTrackingScreen> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(isLent ? 'Đã thu' : 'Đã trả', style: TextStyle(fontSize: 12.sp)),
+                    Text(
+                      isLent ? 'Đã thu' : 'Đã trả',
+                      style: TextStyle(fontSize: 12.sp),
+                    ),
                     Text(
                       Helpers.formatCurrency(totalDebtPaid),
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14.sp,
+                      ),
                     ),
                   ],
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text(isLent ? 'Tổng cho vay' : 'Tổng đi vay', style: TextStyle(fontSize: 12.sp)),
+                    Text(
+                      isLent ? 'Tổng cho vay' : 'Tổng đi vay',
+                      style: TextStyle(fontSize: 12.sp),
+                    ),
                     Text(
                       Helpers.formatCurrency(totalDebt),
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14.sp,
+                      ),
                     ),
                   ],
                 ),
@@ -119,7 +139,11 @@ class _LoanTrackingScreenState extends ConsumerState<LoanTrackingScreen> {
             initialExpand: true,
             header: Text(
               'Đang theo dõi',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp, color: AppColors.textHighlight),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16.sp,
+                color: AppColors.textHighlight,
+              ),
             ),
             children:
                 activeDebtSummary.entries
@@ -128,7 +152,11 @@ class _LoanTrackingScreenState extends ConsumerState<LoanTrackingScreen> {
                         isLent: isLent,
                         personId: e.key,
                         handleShowBottomSheet:
-                            () => _handleShowBottomSheet(isLent: isLent, personId: e.key, totalDebtRemaining: e.value),
+                            () => _handleShowBottomSheet(
+                              isLent: isLent,
+                              personId: e.key,
+                              totalDebtRemaining: e.value,
+                            ),
                       ),
                     )
                     .toList(),
@@ -139,10 +167,21 @@ class _LoanTrackingScreenState extends ConsumerState<LoanTrackingScreen> {
             initialExpand: false,
             header: Text(
               'Đã hoàn thành',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp, color: AppColors.success),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16.sp,
+                color: AppColors.success,
+              ),
             ),
             children:
-                paidDebtSummary.entries.map((e) => _personPaidItem(personId: e.key, totalAmount: e.value)).toList(),
+                paidDebtSummary.entries
+                    .map(
+                      (e) => _personPaidItem(
+                        personId: e.key,
+                        totalAmount: e.value,
+                      ),
+                    )
+                    .toList(),
           ),
         ],
       ),
@@ -154,11 +193,19 @@ class _LoanTrackingScreenState extends ConsumerState<LoanTrackingScreen> {
     final person = ref.watch(personByIdProvider(personId));
 
     return CustomListTile(
-      leading: CircleAvatar(child: Text(person?.name.substring(0, 1).toUpperCase() ?? 'T')),
-      title: Text(person?.name ?? 'Unknown', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.sp)),
+      leading: CircleAvatar(
+        child: Text(person?.name.substring(0, 1).toUpperCase() ?? 'T'),
+      ),
+      title: Text(
+        person?.name ?? 'Unknown',
+        style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.sp),
+      ),
       trailing: Row(
         children: [
-          Text(Helpers.formatCurrency(totalAmount), style: TextStyle(fontSize: 16.sp, color: AppColors.textPrimary)),
+          Text(
+            Helpers.formatCurrency(totalAmount),
+            style: TextStyle(fontSize: 16.sp, color: AppColors.textPrimary),
+          ),
           SizedBox(width: 8.w),
           Icon(Icons.check_circle, color: AppColors.success),
         ],
@@ -166,10 +213,18 @@ class _LoanTrackingScreenState extends ConsumerState<LoanTrackingScreen> {
     );
   }
 
-  void _handleShowBottomSheet({required bool isLent, required int personId, required double totalDebtRemaining}) async {
+  void _handleShowBottomSheet({
+    required bool isLent,
+    required int personId,
+    required double totalDebtRemaining,
+  }) async {
     final title = isLent ? 'Thu nợ' : 'Trả nợ';
-    final debtCollectionCategory = await ref.read(categoryByNameProvider('Thu nợ').future);
-    final debtRepaymentCategory = await ref.read(categoryByNameProvider('Trả nợ').future);
+    final debtCollectionCategory = await ref.read(
+      categoryByNameProvider('Thu nợ').future,
+    );
+    final debtRepaymentCategory = await ref.read(
+      categoryByNameProvider('Trả nợ').future,
+    );
     final person = ref.read(personByIdProvider(personId));
     if (!mounted) return;
     showCustomBottomSheet(
@@ -177,18 +232,28 @@ class _LoanTrackingScreenState extends ConsumerState<LoanTrackingScreen> {
       children: [
         Container(
           padding: const EdgeInsets.all(16),
-          child: Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          child: Text(
+            title,
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
         ),
         CustomListTile(
           leading: Icon(Icons.swap_horiz, size: 20),
-          title: Text(Helpers.formatCurrency(totalDebtRemaining), style: TextStyle(fontSize: 16)),
+          title: Text(
+            Helpers.formatCurrency(totalDebtRemaining),
+            style: TextStyle(fontSize: 16),
+          ),
           onTap: () async {
             Navigator.pop(context);
             await Future.delayed(Duration(milliseconds: 150));
             if (mounted) {
-              final category = isLent ? debtCollectionCategory : debtRepaymentCategory;
-              final transactionType = isLent ? TransactionType.income : TransactionType.expense;
-              ref.read(transactionPrefillDataProvider.notifier).state = TransactionPrefill(
+              final category =
+                  isLent ? debtCollectionCategory : debtRepaymentCategory;
+              final transactionType =
+                  isLent ? TransactionType.income : TransactionType.expense;
+              ref
+                  .read(transactionPrefillDataProvider.notifier)
+                  .state = TransactionPrefill(
                 person: person,
                 amount: totalDebtRemaining,
                 type: transactionType,
@@ -205,9 +270,13 @@ class _LoanTrackingScreenState extends ConsumerState<LoanTrackingScreen> {
           onTap: () {
             context.pop();
             if (mounted) {
-              final category = isLent ? debtCollectionCategory : debtRepaymentCategory;
-              final transactionType = isLent ? TransactionType.income : TransactionType.expense;
-              ref.read(transactionPrefillDataProvider.notifier).state = TransactionPrefill(
+              final category =
+                  isLent ? debtCollectionCategory : debtRepaymentCategory;
+              final transactionType =
+                  isLent ? TransactionType.income : TransactionType.expense;
+              ref
+                  .read(transactionPrefillDataProvider.notifier)
+                  .state = TransactionPrefill(
                 person: person,
                 amount: 0,
                 type: transactionType,

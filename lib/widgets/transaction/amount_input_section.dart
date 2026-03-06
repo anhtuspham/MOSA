@@ -25,7 +25,9 @@ class AmountInputSection extends ConsumerWidget {
           Text(TransactionConstants.amountLabel),
           AmountTextField(
             controller: controller,
-            amountColor: getTransactionTypeColor(type: transactionType ?? TransactionType.expense),
+            amountColor: getTransactionTypeColor(
+              type: transactionType ?? TransactionType.expense,
+            ),
           ),
         ],
       ),

@@ -4,7 +4,11 @@ import 'package:mosa/widgets/item_widget.dart';
 class CategoryGridView extends StatelessWidget {
   final List<ItemWidget> categories;
   final int numberItemPerPage;
-  const CategoryGridView({super.key, required this.categories, required this.numberItemPerPage});
+  const CategoryGridView({
+    super.key,
+    required this.categories,
+    required this.numberItemPerPage,
+  });
 
   @override
   Widget build(BuildContext context) {

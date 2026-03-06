@@ -22,7 +22,7 @@ class AdjustBalanceSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final effectiveWallet = ref.watch(effectiveWalletProvider);
-    
+
     return effectiveWallet.when(
       data: (wallet) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -65,31 +65,38 @@ class AdjustBalanceSection extends ConsumerWidget {
                     ),
                     maxLength: 16,
                     textAlign: TextAlign.right,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    inputFormatters: [ThousandSeparatorFormatter(separator: '.')],
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    inputFormatters: [
+                      ThousandSeparatorFormatter(separator: '.'),
+                    ],
                   ),
                 ),
               ),
               ValueListenableBuilder(
                 valueListenable: actualBalanceController,
                 builder: (context, value, child) {
-                  final actualBalance = double.tryParse(
-                    actualBalanceController.text.replaceAll('.', '')
-                  ) ?? 0;
+                  final actualBalance =
+                      double.tryParse(
+                        actualBalanceController.text.replaceAll('.', ''),
+                      ) ??
+                      0;
                   final different = actualBalance - wallet.balance;
-                  
+
                   return CustomListTile(
                     title: Text(
-                      different > 0 
-                          ? TransactionConstants.received 
-                          : TransactionConstants.spent
+                      different > 0
+                          ? TransactionConstants.received
+                          : TransactionConstants.spent,
                     ),
                     trailing: Text(
                       Helpers.formatCurrency(different),
                       style: TextStyle(
-                        color: different > 0 
-                            ? AppColors.income 
-                            : AppColors.expense,
+                        color:
+                            different > 0
+                                ? AppColors.income
+                                : AppColors.expense,
                         fontSize: 18,
                       ),
                     ),

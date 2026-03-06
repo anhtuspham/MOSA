@@ -41,11 +41,7 @@ class SectionContainerConfig {
     backgroundColor: Colors.white,
     borderRadius: BorderRadius.all(Radius.circular(12)),
     boxShadow: [
-      BoxShadow(
-        color: Color(0x0F000000),
-        blurRadius: 8,
-        offset: Offset(0, 2),
-      ),
+      BoxShadow(color: Color(0x0F000000), blurRadius: 8, offset: Offset(0, 2)),
     ],
   );
 

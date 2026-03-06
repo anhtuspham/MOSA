@@ -6,7 +6,9 @@ import 'package:mosa/models/person.dart';
 class PersonService {
   static Future<List<Person>> loadPersons() async {
     try {
-      final jsonString = await rootBundle.loadString('assets/data/persons.json');
+      final jsonString = await rootBundle.loadString(
+        'assets/data/persons.json',
+      );
       final List<dynamic> jsonList = jsonDecode(jsonString);
       return jsonList.map((e) => Person.fromJson(e)).toList();
     } catch (e) {

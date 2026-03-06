@@ -9,6 +9,7 @@ import 'package:mosa/services/type_wallet_service.dart';
 
 import 'database_service_provider.dart';
 
+/// Quản lý trạng thái danh sách ví bất đồng bộ
 class WalletsNotifier extends AsyncNotifier<List<Wallet>> {
   DatabaseService get _databaseService => ref.read(databaseServiceProvider);
 
@@ -17,13 +18,14 @@ class WalletsNotifier extends AsyncNotifier<List<Wallet>> {
     return await _databaseService.getAllWallets();
   }
 
+  /// Thêm ví mới vào database và cập nhật state
   Future<void> insertWallet(Wallet wallet) async {
     state = const AsyncLoading();
 
     try {
       int id = await _databaseService.insertWallet(wallet);
       final newWallet = wallet.copyWith(id: id);
-      // update state ngay khi thêm wallet
+      // Cập nhật state ngay khi thêm ví
       state = AsyncData([newWallet, ...state.requireValue]);
       refreshWallet();
     } catch (e) {
@@ -33,10 +35,13 @@ class WalletsNotifier extends AsyncNotifier<List<Wallet>> {
     }
   }
 
+  /// Làm mới danh sách ví từ database
   Future<void> refreshWallet() async {
     try {
       final wallets = await _databaseService.getAllWallets();
-      log('Refresh wallet in background: ${state.value?.first.balance} - ${wallets.first.balance}');
+      log(
+        'Refresh wallet in background: ${state.value?.first.balance} - ${wallets.first.balance}',
+      );
       if (state.value != wallets) {
         state = AsyncData(wallets);
       }
@@ -45,13 +50,20 @@ class WalletsNotifier extends AsyncNotifier<List<Wallet>> {
     }
   }
 
+  /// Cập nhật thông tin ví
   Future<void> updateWallet(Wallet wallet) async {
     state = const AsyncLoading();
     try {
       await _databaseService.updateWallet(wallet);
-      final index = state.requireValue.indexWhere((element) => element == wallet);
+      final index = state.requireValue.indexWhere(
+        (element) => element == wallet,
+      );
       if (index != -1) {
-        state = AsyncData([...state.requireValue.sublist(0, index), wallet, ...state.requireValue.sublist(index + 1)]);
+        state = AsyncData([
+          ...state.requireValue.sublist(0, index),
+          wallet,
+          ...state.requireValue.sublist(index + 1),
+        ]);
       }
       refreshWallet();
     } catch (e) {
@@ -59,6 +71,7 @@ class WalletsNotifier extends AsyncNotifier<List<Wallet>> {
     }
   }
 
+  /// Xóa ví khỏi database
   Future<void> deleteWallet(int id) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
@@ -72,36 +85,54 @@ class WalletsNotifier extends AsyncNotifier<List<Wallet>> {
   }
 }
 
-final walletProvider = AsyncNotifierProvider<WalletsNotifier, List<Wallet>>(WalletsNotifier.new);
+/// Provider chính quản lý danh sách ví
+final walletProvider = AsyncNotifierProvider<WalletsNotifier, List<Wallet>>(
+  WalletsNotifier.new,
+);
 
-final getWalletByIdProvider = FutureProvider.family<Wallet?, int>((ref, param) async {
+/// Lấy ví theo ID
+final getWalletByIdProvider = FutureProvider.family<Wallet?, int>((
+  ref,
+  param,
+) async {
   final db = ref.read(databaseServiceProvider);
   return db.getWalletById(param);
 });
 
+/// Lấy ví mặc định
 final defaultWalletProvider = FutureProvider<Wallet?>((ref) {
   final db = ref.read(databaseServiceProvider);
   return db.getDefaultWallet();
 });
 
+/// Lưu trữ ví được chọn hiện tại
 final selectedWalletProvider = StateProvider<Wallet?>((ref) => null);
 
+/// Lưu trữ ví chuyển tiền đi
 final transferOutWalletProvider = StateProvider<Wallet?>((ref) => null);
+/// Lưu trữ ví chuyển tiền đến
 final transferInWalletProvider = StateProvider<Wallet?>((ref) => null);
 
+/// Lấy ví hiệu quả (được chọn hoặc mặc định)
 final effectiveWalletProvider = FutureProvider<Wallet>((ref) async {
   final selectedWallet = ref.watch(selectedWalletProvider);
   final wallets = await ref.watch(walletProvider.future);
 
   if (selectedWallet != null) {
-    final updateWallets = wallets.firstWhere((wallet) => wallet.id == selectedWallet.id);
+    final updateWallets = wallets.firstWhere(
+      (wallet) => wallet.id == selectedWallet.id,
+    );
     return updateWallets;
   }
 
-  final defaultWallet = wallets.firstWhere((wallet) => wallet.isDefault, orElse: () => throw Exception('Không có ví nào để lưu giao dịch'));
+  final defaultWallet = wallets.firstWhere(
+    (wallet) => wallet.isDefault,
+    orElse: () => throw Exception('Không có ví nào để lưu giao dịch'),
+  );
   return defaultWallet;
 });
 
+/// Tính tổng số dư của tất cả các ví
 final totalBalanceWalletProvider = Provider<double>((ref) {
   double total = 0;
   final wallets = ref.watch(walletProvider);
@@ -117,15 +148,20 @@ final totalBalanceWalletProvider = Provider<double>((ref) {
   return total;
 });
 
+/// Lấy danh sách loại ví
 final typeWalletProvider = FutureProvider<List<TypeWallet>>((ref) {
   return TypeWalletService.loadTypeWallets();
 });
 
+/// Lưu trữ loại ví được chọn
 final selectedTypeWalletProvider = StateProvider<TypeWallet?>((ref) {
   final typeWallets = ref.watch(typeWalletProvider);
-  return typeWallets.whenData((wallet) => wallet.isNotEmpty ? wallet.first : null).value;
+  return typeWallets
+      .whenData((wallet) => wallet.isNotEmpty ? wallet.first : null)
+      .value;
 });
 
+/// Quản lý trạng thái danh sách loại ví
 class TypeWalletNotifier extends AsyncNotifier<List<TypeWallet>> {
   DatabaseService get _databaseService => ref.read(databaseServiceProvider);
 
@@ -134,6 +170,7 @@ class TypeWalletNotifier extends AsyncNotifier<List<TypeWallet>> {
     return TypeWalletService.loadTypeWallets();
   }
 
+  /// Làm mới danh sách loại ví từ database
   Future<void> refreshTypeWallet() async {
     try {
       final typeWallets = await _databaseService.getAllTypeWallets();
@@ -145,6 +182,7 @@ class TypeWalletNotifier extends AsyncNotifier<List<TypeWallet>> {
     }
   }
 
+  /// Thêm loại ví mới
   Future<void> addTypeWallet(TypeWallet tp) async {
     state = const AsyncLoading();
     try {
@@ -157,6 +195,7 @@ class TypeWalletNotifier extends AsyncNotifier<List<TypeWallet>> {
     }
   }
 
+  /// Xóa loại ví
   Future<void> deleteTypeWallet(int id) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
@@ -166,4 +205,7 @@ class TypeWalletNotifier extends AsyncNotifier<List<TypeWallet>> {
   }
 }
 
-final typeWalletNotifier = AsyncNotifierProvider<TypeWalletNotifier, List<TypeWallet>>(TypeWalletNotifier.new);
+final typeWalletNotifier =
+    AsyncNotifierProvider<TypeWalletNotifier, List<TypeWallet>>(
+      TypeWalletNotifier.new,
+    );

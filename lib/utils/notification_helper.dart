@@ -9,29 +9,31 @@ class NotificationHelper {
 
   static const AndroidNotificationChannel _debtChannel =
       AndroidNotificationChannel(
-    'debt_reminders',
-    'Debt Reminders',
-    description: 'Notifications for debt due dates and payments',
-    importance: Importance.high,
-  );
+        'debt_reminders',
+        'Debt Reminders',
+        description: 'Notifications for debt due dates and payments',
+        importance: Importance.high,
+      );
 
   static const AndroidNotificationChannel _transactionChannel =
       AndroidNotificationChannel(
-    'transaction_alerts',
-    'Transaction Alerts',
-    description: 'Notifications for transactions and budgets',
-    importance: Importance.defaultImportance,
-  );
+        'transaction_alerts',
+        'Transaction Alerts',
+        description: 'Notifications for transactions and budgets',
+        importance: Importance.defaultImportance,
+      );
 
   static Future<void> initialize() async {
     await _notifications
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
+          AndroidFlutterLocalNotificationsPlugin
+        >()
         ?.createNotificationChannel(_debtChannel);
 
     await _notifications
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
+          AndroidFlutterLocalNotificationsPlugin
+        >()
         ?.createNotificationChannel(_transactionChannel);
   }
 
@@ -43,12 +45,11 @@ class NotificationHelper {
     required DebtType debtType,
   }) async {
     final isLent = debtType == DebtType.lent;
-    final title = isLent
-        ? 'Nhắc nhở thu nợ'
-        : 'Nhắc nhở trả nợ';
-    final body = isLent
-        ? 'Khoản cho vay $personName sắp đến hạn: ${amount.toStringAsFixed(0)} VND'
-        : 'Khoản vay từ $personName sắp đến hạn: ${amount.toStringAsFixed(0)} VND';
+    final title = isLent ? 'Nhắc nhở thu nợ' : 'Nhắc nhở trả nợ';
+    final body =
+        isLent
+            ? 'Khoản cho vay $personName sắp đến hạn: ${amount.toStringAsFixed(0)} VND'
+            : 'Khoản vay từ $personName sắp đến hạn: ${amount.toStringAsFixed(0)} VND';
 
     await _notifications.zonedSchedule(
       debtId,
@@ -85,9 +86,10 @@ class NotificationHelper {
   }) async {
     final isLent = debtType == DebtType.lent;
     final title = isLent ? 'Khoản cho vay quá hạn' : 'Khoản vay quá hạn';
-    final body = isLent
-        ? '$personName chưa trả nợ: ${amount.toStringAsFixed(0)} VND'
-        : 'Bạn chưa trả nợ cho $personName: ${amount.toStringAsFixed(0)} VND';
+    final body =
+        isLent
+            ? '$personName chưa trả nợ: ${amount.toStringAsFixed(0)} VND'
+            : 'Bạn chưa trả nợ cho $personName: ${amount.toStringAsFixed(0)} VND';
 
     await _notifications.show(
       debtId + 10000,
@@ -120,9 +122,10 @@ class NotificationHelper {
   }) async {
     final isLent = debtType == DebtType.lent;
     final title = isLent ? 'Đã thu nợ' : 'Đã trả nợ';
-    final body = isLent
-        ? 'Đã thu ${amount.toStringAsFixed(0)} VND từ $personName'
-        : 'Đã trả ${amount.toStringAsFixed(0)} VND cho $personName';
+    final body =
+        isLent
+            ? 'Đã thu ${amount.toStringAsFixed(0)} VND từ $personName'
+            : 'Đã trả ${amount.toStringAsFixed(0)} VND cho $personName';
 
     await _notifications.show(
       DateTime.now().millisecondsSinceEpoch ~/ 1000,
@@ -290,8 +293,12 @@ class NotificationHelper {
         if (reminderTime.isAfter(DateTime.now())) {
           await scheduleNotificationAt(
             notificationId: debt.id ?? 0,
-            title: debt.type == DebtType.lent ? 'Thu nợ hôm nay' : 'Trả nợ hôm nay',
-            body: 'Nhắc nhở: ${debt.description} - ${debt.amount.toStringAsFixed(0)} VND',
+            title:
+                debt.type == DebtType.lent
+                    ? 'Thu nợ hôm nay'
+                    : 'Trả nợ hôm nay',
+            body:
+                'Nhắc nhở: ${debt.description} - ${debt.amount.toStringAsFixed(0)} VND',
             scheduledDateTime: reminderTime,
             payload: 'debt_${debt.id}',
           );
@@ -302,8 +309,12 @@ class NotificationHelper {
         if (oneDayBefore.isAfter(DateTime.now())) {
           await scheduleNotificationAt(
             notificationId: (debt.id ?? 0) + 100000,
-            title: debt.type == DebtType.lent ? 'Thu nợ ngày mai' : 'Trả nợ ngày mai',
-            body: 'Nhắc nhở: ${debt.description} - ${debt.amount.toStringAsFixed(0)} VND',
+            title:
+                debt.type == DebtType.lent
+                    ? 'Thu nợ ngày mai'
+                    : 'Trả nợ ngày mai',
+            body:
+                'Nhắc nhở: ${debt.description} - ${debt.amount.toStringAsFixed(0)} VND',
             scheduledDateTime: oneDayBefore,
             payload: 'debt_${debt.id}',
           );
@@ -313,7 +324,8 @@ class NotificationHelper {
   }
 
   // Get all pending notifications (for debugging)
-  static Future<List<PendingNotificationRequest>> getPendingNotifications() async {
+  static Future<List<PendingNotificationRequest>>
+  getPendingNotifications() async {
     return await _notifications.pendingNotificationRequests();
   }
 }

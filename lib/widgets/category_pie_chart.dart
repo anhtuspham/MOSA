@@ -62,42 +62,48 @@ class CategoryPieChart extends StatelessWidget {
 
     return Column(
       children:
-          categoryData.entries.toList().asMap().entries.map((e) {
-            final index = e.key;
-            final data = e.value;
-            final percentage = (data.value / total) * 100;
+          categoryData.entries
+              .toList()
+              .asMap()
+              .entries
+              .map((e) {
+                final index = e.key;
+                final data = e.value;
+                final percentage = (data.value / total) * 100;
 
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 2.0),
-              child: Row(
-                children: [
-                  Container(
-                    width: 10,
-                    height: 10,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.rectangle,
-                      borderRadius: BorderRadius.circular(2),
-                      color: AppColors.chartColors[index],
-                    ),
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 2.0),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.rectangle,
+                          borderRadius: BorderRadius.circular(2),
+                          color: AppColors.chartColors[index],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      SizedBox(
+                        width: maxCategoryWidth * AppConstants.scaleTextFactor,
+                        child: Text(
+                          data.key,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(fontSize: 14),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${percentage.toStringAsFixed(2)}%',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 8),
-                  SizedBox(
-                    width: maxCategoryWidth * AppConstants.scaleTextFactor,
-                    child: Text(
-                      data.key,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontSize: 14),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    '${percentage.toStringAsFixed(2)}%',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-            );
-          }).take(4).toList(),
+                );
+              })
+              .take(4)
+              .toList(),
     );
   }
 }
