@@ -17,7 +17,7 @@ class TransactionTypeDropdown extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedTransactionType =
-        ref.watch(currentTransactionByTypeProvider) ?? TransactionType.expense;
+        ref.watch(activeTransactionTypeProvider) ?? TransactionType.expense;
 
     return DropdownButtonFormField<TransactionType>(
       decoration: const InputDecoration(
@@ -57,7 +57,7 @@ class TransactionTypeDropdown extends ConsumerWidget {
       ],
       onChanged: (value) async {
         if (value != null) {
-          ref.read(currentTransactionByTypeProvider.notifier).state = value;
+          ref.read(activeTransactionTypeProvider.notifier).state = value;
 
           final categoryName = getCategoryNameForTransactionType(value);
           onTypeChanged?.call(value);

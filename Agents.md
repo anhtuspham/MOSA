@@ -30,6 +30,9 @@
 * **Lists:** `ListView.builder` or `SliverList` for performance.
 * **Immutability:** `const` constructors everywhere possible. `StatelessWidget` preference.
 * **Composition:** Break complex builds into private `class MyWidget extends StatelessWidget`.
+* **Notifications & Feedback:** - NEVER use `ScaffoldMessenger.of(context).showSnackBar()`.
+    - ALWAYS use the custom toast utility from `lib/utils/toast.dart` for all user notifications (success, error, or info messages).
+    - Ensure the appropriate toast type is used to maintain UI consistency across the MOSA project.
 
 ### Documentation & Localization
 - **Language:** All code comments, documentation, and commit messages MUST be in **Vietnamese**.

@@ -21,6 +21,8 @@ import 'package:mosa/screens/wallet/screen/wallet_screen.dart';
 
 import '../models/debt.dart';
 import 'package:mosa/screens/dashboard/dashboard_screen.dart';
+import 'package:mosa/screens/budget/budget_screen.dart';
+import 'package:mosa/screens/budget/add_budget_screen.dart';
 
 /// Go Router Configuration with StatefulShellRoute
 ///
@@ -93,6 +95,11 @@ final goRouter = GoRouter(
                   name: 'loanTracking',
                   builder: (context, state) => LoanTrackingScreen(),
                 ),
+                GoRoute(
+                  path: 'budgets',
+                  name: 'budgets',
+                  builder: (context, state) => const BudgetScreen(),
+                ),
               ],
             ),
           ],
@@ -145,6 +152,11 @@ final goRouter = GoRouter(
         final debtType = debtTypeString == 'lent' ? DebtType.lent : DebtType.borrowed;
         return DebtSelectionScreen(debtType: debtType);
       },
+    ),
+    GoRoute(
+      path: AppRoutes.addBudget,
+      name: 'add-budget',
+      builder: (context, state) => const AddBudgetScreen(),
     ),
   ],
   errorBuilder: (context, state) {

@@ -7,7 +7,8 @@ import 'package:mosa/widgets/custom_list_tile.dart';
 import 'package:mosa/widgets/error_widget.dart';
 import 'package:mosa/widgets/loading_widget.dart';
 import 'package:mosa/widgets/common_scaffold.dart';
-import '../../../utils/app_colors.dart';
+import 'package:mosa/utils/app_colors.dart';
+import 'package:mosa/utils/toast.dart';
 
 class SelectPersonScreen extends ConsumerStatefulWidget {
   const SelectPersonScreen({super.key});
@@ -131,9 +132,7 @@ class _SelectPersonScreenState extends ConsumerState<SelectPersonScreen> {
                 onPressed: () async {
                   final name = nameController.text.trim();
                   if (name.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Vui lòng nhập tên')),
-                    );
+                    showResultToast('Vui lòng nhập tên', isError: true);
                     return;
                   }
 
@@ -150,15 +149,11 @@ class _SelectPersonScreenState extends ConsumerState<SelectPersonScreen> {
 
                     if (mounted) {
                       Navigator.pop(context);
-                      ScaffoldMessenger.of(
-                        context,
-                      ).showSnackBar(SnackBar(content: Text('Đã thêm $name')));
+                      showResultToast('Đã thêm $name');
                     }
                   } catch (e) {
                     if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Lỗi: ${e.toString()}')),
-                      );
+                      showResultToast('Lỗi: ${e.toString()}', isError: true);
                     }
                   }
                 },
@@ -194,9 +189,7 @@ class _SelectPersonScreenState extends ConsumerState<SelectPersonScreen> {
                 onPressed: () async {
                   final name = nameController.text.trim();
                   if (name.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Vui lòng nhập tên')),
-                    );
+                    showResultToast('Vui lòng nhập tên', isError: true);
                     return;
                   }
 
@@ -208,15 +201,11 @@ class _SelectPersonScreenState extends ConsumerState<SelectPersonScreen> {
 
                     if (mounted) {
                       Navigator.pop(context);
-                      ScaffoldMessenger.of(
-                        context,
-                      ).showSnackBar(SnackBar(content: Text('Đã cập nhật')));
+                      showResultToast('Đã cập nhật');
                     }
                   } catch (e) {
                     if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Lỗi: ${e.toString()}')),
-                      );
+                      showResultToast('Lỗi: ${e.toString()}', isError: true);
                     }
                   }
                 },

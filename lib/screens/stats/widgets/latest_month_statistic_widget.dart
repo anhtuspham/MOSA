@@ -76,11 +76,44 @@ class _LatestMonthStatisticWidgetState extends State<LatestMonthStatisticWidget>
                     ),
                   ),
                 ),
-                // Expanded(
-                //   child: Text(
-                //     'Chi tiêu tháng hiện tại bằng 0, chưa có dự liệu so sánh',
-                //   ),
-                // ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text(
+                          'Chi tiêu so với tháng 2',
+                          style: TextStyle(
+                            color: AppColors.textSecondary,
+                            fontSize: 14,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            const Icon(
+                              Icons.arrow_upward_rounded,
+                              color: AppColors.expense,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 4),
+                            const Text(
+                              '26%',
+                              style: TextStyle(
+                                color: AppColors.expense,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 24,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
           ],

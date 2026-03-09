@@ -55,7 +55,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   /// Khởi tạo dữ liệu điền trước từ provider
   void _initializePrefillData() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(currentTransactionByTypeProvider.notifier).state =
+      ref.read(activeTransactionTypeProvider.notifier).state =
           TransactionType.expense;
       final prefill = ref.read(transactionPrefillDataProvider);
       if (prefill != null) {
@@ -71,7 +71,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       _amountController.text = Helpers.formatNumber(prefill.amount ?? 0);
     }
     if (prefill.type != null) {
-      ref.read(currentTransactionByTypeProvider.notifier).state = prefill.type;
+      ref.read(activeTransactionTypeProvider.notifier).state = prefill.type;
     }
     if (prefill.person != null) {
       ref.read(selectedPersonProvider.notifier).state = prefill.person;
@@ -95,7 +95,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   Widget build(BuildContext context) {
     _listenToPrefillChanges();
     final selectedTransactionType =
-        ref.watch(currentTransactionByTypeProvider) ?? TransactionType.expense;
+        ref.watch(activeTransactionTypeProvider) ?? TransactionType.expense;
 
     return CommonScaffold(
       title: _buildAppBarTitle(),
@@ -158,7 +158,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
     try {
       final type =
-          ref.read(currentTransactionByTypeProvider) ?? TransactionType.expense;
+          ref.read(activeTransactionTypeProvider) ?? TransactionType.expense;
       final service = ref.read(transactionServiceProvider);
 
       switch (type) {

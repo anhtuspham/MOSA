@@ -62,7 +62,7 @@ class _CategoryTabState extends ConsumerState<CategoryTab> {
           category: category,
           type: transactionType,
         );
-        if (context.mounted) context.pop();
+        if (context.mounted) context.pop(category);
       }
     } else if (categoryId == 'lend_collect' || categoryName == 'thu nợ') {
       // Debt collection - show lent debts
@@ -82,13 +82,13 @@ class _CategoryTabState extends ConsumerState<CategoryTab> {
           category: category,
           type: transactionType,
         );
-        if (context.mounted) context.pop();
+        if (context.mounted) context.pop(category);
       }
     } else {
       // Regular category - normal flow
       ref.read(transactionPrefillDataProvider.notifier).state =
           TransactionPrefill(category: category, type: transactionType);
-      context.pop();
+      context.pop(category);
     }
   }
 

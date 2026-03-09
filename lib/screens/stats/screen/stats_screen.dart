@@ -12,11 +12,38 @@ import '../../../providers/wallet_provider.dart';
 class StatsShellScreen extends ConsumerWidget {
   const StatsShellScreen({super.key});
 
+  Widget _buildGridItem(BuildContext context, IconData icon, String label, Color iconColor, {VoidCallback? onTap}) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.borderLighter.withOpacity(0.5)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: iconColor, size: 28),
+            const SizedBox(height: 12),
+            Text(
+              label,
+              style: const TextStyle(fontSize: 14, color: AppColors.textPrimary, fontWeight: FontWeight.w500),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final totalBalance = ref.watch(totalBalanceWalletProvider);
     return CommonScaffold(
-      title: Text('Báo cáo', style: TextStyle(fontWeight: FontWeight.w600)),
+      title: const Text('Báo cáo', style: TextStyle(fontWeight: FontWeight.w600)),
       centerTitle: true,
       appBarBackgroundColor: AppColors.background,
       body: SectionContainer(
@@ -26,52 +53,62 @@ class StatsShellScreen extends ConsumerWidget {
             mainAxisSize: MainAxisSize.max,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 12,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(6),
-                  gradient: LinearGradient(
-                    colors: [
-                      // AppColors.primary,
-                      AppColors.third,
-                      AppColors.fourth,
-                    ],
-                    begin: Alignment.centerLeft,
+                  borderRadius: BorderRadius.circular(12),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF00C6FF), Color(0xFF0072FF)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(
-                      'Tài chính hiện tại',
-                      style: TextStyle(color: AppColors.textWhite),
-                    ),
-                    const SizedBox(height: 2),
+                    const Text('Tài chính hiện tại', style: TextStyle(color: AppColors.textWhite, fontSize: 14)),
+                    const SizedBox(height: 4),
                     Text(
                       Helpers.formatCurrency(totalBalance),
-                      style: TextStyle(
-                        color: AppColors.textWhite,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 26,
-                      ),
+                      style: const TextStyle(color: AppColors.textWhite, fontWeight: FontWeight.bold, fontSize: 28),
                     ),
+                    const SizedBox(height: 20),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        Expanded(child: StatCard()),
-                        const SizedBox(width: 10),
-                        Expanded(child: StatCard()),
+                        Expanded(child: StatCard(title: 'Tổng có', amount: Helpers.formatCurrency(totalBalance))),
+                        const SizedBox(width: 12),
+                        Expanded(child: StatCard(title: 'Tổng nợ', amount: Helpers.formatCurrency(0))),
                       ],
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 16),
               // Latest statistic month widget
-              LatestMonthStatisticWidget(),
-              const SizedBox(height: 6),
+              const LatestMonthStatisticWidget(),
+              const SizedBox(height: 16),
+              GridView.count(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                crossAxisCount: 2,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 1.8,
+                children: [
+                  _buildGridItem(context, Icons.trending_up, 'Phân tích chi tiêu', AppColors.primaryBlue),
+                  _buildGridItem(context, Icons.trending_down, 'Phân tích thu', AppColors.primaryBlue),
+                  _buildGridItem(context, Icons.receipt_long, 'Theo dõi vay nợ', AppColors.primaryBlue),
+                  _buildGridItem(context, Icons.people_alt_outlined, 'Đối tượng thu/chi', AppColors.primaryBlue),
+                  _buildGridItem(context, Icons.calendar_today_outlined, 'Chuyến đi/Sự kiện', AppColors.primaryBlue),
+                  _buildGridItem(
+                    context,
+                    Icons.account_balance_wallet_outlined,
+                    'Phân tích tài chính',
+                    AppColors.primaryBlue,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
             ],
           ),
         ),

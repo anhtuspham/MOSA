@@ -59,4 +59,8 @@ abstract class AppRoutes {
   static const String groupDetail = '/group/:groupId';
   static const String groupSettlement = '/group/:groupId/settlement';
   static const String groupMembers = '/group/:groupId/members';
+
+  // ===== BUDGETS =====
+  static const String budgets = '/budgets';
+  static const String addBudget = '/add-budget';
 }

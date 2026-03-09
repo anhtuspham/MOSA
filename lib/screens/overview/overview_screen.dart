@@ -8,7 +8,8 @@ import 'package:mosa/utils/helpers.dart';
 import 'package:mosa/utils/utils.dart';
 import 'package:mosa/screens/overview/widgets/transaction_in_period_time.dart';
 
-import '../../utils/app_colors.dart';
+import 'package:mosa/utils/app_colors.dart';
+import 'package:mosa/utils/toast.dart';
 
 class OverviewScreen extends ConsumerStatefulWidget {
   const OverviewScreen({super.key});
@@ -176,9 +177,7 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
       ref.invalidate(transactionProvider);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Lỗi: $e')));
+        showResultToast('Lỗi: $e', isError: true);
       }
     }
   }

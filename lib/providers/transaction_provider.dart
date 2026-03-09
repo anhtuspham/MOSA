@@ -82,8 +82,8 @@ final transactionProvider =
       TransactionNotifier.new,
     );
 
-/// Lưu giữ loại giao dịch hiện được chọn cho mục đích lọc giao diện người dùng
-final currentTransactionByTypeProvider = StateProvider<TransactionType?>(
+/// Lưu giữ loại giao dịch hiện đang hoạt động (được chọn) cho mục đích lọc hoặc thêm mới
+final activeTransactionTypeProvider = StateProvider<TransactionType?>(
   (ref) => null,
 );
 

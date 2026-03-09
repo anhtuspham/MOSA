@@ -2,61 +2,66 @@ import 'package:flutter/material.dart';
 import 'package:mosa/utils/app_colors.dart';
 
 class StatCard extends StatelessWidget {
-  const StatCard({super.key});
+  final String title;
+  final String amount;
+  final VoidCallback? onTap;
+
+  const StatCard({
+    super.key,
+    required this.title,
+    required this.amount,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
       child: Stack(
         children: [
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              gradient: LinearGradient(
-                colors: [
-                  AppColors.primaryBlue,
-                  AppColors.thirdBlue,
-                  AppColors.sixthBlue,
-                ],
-                // transform: GradientRotation(0.785398),
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              borderRadius: BorderRadius.circular(12),
+              color: Colors.white.withOpacity(0.2),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Tổng có',
-                  style: TextStyle(
+                  title,
+                  style: const TextStyle(
                     color: AppColors.textWhite,
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w400,
                   ),
                 ),
+                const SizedBox(height: 6),
                 Text(
-                  '15.000.000 đ',
-                  style: TextStyle(
+                  amount,
+                  style: const TextStyle(
                     color: AppColors.textWhite,
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
                   ),
                 ),
               ],
             ),
           ),
           Positioned(
-            top: 5,
-            right: 5,
+            top: 8,
+            right: 8,
             child: Container(
-              padding: EdgeInsets.all(2),
+              padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.buttonPrimary,
+                color: Colors.white.withOpacity(0.3),
               ),
-              child: Icon(
-                Icons.arrow_right_alt_sharp,
+              child: const Icon(
+                Icons.arrow_forward_rounded,
                 color: AppColors.textWhite,
+                size: 16,
               ),
             ),
           ),

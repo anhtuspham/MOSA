@@ -9,6 +9,7 @@ class ItemWidget extends ConsumerWidget {
   final String? type;
   final String? iconType;
   final String? iconPath;
+  final IconData? icon;
   final void Function()? onTap;
   final CrossAxisAlignment? crossAxisAlignment;
 
@@ -18,6 +19,7 @@ class ItemWidget extends ConsumerWidget {
     this.itemId,
     this.name,
     this.type,
+    this.icon,
     this.iconType,
     this.iconPath,
     this.crossAxisAlignment,
@@ -39,12 +41,9 @@ class ItemWidget extends ConsumerWidget {
               shape: BoxShape.circle,
             ),
             child:
-                category?.getIcon() ??
-                Image.asset(
-                  iconPath ?? 'assets/icons/default.png',
-                  width: 24,
-                  height: 24,
-                ),
+                icon != null
+                    ? Icon(icon, color: Theme.of(context).primaryColor)
+                    : category?.getIcon() ?? Image.asset(iconPath ?? 'assets/icons/default.png', width: 24, height: 24),
           ),
           const SizedBox(height: 4),
           Text(

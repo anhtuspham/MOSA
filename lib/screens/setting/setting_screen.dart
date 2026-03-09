@@ -18,20 +18,13 @@ class SettingsShellScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Xin chào!', style: TextStyle(fontSize: 12.sp)),
-            Text(
-              'Pham Anh Tu',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.sp),
-            ),
+            Text('Pham Anh Tu', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.sp)),
           ],
         ),
         toolbarHeight: 60,
         leading: Container(
           margin: EdgeInsets.only(left: 8.w),
-          child: CircleAvatar(
-            radius: 20,
-            backgroundColor: AppColors.thirdBlue,
-            child: Text('P'),
-          ),
+          child: CircleAvatar(radius: 20, backgroundColor: AppColors.thirdBlue, child: Text('P')),
         ),
         actionsPadding: EdgeInsets.symmetric(horizontal: 12.w),
         actions: [
@@ -44,15 +37,8 @@ class SettingsShellScreen extends StatelessWidget {
                 top: -8,
                 child: Container(
                   padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Text(
-                    '3',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.white, fontSize: 12),
-                  ),
+                  decoration: BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+                  child: Text('3', textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 12)),
                 ),
               ),
             ],
@@ -62,11 +48,7 @@ class SettingsShellScreen extends StatelessWidget {
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [
-                AppColors.goldColor,
-                AppColors.lightGoldColor,
-                AppColors.lighterGoldColor,
-              ],
+              colors: [AppColors.goldColor, AppColors.lightGoldColor, AppColors.lighterGoldColor],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -83,46 +65,25 @@ class SettingsShellScreen extends StatelessWidget {
               decoration: BoxDecoration(color: AppColors.surface),
               child: Column(
                 children: [
-                  Text(
-                    'Tính năng',
-                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
-                  ),
+                  Text('Tính năng', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18)),
                   const SizedBox(height: 12),
                   CategoryGridView(
                     numberItemPerPage: 3,
                     categories: [
-                      ItemWidget(
-                        itemId: '1',
-                        iconPath: AppIcons.interface,
-                        name: 'Giao diện',
-                      ),
-                      ItemWidget(
-                        itemId: '2',
-                        iconPath: AppIcons.sampleRecord,
-                        name: 'Ghi chép mẫu',
-                      ),
-                      ItemWidget(
-                        itemId: '3',
-                        iconPath: AppIcons.categoryRecord,
-                        name: 'Hạng mục thu chi',
-                      ),
+                      ItemWidget(itemId: '1', iconPath: AppIcons.interface, name: 'Giao diện'),
+                      ItemWidget(itemId: '2', iconPath: AppIcons.sampleRecord, name: 'Ghi chép mẫu'),
+                      ItemWidget(itemId: '3', iconPath: AppIcons.categoryRecord, name: 'Hạng mục thu chi'),
                       ItemWidget(
                         itemId: '4',
-                        iconPath: AppIcons.scanBill,
-                        name: 'Trích xuất hóa đơn',
+                        icon: Icons.account_balance_outlined,
+                        name: 'Quản lý ngân sách',
+                        onTap: () => context.pushNamed('budgets'),
                       ),
+                      ItemWidget(itemId: '5', iconPath: AppIcons.scanBill, name: 'Trích xuất hóa đơn'),
+                      ItemWidget(itemId: '6', iconPath: AppIcons.shopList, name: 'Danh sách mua sắm'),
+                      ItemWidget(itemId: '7', iconPath: AppIcons.limitTransaction, name: 'Hạn mức thu/chi'),
                       ItemWidget(
-                        itemId: '5',
-                        iconPath: AppIcons.shopList,
-                        name: 'Danh sách mua sắm',
-                      ),
-                      ItemWidget(
-                        itemId: '6',
-                        iconPath: AppIcons.limitTransaction,
-                        name: 'Hạn mức thu/chi',
-                      ),
-                      ItemWidget(
-                        itemId: '7',
+                        itemId: '8',
                         iconPath: AppIcons.debtTracking,
                         onTap: () {
                           context.push(AppRoutes.loanTracking);

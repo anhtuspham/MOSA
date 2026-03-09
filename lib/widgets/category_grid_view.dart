@@ -23,13 +23,7 @@ class CategoryGridView extends StatelessWidget {
       ),
       itemCount: categories.length,
       itemBuilder: (context, index) {
-        final category = categories[index];
-        return ItemWidget(
-          itemId: category.itemId,
-          name: category.name,
-          iconPath: category.iconPath,
-          onTap: category.onTap,
-        );
+        return categories[index];
       },
     );
   }

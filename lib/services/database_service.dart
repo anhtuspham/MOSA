@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:mosa/models/budget.dart';
 import 'package:mosa/models/debt.dart';
 import 'package:mosa/models/person.dart';
 import 'package:mosa/models/wallets.dart';
@@ -59,6 +60,7 @@ class DatabaseService {
       );
       await db.execute('DROP TABLE IF EXISTS ${AppConstants.tableWallets}');
       await db.execute('DROP TABLE IF EXISTS ${AppConstants.tableTypeWallets}');
+      await db.execute('DROP TABLE IF EXISTS ${AppConstants.tableBudgets}');
 
       // Recreate with latest schema
       await _createLatestSchema(db);
@@ -359,6 +361,18 @@ class DatabaseService {
       )
     ''');
 
+    // Create budgets table
+    await db.execute('''
+      CREATE TABLE ${AppConstants.tableBudgets}(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        categoryId TEXT NOT NULL,
+        amount REAL NOT NULL,
+        month INTEGER NOT NULL,
+        year INTEGER NOT NULL,
+        FOREIGN KEY (categoryId) REFERENCES ${AppConstants.tableCategories}(id) ON DELETE CASCADE
+      )
+    ''');
+
     // Create indexes for fast lookup
     await db.execute(
       'CREATE INDEX idx_type_wallet_name ON ${AppConstants.tableTypeWallets}(name)',
@@ -386,6 +400,9 @@ class DatabaseService {
     );
     await db.execute(
       'CREATE INDEX idx_debt_categoriesId ON ${AppConstants.tableCategories}(id)',
+    );
+    await db.execute(
+      'CREATE INDEX idx_budget_month_year ON ${AppConstants.tableBudgets}(month, year)',
     );
 
     // Seed default data
@@ -704,6 +721,78 @@ class DatabaseService {
       return count;
     } catch (e) {
       log('Update category failed: $e');
+      rethrow;
+    }
+  }
+
+  // ==================== BUDGETS OPERATIONS ====================
+
+  /// Lấy tất cả ngân sách trong một tháng/năm
+  Future<List<Budget>> getBudgetsByMonth(int month, int year) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      AppConstants.tableBudgets,
+      where: 'month = ? AND year = ?',
+      whereArgs: [month, year],
+    );
+    return List.generate(maps.length, (i) => Budget.fromMap(maps[i]));
+  }
+
+  /// Lấy ngân sách của một category cụ thể trong tháng/năm
+  Future<Budget?> getBudgetByCategory(String categoryId, int month, int year) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      AppConstants.tableBudgets,
+      where: 'categoryId = ? AND month = ? AND year = ?',
+      whereArgs: [categoryId, month, year],
+    );
+    if (maps.isEmpty) return null;
+    return Budget.fromMap(maps.first);
+  }
+
+  /// Thêm/Cập nhật ngân sách
+  Future<int> upsertBudget(Budget budget) async {
+    try {
+      final db = await database;
+      // Tránh duplicate categoryId trong cùng tháng và năm
+      final existing = await getBudgetByCategory(budget.categoryId, budget.month, budget.year);
+      
+      if (existing != null) {
+        // Cập nhật
+        final updatedBudget = budget.copyWith(id: existing.id);
+        final count = await db.update(
+          AppConstants.tableBudgets,
+          updatedBudget.toMap(),
+          where: 'id = ?',
+          whereArgs: [existing.id],
+        );
+        log('Budget updated: $count rows affected');
+        return existing.id!;
+      } else {
+        // Tạo mới
+        final id = await db.insert(AppConstants.tableBudgets, budget.toMap());
+        log('Budget inserted with id: $id');
+        return id;
+      }
+    } catch (e) {
+      log('Upsert budget failed: $e');
+      rethrow;
+    }
+  }
+
+  /// Xóa ngân sách
+  Future<int> deleteBudget(int id) async {
+    try {
+      final db = await database;
+      final count = await db.delete(
+        AppConstants.tableBudgets,
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+      log('Budget deleted: $count rows affected');
+      return count;
+    } catch (e) {
+      log('Delete budget failed: $e');
       rethrow;
     }
   }

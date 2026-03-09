@@ -17,7 +17,7 @@ class CategoryScreen extends ConsumerStatefulWidget {
 
 class _CategoryScreenState extends ConsumerState<CategoryScreen> {
   int initialIndexValue() {
-    final currentCategoryType = ref.watch(currentTransactionByTypeProvider);
+    final currentCategoryType = ref.watch(activeTransactionTypeProvider);
     switch (currentCategoryType) {
       case TransactionType.expense:
         return 0;
@@ -47,6 +47,15 @@ class _CategoryScreenState extends ConsumerState<CategoryScreen> {
         SizedBox(width: 12),
         Icon(Icons.filter_list),
       ],
+      onTabChanged: (index) {
+        final type = switch (index) {
+          0 => TransactionType.expense,
+          1 => TransactionType.income,
+          2 => TransactionType.lend,
+          _ => TransactionType.expense,
+        };
+        ref.read(activeTransactionTypeProvider.notifier).state = type;
+      },
       appBarBackgroundColor: AppColors.background,
       tabs: const [
         Tab(child: Text('Chi tiền')),
