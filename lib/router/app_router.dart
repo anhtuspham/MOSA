@@ -4,6 +4,7 @@ import 'package:mosa/router/app_routes.dart';
 import 'package:mosa/screens/category/category_screen.dart';
 import 'package:mosa/screens/debt/debt_selection_screen.dart';
 import 'package:mosa/screens/debt/loan_tracking_screen.dart';
+import 'package:mosa/screens/home/home_screen.dart';
 import 'package:mosa/screens/login/login_screen.dart';
 import 'package:mosa/screens/setting/setting_screen.dart';
 import 'package:mosa/screens/shell_scaffold/shell_scaffold_screen.dart';
@@ -19,7 +20,7 @@ import 'package:mosa/screens/wallet/screen/select_type_wallet_screen.dart';
 import 'package:mosa/screens/wallet/screen/wallet_screen.dart';
 
 import '../models/debt.dart';
-import '../screens/home/home_screen.dart';
+import 'package:mosa/screens/dashboard/dashboard_screen.dart';
 
 /// Go Router Configuration with StatefulShellRoute
 ///
@@ -27,7 +28,7 @@ import '../screens/home/home_screen.dart';
 /// ├─ StatefulShellRoute (Main Shell)
 /// │  ├─ ShellScaffoldScreen (AppBar + BottomNav)
 /// │  └─ Branches (5):
-/// │     ├─ /overview → HomeScreen (with 3 internal tabs)
+/// │     ├─ /overview → DashboardScreen
 /// │     ├─ /wallet → WalletShellScreen
 /// │     ├─ /stats → StatsShellScreen
 /// │     └─ /settings → SettingsShellScreen
@@ -43,29 +44,16 @@ final goRouter = GoRouter(
   routes: [
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
-        return ShellScaffoldScreen(
-          navigationShell: navigationShell,
-          child: navigationShell,
-        );
+        return ShellScaffoldScreen(navigationShell: navigationShell, child: navigationShell);
       },
       branches: [
         StatefulShellBranch(
           routes: [
-            GoRoute(
-              path: AppRoutes.overview,
-              name: 'overview',
-              builder: (context, state) => HomeScreen(),
-            ),
+            GoRoute(path: AppRoutes.overview, name: 'overview', builder: (context, state) => const HomeScreen()),
           ],
         ),
         StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: AppRoutes.wallet,
-              name: 'wallet',
-              builder: (context, state) => WalletShellScreen(),
-            ),
-          ],
+          routes: [GoRoute(path: AppRoutes.wallet, name: 'wallet', builder: (context, state) => WalletShellScreen())],
         ),
         StatefulShellBranch(
           routes: [
@@ -82,6 +70,13 @@ final goRouter = GoRouter(
               path: AppRoutes.stats,
               name: 'stats',
               builder: (context, state) => StatsShellScreen(),
+              routes: [
+                GoRoute(
+                  path: 'dashboard-chart',
+                  name: 'dashboard-chart',
+                  builder: (context, state) => DashboardScreen(),
+                ),
+              ],
             ),
           ],
         ),
@@ -94,8 +89,7 @@ final goRouter = GoRouter(
               routes: [
                 // Nested routes within Settings branch
                 GoRoute(
-                  path:
-                      'loan-tracking', // Relative path, becomes /settings/loan-tracking
+                  path: 'loan-tracking', // Relative path, becomes /settings/loan-tracking
                   name: 'loanTracking',
                   builder: (context, state) => LoanTrackingScreen(),
                 ),
@@ -106,21 +100,9 @@ final goRouter = GoRouter(
       ],
     ),
 
-    GoRoute(
-      path: AppRoutes.login,
-      name: 'login',
-      builder: (context, state) => LoginScreen(),
-    ),
-    GoRoute(
-      path: AppRoutes.categoryList,
-      name: 'categoryList',
-      builder: (context, state) => CategoryScreen(),
-    ),
-    GoRoute(
-      path: AppRoutes.selectWallet,
-      name: 'selectWallet',
-      builder: (context, state) => SelectWalletScreen(),
-    ),
+    GoRoute(path: AppRoutes.login, name: 'login', builder: (context, state) => LoginScreen()),
+    GoRoute(path: AppRoutes.categoryList, name: 'categoryList', builder: (context, state) => CategoryScreen()),
+    GoRoute(path: AppRoutes.selectWallet, name: 'selectWallet', builder: (context, state) => SelectWalletScreen()),
     GoRoute(
       path: AppRoutes.selectTransferOutWallet,
       name: 'selectTransferOutWallet',
@@ -139,21 +121,10 @@ final goRouter = GoRouter(
             child: AddWalletScreen(),
             transitionDuration: const Duration(milliseconds: 450),
             reverseTransitionDuration: const Duration(milliseconds: 300),
-            transitionsBuilder: (
-              context,
-              animation,
-              secondaryAnimation,
-              child,
-            ) {
-              final curveAnimation = CurvedAnimation(
-                parent: animation,
-                curve: Curves.easeOut,
-              );
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              final curveAnimation = CurvedAnimation(parent: animation, curve: Curves.easeOut);
               return SlideTransition(
-                position: Tween<Offset>(
-                  begin: const Offset(0, 1),
-                  end: Offset.zero,
-                ).animate(curveAnimation),
+                position: Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero).animate(curveAnimation),
                 child: child,
               );
             },
@@ -164,23 +135,14 @@ final goRouter = GoRouter(
       name: 'typeWalletList',
       builder: (context, state) => SelectTypeWalletScreen(),
     ),
-    GoRoute(
-      path: AppRoutes.bankList,
-      name: 'bankList',
-      builder: (context, state) => SelectBankScreen(),
-    ),
-    GoRoute(
-      path: AppRoutes.personList,
-      name: 'personList',
-      builder: (context, state) => SelectPersonScreen(),
-    ),
+    GoRoute(path: AppRoutes.bankList, name: 'bankList', builder: (context, state) => SelectBankScreen()),
+    GoRoute(path: AppRoutes.personList, name: 'personList', builder: (context, state) => SelectPersonScreen()),
     GoRoute(
       path: AppRoutes.debtSelection,
       name: 'debtSelection',
       builder: (context, state) {
         final debtTypeString = state.uri.queryParameters['type'] ?? 'borrowed';
-        final debtType =
-            debtTypeString == 'lent' ? DebtType.lent : DebtType.borrowed;
+        final debtType = debtTypeString == 'lent' ? DebtType.lent : DebtType.borrowed;
         return DebtSelectionScreen(debtType: debtType);
       },
     ),
@@ -194,15 +156,9 @@ final goRouter = GoRouter(
           children: [
             Text('Router không tồn tại'),
             const SizedBox(height: 12),
-            Text(
-              'Path: ${state.uri} không tồn tại. Vui lòng kiểm tra lại',
-              style: TextStyle(color: Colors.grey),
-            ),
+            Text('Path: ${state.uri} không tồn tại. Vui lòng kiểm tra lại', style: TextStyle(color: Colors.grey)),
             const SizedBox(height: 32),
-            ElevatedButton(
-              onPressed: () => context.go(AppRoutes.overview),
-              child: Text('Quay về trang chủ'),
-            ),
+            ElevatedButton(onPressed: () => context.go(AppRoutes.overview), child: Text('Quay về trang chủ')),
           ],
         ),
       ),

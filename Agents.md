@@ -118,6 +118,12 @@ class User {
 
 # MOSA Project Specific Rules
 
+## UI & Component Rules (MOSA Specific)
+* **Main Layout:** ALWAYS use the custom `CommonScaffold` widget (located in `lib/widgets/common_scaffold.dart`) for all new screens. 
+    - DO NOT use the default Flutter `Scaffold` unless there is a specific technical reason.
+    - `CommonScaffold` provides consistent padding, app bars, and background colors for the MOSA project.
+* **Reuse:** Check `lib/widgets/` for existing common widgets before creating new UI components to ensure visual consistency.
+
 ## Project Overview
 - **Name:** MOSA - Money Saving Application
 - **Type:** Flutter mobile app for personal finance tracking
@@ -170,6 +176,8 @@ flutter test path/to/test_file.dart
 ```bash
 flutter test --name "test_name_pattern"
 flutter test --name "Transaction"
+
+
 ```
 
 ### Run Tests in Directory

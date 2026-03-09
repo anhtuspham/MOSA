@@ -29,6 +29,7 @@ import 'package:mosa/widgets/transaction/transfer_wallet_section.dart';
 import 'package:mosa/widgets/transaction/wallet_selector_section.dart';
 import 'package:mosa/widgets/card_section.dart';
 
+/// Màn hình thêm giao dịch mới
 class AddTransactionScreen extends ConsumerStatefulWidget {
   const AddTransactionScreen({super.key});
 
@@ -48,26 +49,38 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   @override
   void initState() {
     super.initState();
+    _initializePrefillData();
+  }
+
+  /// Khởi tạo dữ liệu điền trước từ provider
+  void _initializePrefillData() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(currentTransactionByTypeProvider.notifier).state =
           TransactionType.expense;
       final prefill = ref.read(transactionPrefillDataProvider);
       if (prefill != null) {
-        if (prefill.amount != null) {
-          _amountController.text = Helpers.formatNumber(prefill.amount!);
-        }
-        if (prefill.type != null)
-          ref.read(currentTransactionByTypeProvider.notifier).state =
-              prefill.type;
-        if (prefill.person != null)
-          ref.read(selectedPersonProvider.notifier).state = prefill.person;
-        if (prefill.category != null)
-          ref
-              .read(selectedCategoryProvider.notifier)
-              .selectCategory(prefill.category);
+        _applyPrefill(prefill);
         ref.read(transactionPrefillDataProvider.notifier).state = null;
-      } else {}
+      }
     });
+  }
+
+  /// Áp dụng dữ liệu điền trước vào các điều khiển
+  void _applyPrefill(TransactionPrefill prefill) {
+    if (prefill.amount != null) {
+      _amountController.text = Helpers.formatNumber(prefill.amount ?? 0);
+    }
+    if (prefill.type != null) {
+      ref.read(currentTransactionByTypeProvider.notifier).state = prefill.type;
+    }
+    if (prefill.person != null) {
+      ref.read(selectedPersonProvider.notifier).state = prefill.person;
+    }
+    if (prefill.category != null) {
+      ref
+          .read(selectedCategoryProvider.notifier)
+          .selectCategory(prefill.category);
+    }
   }
 
   @override
@@ -80,46 +93,12 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    ref.listen<TransactionPrefill?>(transactionPrefillDataProvider, (
-      previous,
-      next,
-    ) {
-      if (next != null) {
-        if (next.amount != null) {
-          _amountController.text = Helpers.formatNumber(next.amount!);
-        }
-        if (next.type != null) {
-          ref.read(currentTransactionByTypeProvider.notifier).state = next.type;
-        }
-        if (next.person != null) {
-          ref.read(selectedPersonProvider.notifier).state = next.person;
-        }
-        if (next.category != null) {
-          ref
-              .read(selectedCategoryProvider.notifier)
-              .selectCategory(next.category);
-        }
-
-        Future.microtask(() {
-          ref.read(transactionPrefillDataProvider.notifier).state = null;
-        });
-      }
-    });
+    _listenToPrefillChanges();
     final selectedTransactionType =
         ref.watch(currentTransactionByTypeProvider) ?? TransactionType.expense;
 
     return CommonScaffold(
-      title: Container(
-        decoration: BoxDecoration(
-          border: Border.all(width: 2, color: AppColors.lightBorder),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        alignment: Alignment.center,
-        constraints: const BoxConstraints(maxWidth: 180),
-        child: TransactionTypeDropdown(
-          onTypeChanged: (_) => _clearTransaction(),
-        ),
-      ),
+      title: _buildAppBarTitle(),
       centerTitle: true,
       leading: const Icon(Icons.history),
       actions: [
@@ -132,8 +111,38 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     );
   }
 
-  /// Clear all form inputs
-  void _clearTransaction() {
+  /// Lắng nghe thay đổi của dữ liệu điền trước
+  void _listenToPrefillChanges() {
+    ref.listen<TransactionPrefill?>(transactionPrefillDataProvider, (
+      previous,
+      next,
+    ) {
+      if (next != null) {
+        _applyPrefill(next);
+        Future.microtask(() {
+          ref.read(transactionPrefillDataProvider.notifier).state = null;
+        });
+      }
+    });
+  }
+
+  /// Xây dựng tiêu đề AppBar với Dropdown loại giao dịch
+  Widget _buildAppBarTitle() {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(width: 2, color: AppColors.lightBorder),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      alignment: Alignment.center,
+      constraints: const BoxConstraints(maxWidth: 180),
+      child: TransactionTypeDropdown(
+        onTypeChanged: (_) => _resetForm(),
+      ),
+    );
+  }
+
+  /// Đặt lại toàn bộ dữ liệu trong form
+  void _resetForm() {
     _noteController.clear();
     _actualBalanceController.clear();
     _selectedDateTime = DateTime.now();
@@ -143,192 +152,303 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         .state = TransactionPrefill(amount: 0, person: null, category: null);
   }
 
-  /// Main save transaction method - delegates to appropriate handler
+  /// Phương thức lưu giao dịch chính
   Future<void> _saveTransaction() async {
     if (!mounted) return;
 
     try {
-      final selectedTransactionType =
+      final type =
           ref.read(currentTransactionByTypeProvider) ?? TransactionType.expense;
-      final transactionService = ref.read(transactionServiceProvider);
+      final service = ref.read(transactionServiceProvider);
 
-      switch (selectedTransactionType) {
+      switch (type) {
         case TransactionType.adjustBalance:
-          await _saveAdjustBalance(transactionService);
-          break;
+          await _handleSaveAdjustBalance(service);
         case TransactionType.lend:
         case TransactionType.borrowing:
-          await _saveLendOrBorrow(transactionService, selectedTransactionType);
-          break;
+          await _handleSaveLendOrBorrow(service, type);
         case TransactionType.transfer:
-          await _saveTransfer(transactionService);
-          break;
+          await _handleSaveTransfer(service);
         default:
-          await _saveRegularTransaction(
-            transactionService,
-            selectedTransactionType,
-          );
+          await _handleSaveRegularTransaction(service, type);
       }
 
-      _clearTransaction();
-      _showSuccessToast();
+      _resetForm();
+      _notifySuccess();
     } catch (e) {
-      log('Error saving transaction: $e');
-      _showErrorToast(e.toString());
+      log('Lỗi khi lưu giao dịch: $e', name: 'AddTransactionScreen');
+      _notifyError(e.toString());
     }
   }
 
-  /// Save adjust balance transaction
-  Future<void> _saveAdjustBalance(TransactionService service) async {
-    final actualBalance =
-        double.tryParse(_actualBalanceController.text.replaceAll('.', '')) ?? 0;
-    final effectiveWallet = await ref.read(effectiveWalletProvider.future);
+  /// Lưu giao dịch điều chỉnh số dư
+  Future<void> _handleSaveAdjustBalance(TransactionService service) async {
+    final balanceText = _actualBalanceController.text.replaceAll('.', '');
+    final actualBalance = double.tryParse(balanceText) ?? 0.0;
+    final wallet = await ref.read(effectiveWalletProvider.future);
 
     await service.saveAdjustBalanceTransaction(
       actualBalance: actualBalance,
-      wallet: effectiveWallet,
+      wallet: wallet,
       date: _selectedDateTime,
       note: _noteController.text.isNotEmpty ? _noteController.text : null,
     );
   }
 
-  /// Save lend or borrow transaction
-  Future<void> _saveLendOrBorrow(
+  /// Lưu giao dịch cho vay hoặc đi vay
+  Future<void> _handleSaveLendOrBorrow(
     TransactionService service,
     TransactionType type,
   ) async {
-    final selectedPerson = ref.read(selectedPersonProvider);
-    service.validatePerson(selectedPerson);
+    final person = ref.read(selectedPersonProvider);
+    service.validatePerson(person);
     service.validateAmount(_amountController.text);
 
-    final amount = double.parse(_amountController.text.replaceAll('.', ''));
-    final effectiveWallet = await ref.read(effectiveWalletProvider.future);
+    final amountText = _amountController.text.replaceAll('.', '');
+    final amount = double.tryParse(amountText) ?? 0.0;
+    final wallet = await ref.read(effectiveWalletProvider.future);
 
     await service.saveLendOrBorrowTransaction(
       amount: amount,
       date: _selectedDateTime,
       type: type,
-      person: selectedPerson!,
-      wallet: effectiveWallet,
+      person: person!, // Đã được validate ở trên
+      wallet: wallet,
       note: _noteController.text.isNotEmpty ? _noteController.text : null,
       dueDate: _selectedLoanDateTime,
     );
   }
 
-  /// Save transfer transaction
-  Future<void> _saveTransfer(TransactionService service) async {
+  /// Lưu giao dịch chuyển khoản
+  Future<void> _handleSaveTransfer(TransactionService service) async {
     service.validateAmount(_amountController.text);
 
-    final amount = double.parse(_amountController.text.replaceAll('.', ''));
-    final transferOutWallet = ref.read(transferOutWalletProvider);
-    final transferInWallet = ref.read(transferInWalletProvider);
+    final amountText = _amountController.text.replaceAll('.', '');
+    final amount = double.tryParse(amountText) ?? 0.0;
+    final fromWallet = ref.read(transferOutWalletProvider);
+    final toWallet = ref.read(transferInWalletProvider);
 
-    service.validateTransferWallets(transferOutWallet, transferInWallet);
+    service.validateTransferWallets(fromWallet, toWallet);
 
     await service.saveTransferTransaction(
       amount: amount,
       date: _selectedDateTime,
-      fromWallet: transferOutWallet!,
-      toWallet: transferInWallet!,
+      fromWallet: fromWallet!, // Đã được validate
+      toWallet: toWallet!, // Đã được validate
       note: _noteController.text.isNotEmpty ? _noteController.text : null,
     );
   }
 
-  /// Save regular income/expense transaction or debt collection/repayment
-  Future<void> _saveRegularTransaction(
+  /// Lưu giao dịch thu nhập/chi phí thông thường
+  Future<void> _handleSaveRegularTransaction(
     TransactionService service,
     TransactionType type,
   ) async {
-    final selectedCategory = ref.read(selectedCategoryProvider);
-    service.validateCategory(selectedCategory);
+    final category = ref.read(selectedCategoryProvider);
+    service.validateCategory(category);
     service.validateAmount(_amountController.text);
 
-    final amount = double.parse(_amountController.text.replaceAll('.', ''));
-    final effectiveWallet = await ref.read(effectiveWalletProvider.future);
+    final amountText = _amountController.text.replaceAll('.', '');
+    final amount = double.tryParse(amountText) ?? 0.0;
+    final wallet = await ref.read(effectiveWalletProvider.future);
 
-    // Check if this is a debt collection or repayment
-    if (selectedCategory!.type == 'lend') {
-      await _saveDebtCollectionOrRepayment(
-        service,
-        type,
-        amount,
-        effectiveWallet,
-      );
+    if (category?.type == 'lend') {
+      await _handleSaveDebtTransaction(service, type, amount, wallet);
     } else {
-      // Regular transaction
       await service.saveRegularTransaction(
         amount: amount,
         date: _selectedDateTime,
         type: type,
-        category: selectedCategory,
-        wallet: effectiveWallet,
+        category: category!, // Đã được validate
+        wallet: wallet,
         note: _noteController.text.isNotEmpty ? _noteController.text : null,
       );
     }
   }
 
-  /// Save debt collection or repayment
-  Future<void> _saveDebtCollectionOrRepayment(
+  /// Xử lý lưu giao dịch liên quan đến nợ (thu nợ/trả nợ)
+  Future<void> _handleSaveDebtTransaction(
     TransactionService service,
     TransactionType type,
     double amount,
     dynamic wallet,
   ) async {
-    final selectedPerson = ref.read(selectedPersonProvider);
+    final person = ref.read(selectedPersonProvider);
 
     if (type == TransactionType.income) {
-      service.validatePersonDebt(selectedPerson, DebtType.lent);
-
-      // Debt collection
+      service.validatePersonDebt(person, DebtType.lent);
       await service.saveDebtCollectionTransaction(
         amount: amount,
-        person: selectedPerson!,
+        person: person!,
         wallet: wallet,
       );
     } else if (type == TransactionType.expense) {
-      service.validatePersonDebt(selectedPerson, DebtType.borrowed);
-
-      // Debt repayment
+      service.validatePersonDebt(person, DebtType.borrowed);
       await service.saveDebtRepaymentTransaction(
         amount: amount,
-        person: selectedPerson!,
+        person: person!,
         wallet: wallet,
       );
     }
   }
 
-  /// Show success toast
-  void _showSuccessToast() {
+  void _notifySuccess() {
     if (!mounted) return;
     showResultToast(TransactionConstants.successSaveTransaction);
   }
 
-  /// Show error toast
-  void _showErrorToast(String error) {
+  void _notifyError(String error) {
     if (!mounted) return;
     showResultToast(error, isError: true);
   }
 
-  /// Build transaction detail based on type
-  Widget _buildTransactionDetail(TransactionType transactionType) {
-    switch (transactionType) {
+  /// Phân bổ widget chi tiết dựa trên loại giao dịch
+  Widget _buildTransactionDetail(TransactionType type) {
+    switch (type) {
       case TransactionType.lend:
       case TransactionType.borrowing:
-        return _buildLoanTransactionDetail(transactionType: transactionType);
+        return _LoanTransactionBody(
+          type: type,
+          amountController: _amountController,
+          selectedDate: _selectedLoanDateTime,
+          onDateChanged: (date) => setState(() => _selectedLoanDateTime = date),
+          bottomSection: _buildBottomFormSection(),
+          saveButton: _buildSaveButton(),
+        );
       case TransactionType.transfer:
-        return _buildTransferDetail();
+        return _TransferTransactionBody(
+          amountController: _amountController,
+          noteController: _noteController,
+          selectedDate: _selectedDateTime,
+          onDateChanged: (date) => setState(() => _selectedDateTime = date),
+          saveButton: _buildSaveButton(),
+        );
       case TransactionType.adjustBalance:
-        return _buildAdjustBalanceDetail();
+        return _AdjustBalanceBody(
+          actualBalanceController: _actualBalanceController,
+          noteController: _noteController,
+          selectedDate: _selectedDateTime,
+          onDateChanged: (date) => setState(() => _selectedDateTime = date),
+          saveButton: _buildSaveButton(),
+        );
       default:
-        return _buildDefaultTransactionDetail(transactionType);
+        return _DefaultTransactionBody(
+          type: type,
+          amountController: _amountController,
+          bottomSection: _buildBottomFormSection(),
+          saveButton: _buildSaveButton(),
+        );
     }
   }
 
-  /// Build loan transaction detail (lend/borrow)
-  Widget _buildLoanTransactionDetail({
-    required TransactionType? transactionType,
-    bool isRepaymentOrCollection = false,
-  }) {
+  Widget _buildBottomFormSection() {
+    return _WalletAndDetailSection(
+      selectedDateTime: _selectedDateTime,
+      noteController: _noteController,
+      onDateTimeChanged: (date) => setState(() => _selectedDateTime = date),
+    );
+  }
+
+  Widget _buildSaveButton() {
+    return _SaveButton(onPressed: _saveTransaction);
+  }
+}
+
+/// Widget cho phần ví và chi tiết (ngày, ghi chú)
+class _WalletAndDetailSection extends StatelessWidget {
+  final DateTime selectedDateTime;
+  final TextEditingController noteController;
+  final ValueChanged<DateTime> onDateTimeChanged;
+
+  const _WalletAndDetailSection({
+    required this.selectedDateTime,
+    required this.noteController,
+    required this.onDateTimeChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return CardSection(
+      child: Column(
+        children: [
+          const WalletSelectorSection(),
+          const SizedBox(height: 8),
+          DateTimeSelectorSection(
+            selectedDateTime: selectedDateTime,
+            onDateTimeChanged: onDateTimeChanged,
+          ),
+          TextSelectorSection(
+            controller: noteController,
+            leading: const Icon(Icons.notes_sharp),
+            hintText: TransactionConstants.notes,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Widget thanh hành động đa phương tiện (ảnh, giọng nói)
+class _MediaActionSection extends StatelessWidget {
+  const _MediaActionSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return CardSection(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      child: MediaActionBar(
+        onMicTap: () {},
+        onImageTap: () {},
+        onCameraTap: () {},
+      ),
+    );
+  }
+}
+
+/// Nút lưu giao dịch dùng chung
+class _SaveButton extends StatelessWidget {
+  final VoidCallback onPressed;
+
+  const _SaveButton({required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.buttonPrimary,
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+        child: const Text(AppConstants.save),
+      ),
+    );
+  }
+}
+
+/// Thân màn hình cho giao dịch Cho vay/Đi vay
+class _LoanTransactionBody extends StatelessWidget {
+  final TransactionType type;
+  final TextEditingController amountController;
+  final DateTime? selectedDate;
+  final ValueChanged<DateTime?> onDateChanged;
+  final Widget bottomSection;
+  final Widget saveButton;
+
+  const _LoanTransactionBody({
+    required this.type,
+    required this.amountController,
+    required this.selectedDate,
+    required this.onDateChanged,
+    required this.bottomSection,
+    required this.saveButton,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -337,40 +457,52 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
             child: Column(
               children: [
                 AmountInputSection(
-                  controller: _amountController,
-                  transactionType: transactionType,
+                  controller: amountController,
+                  transactionType: type,
                 ),
                 const SizedBox(height: 12),
                 const CategorySelectorSection(),
                 const PersonSelectorSection(),
                 const SizedBox(height: 12),
-                _buildWalletAndDetailSection(),
-                if (!isRepaymentOrCollection)
-                  DateOnlySelectorSection(
-                    selectedDateOnly: _selectedLoanDateTime,
-                    onDateTimeChanged: (newDateTime) {
-                      setState(() {
-                        _selectedLoanDateTime = newDateTime;
-                      });
-                    },
-                    defaultTitle:
-                        transactionType == TransactionType.lend
-                            ? TransactionConstants.debtCollectionDate
-                            : TransactionConstants.debtRepaymentDate,
-                  ),
+                bottomSection,
+                DateOnlySelectorSection(
+                  selectedDateOnly: selectedDate,
+                  onDateTimeChanged: onDateChanged,
+                  defaultTitle:
+                      type == TransactionType.lend
+                          ? TransactionConstants.debtCollectionDate
+                          : TransactionConstants.debtRepaymentDate,
+                ),
                 const SizedBox(height: 12),
-                _buildMediaActionSection(),
+                const _MediaActionSection(),
               ],
             ),
           ),
         ),
-        _buildSaveButton(),
+        saveButton,
       ],
     );
   }
+}
 
-  /// Build transfer detail
-  Widget _buildTransferDetail() {
+/// Thân màn hình cho giao dịch Chuyển khoản
+class _TransferTransactionBody extends StatelessWidget {
+  final TextEditingController amountController;
+  final TextEditingController noteController;
+  final DateTime selectedDate;
+  final ValueChanged<DateTime> onDateChanged;
+  final Widget saveButton;
+
+  const _TransferTransactionBody({
+    required this.amountController,
+    required this.noteController,
+    required this.selectedDate,
+    required this.onDateChanged,
+    required this.saveButton,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -379,7 +511,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
             child: Column(
               children: [
                 AmountInputSection(
-                  controller: _amountController,
+                  controller: amountController,
                   transactionType: TransactionType.transfer,
                 ),
                 const SizedBox(height: 12),
@@ -393,15 +525,11 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 ),
                 const SizedBox(height: 12),
                 DateTimeSelectorSection(
-                  selectedDateTime: _selectedDateTime,
-                  onDateTimeChanged: (newDateTime) {
-                    setState(() {
-                      _selectedDateTime = newDateTime;
-                    });
-                  },
+                  selectedDateTime: selectedDate,
+                  onDateTimeChanged: onDateChanged,
                 ),
                 TextSelectorSection(
-                  controller: _noteController,
+                  controller: noteController,
                   leading: const Icon(Icons.notes_sharp),
                   hintText: TransactionConstants.notes,
                 ),
@@ -409,13 +537,30 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
             ),
           ),
         ),
-        _buildSaveButton(),
+        saveButton,
       ],
     );
   }
+}
 
-  /// Build adjust balance detail
-  Widget _buildAdjustBalanceDetail() {
+/// Thân màn hình cho giao dịch Điều chỉnh số dư
+class _AdjustBalanceBody extends StatelessWidget {
+  final TextEditingController actualBalanceController;
+  final TextEditingController noteController;
+  final DateTime selectedDate;
+  final ValueChanged<DateTime> onDateChanged;
+  final Widget saveButton;
+
+  const _AdjustBalanceBody({
+    required this.actualBalanceController,
+    required this.noteController,
+    required this.selectedDate,
+    required this.onDateChanged,
+    required this.saveButton,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -426,19 +571,15 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 const WalletSelectorSection(),
                 const SizedBox(height: 12),
                 AdjustBalanceSection(
-                  actualBalanceController: _actualBalanceController,
+                  actualBalanceController: actualBalanceController,
                 ),
                 const SizedBox(height: 12),
                 DateTimeSelectorSection(
-                  selectedDateTime: _selectedDateTime,
-                  onDateTimeChanged: (newDateTime) {
-                    setState(() {
-                      _selectedDateTime = newDateTime;
-                    });
-                  },
+                  selectedDateTime: selectedDate,
+                  onDateTimeChanged: onDateChanged,
                 ),
                 TextSelectorSection(
-                  controller: _noteController,
+                  controller: noteController,
                   leading: const Icon(Icons.notes_sharp),
                   hintText: TransactionConstants.notes,
                 ),
@@ -446,20 +587,39 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
             ),
           ),
         ),
-        _buildSaveButton(),
+        saveButton,
       ],
     );
   }
+}
 
-  /// Build default transaction detail (income/expense)
-  Widget _buildDefaultTransactionDetail(TransactionType transactionType) {
+/// Thân màn hình cho giao dịch Thu nhập/Chi phí thông thường
+class _DefaultTransactionBody extends ConsumerWidget {
+  final TransactionType type;
+  final TextEditingController amountController;
+  final Widget bottomSection;
+  final Widget saveButton;
+
+  const _DefaultTransactionBody({
+    required this.type,
+    required this.amountController,
+    required this.bottomSection,
+    required this.saveButton,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
     final selectedCategory = ref.watch(selectedCategoryProvider);
 
-    // Check if this is debt collection or repayment
-    if (selectedCategory != null && selectedCategory.type == 'lend') {
-      return _buildLoanTransactionDetail(
-        transactionType: transactionType,
-        isRepaymentOrCollection: true,
+    // Kiểm tra nếu là thu nợ/trả nợ (loại đặc biệt của income/expense)
+    if (selectedCategory?.type == 'lend') {
+      return _LoanTransactionBody(
+        type: type,
+        amountController: amountController,
+        selectedDate: null, // Không cần ngày đến hạn cho trả nợ/thu nợ lẻ
+        onDateChanged: (_) {},
+        bottomSection: bottomSection,
+        saveButton: saveButton,
       );
     }
 
@@ -471,81 +631,21 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
             child: Column(
               children: [
                 AmountInputSection(
-                  controller: _amountController,
-                  transactionType: transactionType,
+                  controller: amountController,
+                  transactionType: type,
                 ),
                 const SizedBox(height: 12),
                 const CategorySelectorSection(),
                 const SizedBox(height: 12),
-                _buildWalletAndDetailSection(),
+                bottomSection,
                 const SizedBox(height: 12),
-                _buildMediaActionSection(),
+                const _MediaActionSection(),
               ],
             ),
           ),
         ),
-        _buildSaveButton(),
+        saveButton,
       ],
-    );
-  }
-
-  /// Build wallet and detail section
-  Widget _buildWalletAndDetailSection() {
-    return CardSection(
-      child: Column(
-        children: [
-          const WalletSelectorSection(),
-          const SizedBox(height: 8),
-          DateTimeSelectorSection(
-            selectedDateTime: _selectedDateTime,
-            onDateTimeChanged: (newDateTime) {
-              setState(() {
-                _selectedDateTime = newDateTime;
-              });
-            },
-          ),
-          TextSelectorSection(
-            controller: _noteController,
-            leading: const Icon(Icons.notes_sharp),
-            hintText: TransactionConstants.notes,
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// Build media action section
-  Widget _buildMediaActionSection() {
-    return CardSection(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      child: MediaActionBar(
-        onMicTap: () {
-          // TODO: Implement voice recording
-        },
-        onImageTap: () {
-          // TODO: Implement image selection
-        },
-        onCameraTap: () {
-          // TODO: Implement camera capture
-        },
-      ),
-    );
-  }
-
-  /// Build save button
-  Widget _buildSaveButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: _saveTransaction,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.buttonPrimary,
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        ),
-        child: const Text(AppConstants.save),
-      ),
     );
   }
 }

@@ -4,14 +4,16 @@
     "name": "Mb bank",
     "iconPath": "assets/icons/mb_bank.png",
     "initialBalance": 50000000,
-    "balance": 0,
+    "balance": 50000000,
     "typeWalletId": 2,
     "isDefault": false,
     "isActive": true,
-    "createAt": "2025-08-01T10:00:00.000Z",
-    "updateAt": "2025-11-01T09:00:00.000Z",
+    "createAt": "2026-01-01T10:00:00.000Z",
+    "updateAt": "2026-01-01T10:00:00.000Z",
     "isSynced": false,
-    "syncId": ""
+    "syncId": "",
+    "note": "Tài khoản ngân hàng chính",
+    "bankId": 7
   },
   {
     "id": 2,
@@ -19,27 +21,31 @@
     "iconPath": "assets/icons/cash.png",
     "initialBalance": 26470000,
     "typeWalletId": 1,
-    "balance": 0,
+    "balance": 26470000,
     "isDefault": true,
     "isActive": true,
-    "createAt": "2025-08-15T10:00:00.000Z",
-    "updateAt": "2025-11-01T09:00:00.000Z",
+    "createAt": "2026-01-01T10:00:00.000Z",
+    "updateAt": "2026-01-01T10:00:00.000Z",
     "isSynced": false,
-    "syncId": ""
+    "syncId": "",
+    "note": "Tiền mặt hàng ngày",
+    "bankId": null
   },
   {
     "id": 3,
     "name": "Momo",
     "iconPath": "assets/icons/logo_momo.png",
     "initialBalance": 5000000,
-    "balance": 0,
+    "balance": 5000000,
     "typeWalletId": 3,
     "isDefault": false,
     "isActive": true,
-    "createAt": "2025-08-20T14:30:00.000Z",
-    "updateAt": "2025-10-30T16:45:00.000Z",
+    "createAt": "2026-01-01T14:30:00.000Z",
+    "updateAt": "2026-01-01T14:30:00.000Z",
     "isSynced": false,
-    "syncId": ""
+    "syncId": "",
+    "note": "Ví điện tử Momo",
+    "bankId": null
   },
   {
     "id": 4,
@@ -50,9 +56,11 @@
     "typeWalletId": 3,
     "isDefault": false,
     "isActive": true,
-    "createAt": "2025-08-25T11:20:00.000Z",
-    "updateAt": "2025-08-25T11:20:00.000Z",
+    "createAt": "2026-01-01T11:20:00.000Z",
+    "updateAt": "2026-01-01T11:20:00.000Z",
     "isSynced": false,
-    "syncId": ""
+    "syncId": "",
+    "note": "Ví điện tử Zalopay",
+    "bankId": null
   }
 ]

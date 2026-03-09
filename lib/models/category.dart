@@ -2,15 +2,28 @@ import 'package:flutter/material.dart';
 
 /// Model lưu trữ thông tin danh mục giao dịch
 class Category {
+  /// Mã định danh duy nhất (ví dụ: 'food', 'salary')
   final String id;
+
+  /// Tên danh mục (ví dụ: 'Ăn uống', 'Lương')
   final String name;
 
-  /// income / expense / lend / borrowing / repayment / debtCollection
+  /// Loại giao dịch (expense, income, lend, borrowing, repayment, debtCollection)
   final String type;
+
+  /// Loại icon ('custom' cho ảnh asset hoặc 'material' cho Material Icons)
   final String iconType;
+
+  /// Đường dẫn (ví dụ: 'assets/icons/food.png') hoặc tên icon (ví dụ: 'attach_money')
   final String iconPath;
+
+  /// Mã màu hex (ví dụ: '#FF5733')
   final String? color;
+
+  /// ID của danh mục cha nếu là danh mục con
   final String? parentId;
+
+  /// Danh sách các danh mục con
   final List<Category>? children;
 
   Category({
@@ -24,20 +37,22 @@ class Category {
     this.children = const [],
   });
 
+  /// Kiểm tra xem có phải là danh mục cha không
   bool? get isParent => children?.isNotEmpty;
 
+  /// Kiểm tra xem có phải là danh mục con không
   bool get isChild => parentId != null;
 
-  /// Tạo Category từ JSON
+  /// Tạo Category từ JSON (dùng cho seeding từ file assets)
   factory Category.fromJson(Map<String, dynamic> json) {
     return Category(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      type: json['type'] as String,
-      iconType: json['iconType'] ?? 'custom',
-      iconPath: json['iconPath'] as String,
+      id: json['id'] as String? ?? 'unknown',
+      name: json['name'] as String? ?? 'Chưa xác định',
+      type: json['type'] as String? ?? 'expense',
+      iconType: json['iconType'] as String? ?? 'custom',
+      iconPath: json['iconPath'] as String? ?? 'assets/icons/default.png',
       color: json['color'] as String?,
-      parentId: json["parentId"] != null ? json['parentId'] : null,
+      parentId: json['parentId'] as String?,
       children:
           json['children'] != null
               ? (json['children'] as List<dynamic>)
@@ -47,10 +62,10 @@ class Category {
     );
   }
 
-  /// Tạo Category rỗng
+  /// Tạo Category rỗng dùng làm fallback
   factory Category.empty() => Category(
     id: 'unknown',
-    name: 'unknown',
+    name: 'Chưa xác định',
     type: 'unknown',
     iconType: 'custom',
     iconPath: 'assets/icons/default.png',
@@ -70,7 +85,7 @@ class Category {
     };
   }
 
-  /// Chuyển Category sang Map (database)
+  /// Chuyển Category sang Map để lưu vào database
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -80,21 +95,44 @@ class Category {
       'iconPath': iconPath,
       'color': color,
       'parentId': parentId,
-      'children': children?.map((e) => e.toMap()).toList(),
+      // children không được lưu trực tiếp vào bảng categories mà thông qua quan hệ database
     };
   }
 
-  /// Tạo Category từ Map (database)
+  /// Tạo Category từ Map (database) với cơ chế fallback an toàn
   factory Category.fromMap(Map<String, dynamic> map) {
     return Category(
-      id: map['id'] as String,
-      name: map['name'] as String,
-      type: map['type'] as String,
-      iconType: map['iconType'] as String,
-      iconPath: map['iconPath'] as String,
+      id: map['id'] as String? ?? 'unknown',
+      name: map['name'] as String? ?? 'Chưa xác định',
+      type: map['type'] as String? ?? 'expense',
+      iconType: map['iconType'] as String? ?? 'custom',
+      iconPath: map['iconPath'] as String? ?? 'assets/icons/default.png',
       color: map['color'] as String?,
       parentId: map['parentId'] as String?,
-      children: [],
+      children: [], // Khởi tạo danh sách con trống, sẽ được gán lại khi dựng cây
+    );
+  }
+
+  /// Tạo bản sao của Category với một số trường thay đổi
+  Category copyWith({
+    String? id,
+    String? name,
+    String? type,
+    String? iconType,
+    String? iconPath,
+    String? color,
+    String? parentId,
+    List<Category>? children,
+  }) {
+    return Category(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      type: type ?? this.type,
+      iconType: iconType ?? this.iconType,
+      iconPath: iconPath ?? this.iconPath,
+      color: color ?? this.color,
+      parentId: parentId ?? this.parentId,
+      children: children ?? this.children,
     );
   }
 

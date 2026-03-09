@@ -6,7 +6,10 @@
     "walletId": 1,
     "date": "2026-01-01T09:00:00.000Z",
     "type": "income",
-    "note": "Lương hàng tháng"
+    "note": "Lương hàng tháng",
+    "isSynced": false,
+    "syncId": "",
+    "dueDate": null
   },
   {
     "title": "Thưởng dự án",
@@ -15,7 +18,10 @@
     "walletId": 1,
     "date": "2026-01-02T14:00:00.000Z",
     "type": "income",
-    "note": "Thưởng hoàn thành dự án"
+    "note": "Thưởng hoàn thành dự án",
+    "isSynced": false,
+    "syncId": "",
+    "dueDate": null
   },
   {
     "title": "Tiền lãi từ tiết kiệm",
@@ -24,9 +30,11 @@
     "walletId": 1,
     "date": "2026-01-03T10:00:00.000Z",
     "type": "income",
-    "note": "Tiền lãi tiết kiệm"
+    "note": "Tiền lãi tiết kiệm",
+    "isSynced": false,
+    "syncId": "",
+    "dueDate": null
   },
-
   {
     "title": "Ăn sáng - Cơm tấm",
     "amount": 35000,
@@ -34,7 +42,10 @@
     "walletId": 2,
     "date": "2026-01-03T07:30:00.000Z",
     "type": "expense",
-    "note": "Ăn sáng bên ngoài"
+    "note": "Ăn sáng bên ngoài",
+    "isSynced": false,
+    "syncId": "",
+    "dueDate": null
   },
   {
     "title": "Xe buýt đi làm",
@@ -43,7 +54,10 @@
     "walletId": 2,
     "date": "2026-01-03T07:00:00.000Z",
     "type": "expense",
-    "note": "Vé xe buýt"
+    "note": "Vé xe buýt",
+    "isSynced": false,
+    "syncId": "",
+    "dueDate": null
   },
   {
     "title": "Cà phê sáng",
@@ -52,7 +66,10 @@
     "walletId": 4,
     "date": "2026-01-04T08:00:00.000Z",
     "type": "expense",
-    "note": "Cà phê tại quán"
+    "note": "Cà phê tại quán",
+    "isSynced": false,
+    "syncId": "",
+    "dueDate": null
   },
   {
     "title": "Ăn trưa - Phở",
@@ -61,114 +78,153 @@
     "walletId": 2,
     "date": "2026-01-04T12:30:00.000Z",
     "type": "expense",
-    "note": "Ăn phở xóm"
+    "note": "Ăn phở xóm",
+    "isSynced": false,
+    "syncId": "",
+    "dueDate": null
   },
   {
     "title": "Taxi về nhà",
     "amount": 85000,
     "categoryId": "expense_transport_taxi",
     "walletId": 3,
-    "date": "2026-01-05T18:45:00.000Z",
+    "date": "2026-02-05T18:45:00.000Z",
     "type": "expense",
-    "note": "Grab từ công ty về nhà"
+    "note": "Grab từ công ty về nhà",
+    "isSynced": false,
+    "syncId": "",
+    "dueDate": null
   },
   {
     "title": "Mua sắm quần áo",
     "amount": 450000,
     "categoryId": "expense_shopping_clothes",
     "walletId": 3,
-    "date": "2026-01-06T14:00:00.000Z",
+    "date": "2026-02-06T14:00:00.000Z",
     "type": "expense",
-    "note": "Mua áo phông và quần"
+    "note": "Mua áo phông và quần",
+    "isSynced": false,
+    "syncId": "",
+    "dueDate": null
   },
   {
     "title": "Ăn tối - Lẩu",
     "amount": 180000,
     "categoryId": "expense_food_dinner",
     "walletId": 2,
-    "date": "2026-01-07T19:00:00.000Z",
+    "date": "2026-02-07T19:00:00.000Z",
     "type": "expense",
-    "note": "Ăn lẩu với bạn"
+    "note": "Ăn lẩu với bạn",
+    "isSynced": false,
+    "syncId": "",
+    "dueDate": null
   },
   {
     "title": "Mua điện tử - Sạc điện thoại",
     "amount": 150000,
     "categoryId": "expense_shopping_electronics",
     "walletId": 3,
-    "date": "2026-01-08T15:20:00.000Z",
+    "date": "2026-02-08T15:20:00.000Z",
     "type": "expense",
-    "note": "Sạc nhanh USB-C"
+    "note": "Sạc nhanh USB-C",
+    "isSynced": false,
+    "syncId": "",
+    "dueDate": null
   },
   {
     "title": "Xem phim",
     "amount": 90000,
     "categoryId": "expense_entertainment",
     "walletId": 4,
-    "date": "2026-01-09T19:30:00.000Z",
+    "date": "2026-02-09T19:30:00.000Z",
     "type": "expense",
-    "note": "Vé xem phim"
+    "note": "Vé xem phim",
+    "isSynced": false,
+    "syncId": "",
+    "dueDate": null
   },
   {
     "title": "Hóa đơn điện nước",
     "amount": 250000,
     "categoryId": "expense_bill",
     "walletId": 1,
-    "date": "2026-01-10T10:00:00.000Z",
+    "date": "2026-02-10T10:00:00.000Z",
     "type": "expense",
-    "note": "Tiền điện nước"
+    "note": "Tiền điện nước",
+    "isSynced": false,
+    "syncId": "",
+    "dueDate": null
   },
   {
     "title": "Khám bác sĩ",
     "amount": 200000,
     "categoryId": "expense_health",
     "walletId": 2,
-    "date": "2026-01-11T09:00:00.000Z",
+    "date": "2026-02-11T09:00:00.000Z",
     "type": "expense",
-    "note": "Khám sức khỏe định kỳ"
+    "note": "Khám sức khỏe định kỳ",
+    "isSynced": false,
+    "syncId": "",
+    "dueDate": null
   },
   {
     "title": "Du lịch - Vé máy bay",
     "amount": 2500000,
     "categoryId": "expense_travel",
     "walletId": 1,
-    "date": "2026-01-12T10:30:00.000Z",
+    "date": "2026-02-12T10:30:00.000Z",
     "type": "expense",
-    "note": "Vé máy bay"
+    "note": "Vé máy bay",
+    "isSynced": false,
+    "syncId": "",
+    "dueDate": null
   },
   {
     "title": "Học thêm tiếng Anh",
     "amount": 500000,
     "categoryId": "expense_education",
     "walletId": 3,
-    "date": "2026-01-14T18:00:00.000Z",
+    "date": "2026-03-01T18:00:00.000Z",
     "type": "expense",
-    "note": "Học phí tháng"
+    "note": "Học phí tháng",
+    "isSynced": false,
+    "syncId": "",
+    "dueDate": null
   },
   {
     "title": "Cho bạn vay tiền",
     "amount": 1000000,
     "categoryId": "lend_borrow",
     "walletId": 2,
-    "date": "2026-01-16T19:00:00.000Z",
+    "date": "2026-03-02T19:00:00.000Z",
     "type": "lend",
-    "note": "Cho Linh vay tiền"
+    "note": "Cho Linh vay tiền",
+    "isSynced": false,
+    "syncId": "",
+    "dueDate": "2026-04-01T19:00:00.000Z"
   },
   {
     "title": "Bạn trả tiền vay",
     "amount": 1000000,
     "categoryId": "lend_payback",
     "walletId": 2,
-    "date": "2026-01-20T19:00:00.000Z",
+    "date": "2026-03-05T19:00:00.000Z",
     "type": "lend",
-    "note": "Linh trả tiền"
+    "note": "Linh trả tiền",
+    "isSynced": false,
+    "syncId": "",
+    "dueDate": null
   },
   {
     "title": "Ăn trưa - Cơm gà",
     "amount": 45000,
     "categoryId": "expense_food_lunch",
     "walletId": 2,
-    "date": "2026-01-22T12:00:00.000Z",
+    "date": "2026-03-08T12:00:00.000Z",
     "type": "expense",
-    "note": "Ăn trưa cuối kỳ"
+    "note": "Ăn trưa cuối kỳ",
+    "isSynced": false,
+    "syncId": "",
+    "dueDate": null
   }
 ]

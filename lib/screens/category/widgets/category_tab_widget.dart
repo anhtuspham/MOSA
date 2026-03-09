@@ -100,81 +100,94 @@ class _CategoryTabState extends ConsumerState<CategoryTab> {
 
     return Container(
       decoration: BoxDecoration(color: AppColors.secondaryBackground),
-      child: ListView(
+      child: Column(
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
             child: SearchBarWidget(
               onChange: (value) {
-                log(value);
+                log(value, name: 'CategoryTab');
               },
-              onClear: () => log('Clear text'),
+              onClear: () => log('Clear text', name: 'CategoryTab'),
             ),
           ),
-          asyncCategories.when(
-            data: (categories) {
-              return ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: categories.length,
-                itemBuilder: (context, index) {
-                  final category = categories[index];
-                  if (category.children?.isEmpty ?? true) {
-                    return Container(
-                      color: AppColors.background,
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 0,
-                        vertical: 3,
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 18,
-                        vertical: 8,
-                      ),
-                      child: ItemWidget(
-                        category: category,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        onTap:
-                            () => _handleCategorySelection(context, category),
-                      ),
-                    );
-                  } else {
-                    return CustomExpansionTile(
-                      initialExpand: true,
-                      header: ItemWidget(
-                        category: category,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        onTap:
-                            () => _handleCategorySelection(context, category),
-                      ),
-                      children: [
-                        GridView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: category.children!.length,
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 4,
-                                crossAxisSpacing: 10,
-                                childAspectRatio: 1.4,
-                              ),
-                          itemBuilder: (context, index) {
-                            final child = category.children![index];
-                            return ItemWidget(
-                              category: child,
-                              onTap:
-                                  () =>
-                                      _handleCategorySelection(context, child),
-                            );
-                          },
+          Expanded(
+            child: asyncCategories.when(
+              data: (categories) {
+                if (categories.isEmpty) {
+                  return const Center(child: Text('Không có danh mục nào'));
+                }
+                return ListView.builder(
+                  controller: _scrollController,
+                  itemCount: categories.length,
+                  itemBuilder: (context, index) {
+                    final category = categories[index];
+                    // Nếu không có con, hiển thị dạng item đơn giản
+                    if (category.children?.isEmpty ?? true) {
+                      return Container(
+                        color: AppColors.background,
+                        margin: const EdgeInsets.symmetric(vertical: 3),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 18,
+                          vertical: 8,
                         ),
-                      ],
+                        child: ItemWidget(
+                          category: category,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          onTap:
+                              () => _handleCategorySelection(context, category),
+                        ),
+                      );
+                    } else {
+                      // Nếu có con, hiển thị dạng ExpansionTile
+                      return CustomExpansionTile(
+                        initialExpand: true,
+                        header: ItemWidget(
+                          category: category,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          onTap:
+                              () => _handleCategorySelection(context, category),
+                        ),
+                        children: [
+                          GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: category.children!.length,
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 4,
+                                  crossAxisSpacing: 10,
+                                  childAspectRatio: 1.4,
+                                ),
+                            itemBuilder: (context, index) {
+                              final child = category.children![index];
+                              return ItemWidget(
+                                category: child,
+                                onTap:
+                                    () => _handleCategorySelection(
+                                      context,
+                                      child,
+                                    ),
+                              );
+                            },
+                          ),
+                        ],
+                      );
+                    }
+                  },
+                );
+              },
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error:
+                  (error, stackTrace) {
+                    log(
+                      'Lỗi tải danh mục: $error',
+                      name: 'CategoryTab',
+                      stackTrace: stackTrace,
                     );
-                  }
-                },
-              );
-            },
-            loading: () => Center(child: CircularProgressIndicator()),
-            error: (error, stackTrace) => Center(child: Text('Lỗi: $error')),
+                    return Center(child: Text('Lỗi: $error'));
+                  },
+            ),
           ),
         ],
       ),

@@ -18,18 +18,40 @@ class CategoriesNotifier extends AsyncNotifier<List<Category>> {
 
   @override
   FutureOr<List<Category>> build() async {
-    return await _databaseService.getAllCategories();
+    final flatCategories = await _databaseService.getAllCategories();
+    return _buildTree(flatCategories);
+  }
+
+  /// Xây dựng cấu trúc cây từ danh mục phẳng lấy từ database
+  List<Category> _buildTree(List<Category> flatCategories) {
+    // Nhóm các danh mục theo parentId
+    final Map<String?, List<Category>> childrenMap = {};
+    for (var category in flatCategories) {
+      childrenMap.putIfAbsent(category.parentId, () => []).add(category);
+    }
+
+    // Dựng cây phân cấp (hiện tại hỗ trợ 2 cấp: Cha -> Con)
+    final List<Category> rootCategories = [];
+    final parents = flatCategories.where((c) => c.parentId == null).toList();
+
+    for (var parent in parents) {
+      final children = childrenMap[parent.id] ?? [];
+      rootCategories.add(parent.copyWith(children: children));
+    }
+
+    return rootCategories;
   }
 
   /// Làm mới danh sách danh mục từ database
   Future<void> refreshCategories() async {
     try {
-      final categories = await _databaseService.getAllCategories();
-      if (state.value != categories) {
-        state = AsyncData(categories);
+      final flatCategories = await _databaseService.getAllCategories();
+      final treeCategories = _buildTree(flatCategories);
+      if (state.value != treeCategories) {
+        state = AsyncData(treeCategories);
       }
-    } catch (e) {
-      log('Refresh category in background have error ${e.toString()}');
+    } catch (e, stack) {
+      log('Refresh category error: ${e.toString()}', name: 'CategoriesNotifier', stackTrace: stack);
     }
   }
 }
@@ -38,10 +60,7 @@ class CategoriesNotifier extends AsyncNotifier<List<Category>> {
 final categoriesProvider = AsyncNotifierProvider(CategoriesNotifier.new);
 
 /// Lấy danh sách danh mục theo loại
-final categoryByTypeProvider = FutureProvider.family<List<Category>, String>((
-  ref,
-  categoryType,
-) async {
+final categoryByTypeProvider = FutureProvider.family<List<Category>, String>((ref, categoryType) async {
   final categories = await ref.watch(categoriesProvider.future);
   return categories.where((element) => element.type == categoryType).toList();
 });
@@ -53,27 +72,15 @@ final flattenedCategoryProvider = FutureProvider<List<Category>>((ref) async {
 });
 
 /// Lấy danh mục theo ID
-final categoryByIdProvider = FutureProvider.family<Category?, String>((
-  ref,
-  categoryId,
-) async {
+final categoryByIdProvider = FutureProvider.family<Category?, String>((ref, categoryId) async {
   final categories = await ref.watch(flattenedCategoryProvider.future);
-  return CollectionUtils.safeLookup(
-    categories,
-    (category) => category.id == categoryId,
-  );
+  return CollectionUtils.safeLookup(categories, (category) => category.id == categoryId);
 });
 
 /// Lấy danh mục theo tên
-final categoryByNameProvider = FutureProvider.family<Category?, String>((
-  ref,
-  categoryName,
-) async {
+final categoryByNameProvider = FutureProvider.family<Category?, String>((ref, categoryName) async {
   final categories = await ref.watch(flattenedCategoryProvider.future);
-  return CollectionUtils.safeLookup(
-    categories,
-    (category) => category.name == categoryName,
-  );
+  return CollectionUtils.safeLookup(categories, (category) => category.name == categoryName);
 });
 
 /// Quản lý trạng thái danh mục được chọn
@@ -88,9 +95,7 @@ class CategoryNotifier extends Notifier<Category?> {
 }
 
 /// Provider lưu trữ danh mục được chọn
-final selectedCategoryProvider = NotifierProvider<CategoryNotifier, Category?>(
-  CategoryNotifier.new,
-);
+final selectedCategoryProvider = NotifierProvider<CategoryNotifier, Category?>(CategoryNotifier.new);
 
 /// Map danh mục theo ID để tra cứu O(1)
 final categoryMapProvider = FutureProvider<Map<String, Category>>((ref) async {
@@ -104,10 +109,7 @@ final autoTransactionTypeProvider = StateProvider<TransactionType?>((ref) {
   if (selectCategory == null) return null;
 
   // First try to get transaction type from category ID/name (handles special cases like lending)
-  final transactionType = getTransactionTypeFromCategory(
-    selectCategory.id,
-    selectCategory.name,
-  );
+  final transactionType = getTransactionTypeFromCategory(selectCategory.id, selectCategory.name);
 
   // If it's unknown, fall back to the generic type mapping
   if (transactionType == TransactionType.unknown) {
