@@ -34,8 +34,9 @@ class AppConstants {
     'Thuế': Colors.tealAccent,
   };
 
-  static const String dbName = 'finance_tracker.db';
-  static const int dbVersion = 7;
+  // Database config
+  static const String dbName = 'mosa.db';
+  static const int dbVersion = 8;
   static const String tableTransactions = 'transactions';
   static const String tableWallets = 'wallets';
   static const String tableTypeWallets = 'type_wallets';

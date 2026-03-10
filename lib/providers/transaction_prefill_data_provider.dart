@@ -15,6 +15,8 @@ class TransactionPrefill {
   final int? walletId;
   /// Danh mục giao dịch
   final Category? category;
+  /// Khoản nợ (nếu có)
+  final int? debtId;
 
   TransactionPrefill({
     this.amount,
@@ -22,6 +24,7 @@ class TransactionPrefill {
     this.person,
     this.walletId,
     this.category,
+    this.debtId,
   });
 }
 

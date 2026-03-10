@@ -52,11 +52,11 @@ class NotificationHelper {
             : 'Khoản vay từ $personName sắp đến hạn: ${amount.toStringAsFixed(0)} VND';
 
     await _notifications.zonedSchedule(
-      debtId,
-      title,
-      body,
-      _convertToTZDateTime(dueDate.subtract(const Duration(days: 1))),
-      NotificationDetails(
+      id: debtId,
+      title: title,
+      body: body,
+      scheduledDate: _convertToTZDateTime(dueDate.subtract(const Duration(days: 1))),
+      notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(
           _debtChannel.id,
           _debtChannel.name,
@@ -72,8 +72,6 @@ class NotificationHelper {
         ),
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
       payload: 'debt_$debtId',
     );
   }
@@ -92,10 +90,10 @@ class NotificationHelper {
             : 'Bạn chưa trả nợ cho $personName: ${amount.toStringAsFixed(0)} VND';
 
     await _notifications.show(
-      debtId + 10000,
-      title,
-      body,
-      NotificationDetails(
+      id: debtId + 10000,
+      title: title,
+      body: body,
+      notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(
           _debtChannel.id,
           _debtChannel.name,
@@ -128,10 +126,10 @@ class NotificationHelper {
             : 'Đã trả ${amount.toStringAsFixed(0)} VND cho $personName';
 
     await _notifications.show(
-      DateTime.now().millisecondsSinceEpoch ~/ 1000,
-      title,
-      body,
-      NotificationDetails(
+      id: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+      title: title,
+      body: body,
+      notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(
           _debtChannel.id,
           _debtChannel.name,
@@ -156,10 +154,10 @@ class NotificationHelper {
   }) async {
     final percentage = (spent / budget * 100).toInt();
     await _notifications.show(
-      categoryName.hashCode,
-      'Cảnh báo ngân sách',
-      'Đã chi $percentage% ngân sách $categoryName: ${spent.toStringAsFixed(0)}/${budget.toStringAsFixed(0)} VND',
-      NotificationDetails(
+      id: categoryName.hashCode,
+      title: 'Cảnh báo ngân sách',
+      body: 'Đã chi $percentage% ngân sách $categoryName: ${spent.toStringAsFixed(0)}/${budget.toStringAsFixed(0)} VND',
+      notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(
           _transactionChannel.id,
           _transactionChannel.name,
@@ -178,8 +176,8 @@ class NotificationHelper {
   }
 
   static Future<void> cancelDebtReminder(int debtId) async {
-    await _notifications.cancel(debtId);
-    await _notifications.cancel(debtId + 10000);
+    await _notifications.cancel(id: debtId);
+    await _notifications.cancel(id: debtId + 10000);
   }
 
   static Future<void> cancelAllNotifications() async {
@@ -214,11 +212,11 @@ class NotificationHelper {
     }
 
     await _notifications.zonedSchedule(
-      notificationId,
-      title,
-      body,
-      scheduledDate,
-      NotificationDetails(
+      id: notificationId,
+      title: title,
+      body: body,
+      scheduledDate: scheduledDate,
+      notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(
           _debtChannel.id,
           _debtChannel.name,
@@ -234,8 +232,6 @@ class NotificationHelper {
         ),
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
       matchDateTimeComponents: DateTimeComponents.time, // Repeat daily!
     );
   }
@@ -251,11 +247,11 @@ class NotificationHelper {
     final tzScheduledDate = _convertToTZDateTime(scheduledDateTime);
 
     await _notifications.zonedSchedule(
-      notificationId,
-      title,
-      body,
-      tzScheduledDate,
-      NotificationDetails(
+      id: notificationId,
+      title: title,
+      body: body,
+      scheduledDate: tzScheduledDate,
+      notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(
           _debtChannel.id,
           _debtChannel.name,
@@ -271,8 +267,6 @@ class NotificationHelper {
         ),
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
       payload: payload,
     );
   }

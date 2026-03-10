@@ -15,6 +15,7 @@ import 'category_provider.dart';
 import 'database_service_provider.dart';
 import 'package:mosa/providers/wallet_provider.dart';
 import 'package:mosa/providers/transaction_provider.dart';
+import 'package:mosa/utils/notification_helper.dart';
 
 /// Quản lý trạng thái danh sách nợ/cho vay
 class DebtNotifier extends AsyncNotifier<List<Debt>> {
@@ -32,6 +33,9 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
       if (debts != state.value) {
         state = AsyncData(debts);
       }
+      
+      // Lên lịch nhắc nhở các khoản nợ sắp đến hạn
+      await NotificationHelper.scheduleAllDebtReminders(debts);
     } catch (e) {
       log('Error when refresh list debt $e', name: 'debt_provider');
       state = AsyncError(e, StackTrace.current);
@@ -67,6 +71,7 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
         walletId: debt.walletId,
         dueDate: debt.dueDate,
         syncId: generateSyncId(),
+        debtId: newDebt.id,
       );
 
       final borrowingTransaction = TransactionModel(
@@ -79,6 +84,7 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
         walletId: debt.walletId,
         dueDate: debt.dueDate,
         syncId: generateSyncId(),
+        debtId: newDebt.id,
       );
 
       await _databaseService.insertTransaction(
@@ -176,6 +182,7 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
         categoryId: payBackCategory?.id,
         walletId: walletId,
         syncId: generateSyncId(),
+        debtId: newDebt.id,
       );
 
       await _databaseService.insertTransaction(transaction);
@@ -244,6 +251,7 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
         categoryId: collectCategory?.id,
         walletId: walletId,
         syncId: generateSyncId(),
+        debtId: newDebt.id,
       );
       await _databaseService.insertTransaction(transaction);
 
@@ -336,6 +344,7 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
         categoryId: payBackCategory?.id,
         walletId: walletId,
         syncId: generateSyncId(),
+        debtId: null, // Multiple debts paid
       );
       await _databaseService.insertTransaction(transaction);
 
@@ -434,6 +443,7 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
         categoryId: collectCategory?.id,
         walletId: walletId,
         syncId: generateSyncId(),
+        debtId: null, // Multiple debts collected
       );
       await _databaseService.insertTransaction(transaction);
 
@@ -509,6 +519,7 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
         categoryId: payCategory?.id,
         walletId: walletId,
         syncId: generateSyncId(),
+        debtId: debtId,
       );
       await _databaseService.insertTransaction(transaction);
 
@@ -578,6 +589,7 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
         categoryId: collectCategory?.id,
         walletId: walletId,
         syncId: generateSyncId(),
+        debtId: debtId,
       );
       await _databaseService.insertTransaction(transaction);
 
@@ -705,6 +717,7 @@ final totalDebtByTypeProvider = Provider.family<DebtInfo, DebtType>((
   );
 });
 
+
 /// Provider lưu trữ khoản nợ được chọn để trả/thu
 final selectedDebtProvider = StateProvider<Debt?>((ref) => null);
 
@@ -736,3 +749,9 @@ void Function() collectDebtByPersonFn(
         .collectDebtByPerson(personId, paymentAmount, walletId);
   };
 }
+
+/// Provider danh sách nợ đã quá hạn
+final overdueDebtsProvider = FutureProvider<List<Debt>>((ref) async {
+  final dbService = ref.read(databaseServiceProvider);
+  return await dbService.getOverdueDebts();
+});

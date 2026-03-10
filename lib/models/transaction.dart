@@ -16,6 +16,7 @@ class TransactionModel {
   final String syncId;
   final int walletId;
   final DateTime? dueDate;
+  final int? debtId; // Thêm debtId để liên kết với khoản nợ
 
   TransactionModel({
     this.id,
@@ -31,6 +32,7 @@ class TransactionModel {
     required this.syncId,
     required this.walletId,
     this.dueDate,
+    this.debtId,
   });
 
   /// Tạo TransactionModel từ JSON
@@ -48,6 +50,7 @@ class TransactionModel {
       isSynced: json['isSynced'] as bool? ?? false,
       syncId: json['syncId'] as String? ?? '',
       dueDate: json['dueDate'],
+      debtId: json['debtId'] as int?,
     );
   }
 
@@ -76,6 +79,7 @@ class TransactionModel {
           map['dueDate'] != null
               ? DateTime.parse(map['dueDate'] as String)
               : null,
+      debtId: map['debtId'] as int?,
     );
   }
 
@@ -95,6 +99,7 @@ class TransactionModel {
       'syncId': syncId,
       'walletId': walletId,
       'dueDate': dueDate?.toIso8601String(),
+      'debtId': debtId,
     };
   }
 
@@ -112,6 +117,7 @@ class TransactionModel {
     bool? isSynced,
     String? syncId,
     int? walletId,
+    int? debtId,
   }) {
     return TransactionModel(
       id: id ?? this.id,
@@ -126,6 +132,7 @@ class TransactionModel {
       isSynced: isSynced ?? this.isSynced,
       syncId: syncId ?? this.syncId,
       walletId: walletId ?? this.walletId,
+      debtId: debtId ?? this.debtId,
     );
   }
 

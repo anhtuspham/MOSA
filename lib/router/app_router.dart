@@ -4,6 +4,7 @@ import 'package:mosa/router/app_routes.dart';
 import 'package:mosa/screens/category/category_screen.dart';
 import 'package:mosa/screens/debt/debt_selection_screen.dart';
 import 'package:mosa/screens/debt/loan_tracking_screen.dart';
+import 'package:mosa/screens/debt/person_debt_detail_screen.dart';
 import 'package:mosa/screens/home/home_screen.dart';
 import 'package:mosa/screens/login/login_screen.dart';
 import 'package:mosa/screens/setting/setting_screen.dart';
@@ -157,6 +158,14 @@ final goRouter = GoRouter(
       path: AppRoutes.addBudget,
       name: 'add-budget',
       builder: (context, state) => const AddBudgetScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.debtDetail,
+      name: 'debtDetail',
+      builder: (context, state) {
+        final personId = int.tryParse(state.pathParameters['personId'] ?? '') ?? 0;
+        return PersonDebtDetailScreen(personId: personId);
+      },
     ),
   ],
   errorBuilder: (context, state) {

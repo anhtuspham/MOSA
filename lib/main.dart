@@ -11,6 +11,8 @@ import 'package:mosa/services/fcm_service.dart';
 import 'package:mosa/utils/notification_helper.dart';
 import 'package:toastification/toastification.dart';
 import 'package:timezone/data/latest.dart' as tz;
+import 'package:mosa/config/app_theme.dart';
+import 'package:mosa/providers/theme_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,11 +34,14 @@ void main() async {
   runApp(ProviderScope(child: const MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeModeAsync = ref.watch(themeProvider);
+    final themeMode = themeModeAsync.value ?? ThemeMode.system;
+
     return ScreenUtilInit(
       designSize: const Size(392, 852),
       minTextAdapt: true,
@@ -60,11 +65,9 @@ class MyApp extends StatelessWidget {
           ],
           supportedLocales: [Locale('en'), Locale('vi', 'VN')],
           debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            fontFamily: 'Inter',
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlue),
-            useMaterial3: true,
-          ),
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: themeMode,
           routerConfig: goRouter,
         ),
       ),

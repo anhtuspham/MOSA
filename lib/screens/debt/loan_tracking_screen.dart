@@ -157,6 +157,7 @@ class _LoanTrackingScreenState extends ConsumerState<LoanTrackingScreen> {
                               personId: e.key,
                               totalDebtRemaining: e.value,
                             ),
+                        onTap: () => context.push(AppRoutes.debtDetail.replaceAll(':personId', e.key.toString())),
                       ),
                     )
                     .toList(),
@@ -193,6 +194,7 @@ class _LoanTrackingScreenState extends ConsumerState<LoanTrackingScreen> {
     final person = ref.watch(personByIdProvider(personId));
 
     return CustomListTile(
+      onTap: () => context.push(AppRoutes.debtDetail.replaceAll(':personId', personId.toString())),
       leading: CircleAvatar(
         child: Text(person?.name.substring(0, 1).toUpperCase() ?? 'T'),
       ),

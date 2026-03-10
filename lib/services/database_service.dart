@@ -46,8 +46,14 @@ class DatabaseService {
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     log('📦 Database upgraded from version $oldVersion to $newVersion');
-    // For clean upgrade, drop all tables and recreate
-    await _recreateDatabase(db);
+    if (oldVersion < 7) {
+      // For clean upgrade from older versions, drop all tables and recreate
+      await _recreateDatabase(db);
+    }
+    if (oldVersion < 8 && newVersion >= 8) {
+      log('Migration to v8: Adding debtId column to transactions');
+      await db.execute('ALTER TABLE ${AppConstants.tableTransactions} ADD COLUMN debtId INTEGER');
+    }
   }
 
   Future<void> _recreateDatabase(Database db) async {
@@ -317,6 +323,7 @@ class DatabaseService {
         isSynced INTEGER NOT NULL DEFAULT 0,
         syncId TEXT NOT NULL,
         dueDate TEXT,
+        debtId INTEGER,
         FOREIGN KEY (walletId) REFERENCES ${AppConstants.tableWallets}(id) ON DELETE RESTRICT
       )
     ''');
@@ -573,6 +580,34 @@ class DatabaseService {
       where: 'personId = ? AND type = ? AND status != ?',
       whereArgs: [personId, type.name, DebtStatus.paid.name],
       orderBy: 'createdDate ASC',
+    );
+    return List.generate(maps.length, (index) => Debt.fromMap(maps[index]));
+  }
+
+  /// Lấy danh sách giao dịch trả nợ/thu nợ của một khoản nợ cụ thể
+  Future<List<TransactionModel>> getTransactionsByDebtId(int debtId) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      AppConstants.tableTransactions,
+      where: 'debtId = ?',
+      whereArgs: [debtId],
+      orderBy: 'date DESC',
+    );
+    return List.generate(
+      maps.length,
+      (index) => TransactionModel.fromMap(maps[index]),
+    );
+  }
+
+  /// Lấy danh sách các khoản nợ đã quá hạn nhưng chưa trả hết
+  Future<List<Debt>> getOverdueDebts() async {
+    final db = await database;
+    final currentDate = DateTime.now().toIso8601String();
+    final List<Map<String, dynamic>> maps = await db.query(
+      AppConstants.tableDebts,
+      where: 'status != ? AND dueDate IS NOT NULL AND dueDate < ?',
+      whereArgs: [DebtStatus.paid.name, currentDate],
+      orderBy: 'dueDate ASC',
     );
     return List.generate(maps.length, (index) => Debt.fromMap(maps[index]));
   }
