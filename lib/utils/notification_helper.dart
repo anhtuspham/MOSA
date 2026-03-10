@@ -1,3 +1,6 @@
+import 'dart:developer';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mosa/models/debt.dart';
@@ -24,17 +27,73 @@ class NotificationHelper {
       );
 
   static Future<void> initialize() async {
-    await _notifications
-        .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin
-        >()
-        ?.createNotificationChannel(_debtChannel);
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/launcher_icon');
 
-    await _notifications
-        .resolvePlatformSpecificImplementation<
+    const DarwinInitializationSettings initializationSettingsIOS =
+        DarwinInitializationSettings(
+          requestAlertPermission: true,
+          requestBadgePermission: true,
+          requestSoundPermission: true,
+        );
+
+    const InitializationSettings initializationSettings = InitializationSettings(
+      android: initializationSettingsAndroid,
+      iOS: initializationSettingsIOS,
+    );
+
+    await _notifications.initialize(settings: initializationSettings);
+
+    final androidImplementation =
+        _notifications.resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin
-        >()
-        ?.createNotificationChannel(_transactionChannel);
+        >();
+
+    await androidImplementation?.createNotificationChannel(_debtChannel);
+    await androidImplementation?.createNotificationChannel(_transactionChannel);
+
+    // Request permissions for Android 13+
+    if (Platform.isAndroid) {
+      await androidImplementation?.requestNotificationsPermission();
+      // On Android 12+, SCHEDULE_EXACT_ALARM is required for exact alarms.
+      // But we will handle it via try-catch and fallback in _scheduleNotification.
+    }
+  }
+
+  static Future<void> _scheduleNotification({
+    required int id,
+    required String title,
+    required String body,
+    required tz.TZDateTime scheduledDate,
+    required NotificationDetails notificationDetails,
+    String? payload,
+    DateTimeComponents? matchDateTimeComponents,
+  }) async {
+    try {
+      await _notifications.zonedSchedule(
+        id: id,
+        title: title,
+        body: body,
+        scheduledDate: scheduledDate,
+        notificationDetails: notificationDetails,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        payload: payload,
+        matchDateTimeComponents: matchDateTimeComponents,
+      );
+    } catch (e) {
+      log('Error scheduling exact alarm: $e', name: 'NotificationHelper');
+      // Fallback to inexact if exact is not permitted
+      await _notifications.zonedSchedule(
+        id: id,
+        title: title,
+        body: body,
+        scheduledDate: scheduledDate,
+        notificationDetails: notificationDetails,
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        payload: payload,
+        matchDateTimeComponents: matchDateTimeComponents,
+      );
+    }
   }
 
   static Future<void> scheduleDebtReminder({
@@ -51,11 +110,13 @@ class NotificationHelper {
             ? 'Khoản cho vay $personName sắp đến hạn: ${amount.toStringAsFixed(0)} VND'
             : 'Khoản vay từ $personName sắp đến hạn: ${amount.toStringAsFixed(0)} VND';
 
-    await _notifications.zonedSchedule(
+    await _scheduleNotification(
       id: debtId,
       title: title,
       body: body,
-      scheduledDate: _convertToTZDateTime(dueDate.subtract(const Duration(days: 1))),
+      scheduledDate: _convertToTZDateTime(
+        dueDate.subtract(const Duration(days: 1)),
+      ),
       notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(
           _debtChannel.id,
@@ -71,7 +132,6 @@ class NotificationHelper {
           presentSound: true,
         ),
       ),
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       payload: 'debt_$debtId',
     );
   }
@@ -156,7 +216,8 @@ class NotificationHelper {
     await _notifications.show(
       id: categoryName.hashCode,
       title: 'Cảnh báo ngân sách',
-      body: 'Đã chi $percentage% ngân sách $categoryName: ${spent.toStringAsFixed(0)}/${budget.toStringAsFixed(0)} VND',
+      body:
+          'Đã chi $percentage% ngân sách $categoryName: ${spent.toStringAsFixed(0)}/${budget.toStringAsFixed(0)} VND',
       notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(
           _transactionChannel.id,
@@ -211,7 +272,7 @@ class NotificationHelper {
       scheduledDate = scheduledDate.add(const Duration(days: 1));
     }
 
-    await _notifications.zonedSchedule(
+    await _scheduleNotification(
       id: notificationId,
       title: title,
       body: body,
@@ -231,7 +292,6 @@ class NotificationHelper {
           presentSound: true,
         ),
       ),
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       matchDateTimeComponents: DateTimeComponents.time, // Repeat daily!
     );
   }
@@ -246,7 +306,7 @@ class NotificationHelper {
   }) async {
     final tzScheduledDate = _convertToTZDateTime(scheduledDateTime);
 
-    await _notifications.zonedSchedule(
+    await _scheduleNotification(
       id: notificationId,
       title: title,
       body: body,
@@ -266,7 +326,6 @@ class NotificationHelper {
           presentSound: true,
         ),
       ),
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       payload: payload,
     );
   }
@@ -287,10 +346,7 @@ class NotificationHelper {
         if (reminderTime.isAfter(DateTime.now())) {
           await scheduleNotificationAt(
             notificationId: debt.id ?? 0,
-            title:
-                debt.type == DebtType.lent
-                    ? 'Thu nợ hôm nay'
-                    : 'Trả nợ hôm nay',
+            title: debt.type == DebtType.lent ? 'Thu nợ hôm nay' : 'Trả nợ hôm nay',
             body:
                 'Nhắc nhở: ${debt.description} - ${debt.amount.toStringAsFixed(0)} VND',
             scheduledDateTime: reminderTime,
@@ -304,9 +360,7 @@ class NotificationHelper {
           await scheduleNotificationAt(
             notificationId: (debt.id ?? 0) + 100000,
             title:
-                debt.type == DebtType.lent
-                    ? 'Thu nợ ngày mai'
-                    : 'Trả nợ ngày mai',
+                debt.type == DebtType.lent ? 'Thu nợ ngày mai' : 'Trả nợ ngày mai',
             body:
                 'Nhắc nhở: ${debt.description} - ${debt.amount.toStringAsFixed(0)} VND',
             scheduledDateTime: oneDayBefore,
