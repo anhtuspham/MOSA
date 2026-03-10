@@ -25,22 +25,32 @@ class DebtTimelineItem extends StatelessWidget {
     Color iconColor;
     Color bgColor;
     String title;
+    bool isMoneyIn = false;
+    String sign = '';
     
     if (!isTransaction) {
-      icon = isLent ? Icons.arrow_outward : Icons.south_west;
-      iconColor = isLent ? Colors.orange[700]! : Colors.purple[700]!;
-      bgColor = isLent ? Colors.orange[50]! : Colors.purple[50]!;
-      title = isLent ? 'Cho vay mới' : 'Đi vay mới';
+      final debt = record as Debt;
+      final bool isLentFromDebt = debt.type == DebtType.lent;
+      icon = isLentFromDebt ? Icons.arrow_outward : Icons.south_west;
+      iconColor = isLentFromDebt ? Colors.orange[700]! : Colors.purple[700]!;
+      bgColor = isLentFromDebt ? Colors.orange[50]! : Colors.purple[50]!;
+      title = isLentFromDebt ? 'Cho vay' : 'Đi vay';
+      
+      // Cho mượn (lent) là tiền ra (-), Đi mượn (borrowed) là tiền vào (+)
+      isMoneyIn = debt.type == DebtType.borrowed;
     } else {
       final tx = record as TransactionModel;
-      final isCollection = tx.type == TransactionType.debtCollection;
       // Thu nợ (nhận tiền về) -> Mũi tên hướng vào
       // Trả nợ (tiền ra khỏi ví) -> Mũi tên hướng ra
-      icon = isCollection ? Icons.south_west : Icons.arrow_outward;
-      iconColor = isCollection ? Colors.green[700]! : Colors.blue[700]!;
-      bgColor = isCollection ? Colors.green[50]! : Colors.blue[50]!;
-      title = tx.title.isNotEmpty ? tx.title : (isCollection ? 'Đã thu nợ' : 'Đã trả nợ');
+      isMoneyIn = tx.type == TransactionType.debtCollection || tx.type == TransactionType.income || tx.type == TransactionType.borrowing;
+      
+      icon = isMoneyIn ? Icons.south_west : Icons.arrow_outward;
+      iconColor = isMoneyIn ? Colors.green[700]! : Colors.blue[700]!;
+      bgColor = isMoneyIn ? Colors.green[50]! : Colors.blue[50]!;
+      title = tx.title.isNotEmpty ? tx.title : (isMoneyIn ? 'Đã thu nợ' : 'Đã trả nợ');
     }
+
+    sign = isMoneyIn ? '+' : '-';
 
     final currencyFormat = NumberFormat.currency(
       locale: 'vi_VN',
@@ -87,11 +97,11 @@ class DebtTimelineItem extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      (!isTransaction ? '+' : '-') + currencyFormat.format(amount),
+                      sign + currencyFormat.format(amount),
                       style: GoogleFonts.inter(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
-                        color: !isTransaction ? iconColor : Colors.grey[800],
+                        color: isMoneyIn ? Colors.green[700] : Colors.red[700],
                       ),
                     ),
                   ],

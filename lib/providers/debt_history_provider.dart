@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mosa/models/debt.dart';
+import 'package:mosa/models/enums.dart';
 import 'package:mosa/models/transaction.dart';
 import 'package:mosa/providers/database_service_provider.dart';
 
@@ -16,17 +17,17 @@ final personDebtTimelineProvider = FutureProvider.family<List<dynamic>, int>((re
   // Lấy các khoản nợ (cho vay / mượn)
   final debts = await dbService.getDebtByPersonId(personId);
   
-  // Lấy các giao dịch trả nợ tương ứng
-  final List<TransactionModel> transactions = [];
-  for (final debt in debts) {
-    if (debt.id != null) {
-      final txs = await dbService.getTransactionsByDebtId(debt.id!);
-      transactions.addAll(txs);
-    }
-  }
+  // Lấy các giao dịch liên quan đến người này (bao gồm cả trả nợ gộp không có debtId)
+  final List<TransactionModel> transactions = await dbService.getTransactionsByPersonId(personId);
   
   // Gộp Debt (lúc khởi tạo nợ) và TransactionModel (lúc thanh toán) vào một timeline
-  final timeline = <dynamic>[...debts, ...transactions];
+  // Lưu ý: Chúng ta lọc bỏ các Transaction có type là lend hoặc borrowing 
+  // vì chúng đại diện cho việc khởi tạo khoản nợ, vốn đã được hiển thị bởi đối tượng Debt.
+  final filteredTransactions = transactions.where((tx) => 
+    tx.type != TransactionType.lend && tx.type != TransactionType.borrowing
+  ).toList();
+
+  final timeline = <dynamic>[...debts, ...filteredTransactions];
   
   // Sắp xếp theo ngày (mới nhất trước)
   timeline.sort((a, b) {

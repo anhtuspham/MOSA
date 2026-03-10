@@ -54,6 +54,10 @@ class DatabaseService {
       log('Migration to v8: Adding debtId column to transactions');
       await db.execute('ALTER TABLE ${AppConstants.tableTransactions} ADD COLUMN debtId INTEGER');
     }
+    if (oldVersion < 9 && newVersion >= 9) {
+      log('Migration to v9: Adding personId column to transactions');
+      await db.execute('ALTER TABLE ${AppConstants.tableTransactions} ADD COLUMN personId INTEGER');
+    }
   }
 
   Future<void> _recreateDatabase(Database db) async {
@@ -324,6 +328,7 @@ class DatabaseService {
         syncId TEXT NOT NULL,
         dueDate TEXT,
         debtId INTEGER,
+        personId INTEGER,
         FOREIGN KEY (walletId) REFERENCES ${AppConstants.tableWallets}(id) ON DELETE RESTRICT
       )
     ''');
@@ -591,6 +596,21 @@ class DatabaseService {
       AppConstants.tableTransactions,
       where: 'debtId = ?',
       whereArgs: [debtId],
+      orderBy: 'date DESC',
+    );
+    return List.generate(
+      maps.length,
+      (index) => TransactionModel.fromMap(maps[index]),
+    );
+  }
+
+  /// Lấy danh sách giao dịch liên quan đến một người cụ thể (theo personId)
+  Future<List<TransactionModel>> getTransactionsByPersonId(int personId) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      AppConstants.tableTransactions,
+      where: 'personId = ? OR debtId IN (SELECT id FROM ${AppConstants.tableDebts} WHERE personId = ?)',
+      whereArgs: [personId, personId],
       orderBy: 'date DESC',
     );
     return List.generate(

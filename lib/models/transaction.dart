@@ -17,6 +17,7 @@ class TransactionModel {
   final int walletId;
   final DateTime? dueDate;
   final int? debtId; // Thêm debtId để liên kết với khoản nợ
+  final int? personId; // Thêm personId để liên kết với người/đối tác
 
   TransactionModel({
     this.id,
@@ -33,6 +34,7 @@ class TransactionModel {
     required this.walletId,
     this.dueDate,
     this.debtId,
+    this.personId,
   });
 
   /// Tạo TransactionModel từ JSON
@@ -51,6 +53,7 @@ class TransactionModel {
       syncId: json['syncId'] as String? ?? '',
       dueDate: json['dueDate'],
       debtId: json['debtId'] as int?,
+      personId: json['personId'] as int?,
     );
   }
 
@@ -80,6 +83,7 @@ class TransactionModel {
               ? DateTime.parse(map['dueDate'] as String)
               : null,
       debtId: map['debtId'] as int?,
+      personId: map['personId'] as int?,
     );
   }
 
@@ -100,6 +104,7 @@ class TransactionModel {
       'walletId': walletId,
       'dueDate': dueDate?.toIso8601String(),
       'debtId': debtId,
+      'personId': personId,
     };
   }
 
@@ -133,6 +138,7 @@ class TransactionModel {
       syncId: syncId ?? this.syncId,
       walletId: walletId ?? this.walletId,
       debtId: debtId ?? this.debtId,
+      personId: personId ?? this.personId,
     );
   }
 

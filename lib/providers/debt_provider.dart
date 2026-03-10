@@ -7,6 +7,7 @@ import 'package:mosa/config/app_config.dart';
 import 'package:mosa/models/debt.dart';
 import 'package:mosa/models/enums.dart';
 import 'package:mosa/models/transaction.dart';
+import 'package:mosa/providers/debt_history_provider.dart';
 import 'package:mosa/providers/person_provider.dart';
 import 'package:mosa/utils/utils.dart';
 
@@ -33,7 +34,7 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
       if (debts != state.value) {
         state = AsyncData(debts);
       }
-      
+
       // Lên lịch nhắc nhở các khoản nợ sắp đến hạn
       await NotificationHelper.scheduleAllDebtReminders(debts);
     } catch (e) {
@@ -72,6 +73,7 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
         dueDate: debt.dueDate,
         syncId: generateSyncId(),
         debtId: newDebt.id,
+        personId: newDebt.personId,
       );
 
       final borrowingTransaction = TransactionModel(
@@ -85,6 +87,7 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
         dueDate: debt.dueDate,
         syncId: generateSyncId(),
         debtId: newDebt.id,
+        personId: newDebt.personId,
       );
 
       await _databaseService.insertTransaction(
@@ -96,6 +99,9 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
 
       // Refresh transaction provider to show new transaction
       await ref.read(transactionProvider.notifier).refreshTransactions();
+
+      // Refresh debt timeline provider to show new transaction
+      ref.invalidate(personDebtTimelineProvider(newDebt.personId));
 
       state = AsyncData([newDebt, ...state.requireValue]);
       refreshListDebt();
@@ -183,6 +189,7 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
         walletId: walletId,
         syncId: generateSyncId(),
         debtId: newDebt.id,
+        personId: newDebt.personId,
       );
 
       await _databaseService.insertTransaction(transaction);
@@ -196,6 +203,7 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
       final updateDebt = [...currentDebts];
       updateDebt[debtIndex] = newDebt;
       state = AsyncData(updateDebt);
+      ref.invalidate(personDebtTimelineProvider(newDebt.personId));
     } catch (e) {
       log('Error when pay debt $e');
       state = AsyncError(e, StackTrace.current);
@@ -252,6 +260,7 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
         walletId: walletId,
         syncId: generateSyncId(),
         debtId: newDebt.id,
+        personId: newDebt.personId,
       );
       await _databaseService.insertTransaction(transaction);
 
@@ -264,6 +273,7 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
       final updateDebt = [...currentDebts];
       updateDebt[debtIndex] = newDebt;
       state = AsyncData(updateDebt);
+      ref.invalidate(personDebtTimelineProvider(newDebt.personId));
     } catch (e) {
       log('Error when collect debt $e');
       state = AsyncError(e, StackTrace.current);
@@ -345,6 +355,7 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
         walletId: walletId,
         syncId: generateSyncId(),
         debtId: null, // Multiple debts paid
+        personId: personId,
       );
       await _databaseService.insertTransaction(transaction);
 
@@ -362,6 +373,7 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
             );
           }).toList();
       state = AsyncData(updatedState);
+      ref.invalidate(personDebtTimelineProvider(personId));
     } catch (e) {
       log('Error when pay debt by person: $e');
       state = AsyncError(e, StackTrace.current);
@@ -444,6 +456,7 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
         walletId: walletId,
         syncId: generateSyncId(),
         debtId: null, // Multiple debts collected
+        personId: personId,
       );
       await _databaseService.insertTransaction(transaction);
 
@@ -461,6 +474,7 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
             );
           }).toList();
       state = AsyncData(updatedState);
+      ref.invalidate(personDebtTimelineProvider(personId));
     } catch (e) {
       log('Error when collect debt by person: $e');
       state = AsyncError(e, StackTrace.current);
@@ -520,6 +534,7 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
         walletId: walletId,
         syncId: generateSyncId(),
         debtId: debtId,
+        personId: debt.personId,
       );
       await _databaseService.insertTransaction(transaction);
 
@@ -531,6 +546,7 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
       final updatedList = [...currentDebts];
       updatedList[debtIndex] = updatedDebt;
       state = AsyncData(updatedList);
+      ref.invalidate(personDebtTimelineProvider(updatedDebt.personId));
     } catch (e) {
       log('Error when pay single debt: $e');
       state = AsyncError(e, StackTrace.current);
@@ -590,6 +606,7 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
         walletId: walletId,
         syncId: generateSyncId(),
         debtId: debtId,
+        personId: debt.personId,
       );
       await _databaseService.insertTransaction(transaction);
 
@@ -601,6 +618,7 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
       final updatedList = [...currentDebts];
       updatedList[debtIndex] = updatedDebt;
       state = AsyncData(updatedList);
+      ref.invalidate(personDebtTimelineProvider(updatedDebt.personId));
     } catch (e) {
       log('Error when collect single debt: $e');
       state = AsyncError(e, StackTrace.current);
@@ -716,7 +734,6 @@ final totalDebtByTypeProvider = Provider.family<DebtInfo, DebtType>((
     totalDebtRemaining: totalDebtRemaining,
   );
 });
-
 
 /// Provider lưu trữ khoản nợ được chọn để trả/thu
 final selectedDebtProvider = StateProvider<Debt?>((ref) => null);

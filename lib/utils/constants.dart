@@ -36,7 +36,7 @@ class AppConstants {
 
   // Database config
   static const String dbName = 'mosa.db';
-  static const int dbVersion = 8;
+  static const int dbVersion = 9;
   static const String tableTransactions = 'transactions';
   static const String tableWallets = 'wallets';
   static const String tableTypeWallets = 'type_wallets';
