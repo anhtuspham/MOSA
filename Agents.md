@@ -418,3 +418,74 @@ lib/
 | `flutter test test/file.dart` | Run single test file |
 | `flutter test --name "pattern"` | Run tests by pattern |
 | `dart run build_runner build --delete-conflicting-outputs` | Build runner for code gen |
+
+---
+
+## Progress Log & Established Patterns
+
+Phần này ghi lại các tính năng đã hoàn thiện và các quy tắc/mẫu code mới được thiết lập trong quá trình phát triển.
+
+### ✅ Các Tính Năng Đã Hoàn Thiện
+
+| Tính năng | Mô tả | Files liên quan |
+|-----------|-------|-----------------|
+| **Chuyển đổi Giao diện (Theme Switching)** | Light/Dark/System mode với persistence qua `SharedPreferences` | `lib/config/app_theme.dart`, `lib/providers/theme_provider.dart`, `lib/screens/setting/setting_screen.dart` |
+| **Push Notifications (Local + FCM)** | Nhắc nhở nợ đến hạn, cảnh báo ngân sách, thông báo thanh toán | `lib/utils/notification_helper.dart`, `lib/services/fcm_service.dart`, `lib/providers/fcm_provider.dart` |
+| **Debt Timeline (Lịch sử nợ)** | Timeline tổng hợp theo người, gộp Debt khởi tạo + các giao dịch thanh toán/thu nợ | `lib/providers/debt_history_provider.dart` |
+| **Refactoring Provider tên** | Đổi tên `currentTransactionByTypeProvider` → `activeTransactionTypeProvider` | `lib/providers/transaction_provider.dart` |
+| **Category Navigation** | Refactor dùng `activeTransactionTypeProvider` thay vì query param để xác định tab hiển thị | `lib/screens/category/` |
+| **Debt Provider CRUD** | Đầy đủ create/update/delete với cập nhật UI tức thì, bao gồm tích hợp notification | `lib/providers/debt_provider.dart` |
+| **Build Fix: desugar_jdk_libs** | Nâng cấp `desugar_jdk_libs` lên 2.1.4 để tương thích `flutter_local_notifications` v21+ | `android/app/build.gradle.kts` |
+
+---
+
+### 📐 Quy Tắc & Mẫu Code Mới
+
+#### Theme Management
+- **ThemeProvider** dùng `AsyncNotifier<ThemeMode>` với persistence qua `SharedPreferences`.
+- `main.dart` dùng `ConsumerWidget`, đọc `themeProvider` để truyền `themeMode` vào `MaterialApp.router`.
+- UI chọn theme dùng `showModalBottomSheet` với `RadioListTile<ThemeMode>` bên trong `Consumer`.
+- `AppTheme` class tập trung định nghĩa `lightTheme` và `darkTheme` trong `lib/config/app_theme.dart`.
+
+```dart
+// Đọc theme trong build()
+final themeMode = ref.watch(themeProvider).value ?? ThemeMode.system;
+// Cập nhật theme
+ref.read(themeProvider.notifier).updateThemeMode(ThemeMode.dark);
+```
+
+#### Local Notifications (`flutter_local_notifications` v21+)
+- **BREAKING:** `show()` và `zonedSchedule()` dùng **named parameters** (`id:`, `title:`, `body:`, `notificationDetails:`).
+- `uiLocalNotificationDateInterpretation` đã bị xóa khỏi `zonedSchedule()`.
+- Luôn wrap `zonedSchedule` với try-catch để fallback từ `AndroidScheduleMode.exactAllowWhileIdle` → `inexactAllowWhileIdle`.
+- Timezone: dùng `tz.TZDateTime` với location `'Asia/Ho_Chi_Minh'`.
+- Khởi tạo `NotificationHelper.initialize()` trong `main()` trước `runApp()`.
+
+```dart
+// ✅ Cú pháp đúng cho v21+
+await _notifications.show(
+  id: notificationId,
+  title: title,
+  body: body,
+  notificationDetails: details,
+);
+```
+
+#### Debt Timeline Pattern
+- `personDebtTimelineProvider` là `FutureProvider.family<List<dynamic>, int>` nhận `personId`.
+- Gộp `List<Debt>` + `List<TransactionModel>` thành một timeline, lọc bỏ các `TransactionType.lend` và `TransactionType.borrowing` (đã có Debt object đại diện).
+- Sắp xếp timeline theo ngày descending.
+- Sau mọi thao tác CRUD trên `DebtNotifier`, gọi `ref.invalidate(personDebtTimelineProvider(personId))` để đồng bộ UI.
+
+```dart
+// Invalidate timeline sau mỗi mutation
+ref.invalidate(personDebtTimelineProvider(debt.personId));
+```
+
+#### Provider Naming Convention
+- Provider dùng thì hiện tại mô tả trạng thái đang active, KHÔNG dùng "current": `activeTransactionTypeProvider` ✅ thay vì `currentTransactionByTypeProvider` ❌.
+
+#### Android Build Configuration
+- `desugar_jdk_libs` phải >= **2.1.4** khi dùng `flutter_local_notifications` v21+.
+- Cập nhật trong `android/app/build.gradle.kts` tại khối `dependencies`.
+

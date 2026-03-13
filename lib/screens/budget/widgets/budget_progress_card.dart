@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mosa/providers/budget_provider.dart';
 import 'package:mosa/providers/category_provider.dart';
-import 'package:mosa/utils/app_colors.dart';
+import 'package:mosa/config/app_colors.dart';
 import 'package:mosa/utils/currency_formatter.dart';
 
 class BudgetProgressCard extends ConsumerWidget {
@@ -53,10 +53,10 @@ class BudgetProgressCard extends ConsumerWidget {
                         const SizedBox(width: 12),
                         Text(
                           categoryName,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                       ],
@@ -74,7 +74,7 @@ class BudgetProgressCard extends ConsumerWidget {
                 const SizedBox(height: 16),
                 LinearProgressIndicator(
                   value: progress.percentage > 1.0 ? 1.0 : progress.percentage,
-                  backgroundColor: AppColors.borderLighter,
+                  backgroundColor: Theme.of(context).colorScheme.outlineVariant,
                   valueColor: AlwaysStoppedAnimation<Color>(progressColor),
                   minHeight: 8,
                   borderRadius: BorderRadius.circular(4),
@@ -86,16 +86,16 @@ class BudgetProgressCard extends ConsumerWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'Đã chi',
-                          style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                          style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant),
                         ),
                         Text(
                           CurrencyFormatter.formatNumber(progress.spentAmount),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                       ],
@@ -103,16 +103,16 @@ class BudgetProgressCard extends ConsumerWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        const Text(
+                        Text(
                           'Ngân sách',
-                          style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                          style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant),
                         ),
                         Text(
                           CurrencyFormatter.formatNumber(progress.budget.amount),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                       ],

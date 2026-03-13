@@ -7,7 +7,7 @@ import 'package:mosa/widgets/custom_list_tile.dart';
 import 'package:mosa/widgets/error_widget.dart';
 import 'package:mosa/widgets/loading_widget.dart';
 import 'package:mosa/widgets/common_scaffold.dart';
-import 'package:mosa/utils/app_colors.dart';
+import 'package:mosa/config/app_colors.dart';
 import 'package:mosa/utils/toast.dart';
 
 class SelectPersonScreen extends ConsumerStatefulWidget {

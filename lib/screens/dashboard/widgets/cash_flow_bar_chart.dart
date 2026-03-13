@@ -2,7 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mosa/providers/dashboard_provider.dart';
-import 'package:mosa/utils/app_colors.dart';
+import 'package:mosa/config/app_colors.dart';
 import 'package:mosa/utils/currency_formatter.dart';
 
 class CashFlowBarChart extends ConsumerWidget {
@@ -29,12 +29,12 @@ class CashFlowBarChart extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Dòng tiền',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 24),
@@ -67,8 +67,8 @@ class CashFlowBarChart extends ConsumerWidget {
                               padding: const EdgeInsets.only(top: 8.0),
                               child: Text(
                                 cashFlowData[value.toInt()].label,
-                                style: const TextStyle(
-                                  color: AppColors.textSecondary,
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 12,
                                 ),
@@ -92,7 +92,7 @@ class CashFlowBarChart extends ConsumerWidget {
                     horizontalInterval: maxVal > 0 ? maxVal / 4 : 250,
                     getDrawingHorizontalLine: (value) {
                       return FlLine(
-                        color: AppColors.borderLight,
+                        color: Theme.of(context).colorScheme.outlineVariant,
                         strokeWidth: 1,
                         dashArray: [5, 5],
                       );

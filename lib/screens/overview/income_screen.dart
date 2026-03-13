@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mosa/models/enums.dart';
-import 'package:mosa/utils/app_colors.dart';
+import 'package:mosa/config/app_colors.dart';
 import 'package:mosa/utils/helpers.dart';
 import 'package:mosa/utils/toast.dart';
 import 'package:mosa/widgets/error_widget.dart';

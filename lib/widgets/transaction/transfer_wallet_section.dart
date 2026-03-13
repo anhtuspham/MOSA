@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mosa/providers/wallet_provider.dart';
 import 'package:mosa/router/app_routes.dart';
-import 'package:mosa/utils/app_colors.dart';
+import 'package:mosa/config/app_colors.dart';
 import 'package:mosa/utils/app_icons.dart';
 import 'package:mosa/utils/transaction_constants.dart';
 import 'package:mosa/widgets/card_section.dart';

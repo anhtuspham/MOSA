@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mosa/providers/debt_provider.dart';
 import 'package:mosa/providers/person_provider.dart';
-import 'package:mosa/utils/app_colors.dart';
+import 'package:mosa/config/app_colors.dart';
 import 'package:mosa/utils/helpers.dart';
 import 'package:mosa/widgets/custom_list_tile.dart';
 

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mosa/models/debt.dart';
 import 'package:mosa/providers/debt_provider.dart';
-import 'package:mosa/utils/app_colors.dart';
+
 import 'package:mosa/widgets/common_scaffold.dart';
 import 'package:mosa/widgets/debt/person_debt_item.dart';
 
@@ -23,7 +23,7 @@ class DebtSelectionScreen extends ConsumerWidget {
         onPressed: () => context.pop(),
         icon: const Icon(Icons.arrow_back),
       ),
-      appBarBackgroundColor: AppColors.background,
+      appBarBackgroundColor: Theme.of(context).colorScheme.surface,
       body: ListView.builder(
         itemCount: debtSummaryByType.values.length,
         itemBuilder: (context, index) {

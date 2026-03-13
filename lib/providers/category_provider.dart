@@ -54,6 +54,39 @@ class CategoriesNotifier extends AsyncNotifier<List<Category>> {
       log('Refresh category error: ${e.toString()}', name: 'CategoriesNotifier', stackTrace: stack);
     }
   }
+
+  /// Thêm danh mục mới
+  Future<void> addCategory(Category category) async {
+    try {
+      await _databaseService.insertCategory(category);
+      await refreshCategories();
+    } catch (e, stackTrace) {
+      log('Thêm danh mục thất bại: $e', name: 'CategoriesNotifier', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  /// Cập nhật danh mục
+  Future<void> updateCategory(Category category) async {
+    try {
+      await _databaseService.updateCategory(category);
+      await refreshCategories();
+    } catch (e, stackTrace) {
+      log('Cập nhật danh mục thất bại: $e', name: 'CategoriesNotifier', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  /// Xóa danh mục
+  Future<void> deleteCategory(String categoryId) async {
+    try {
+      await _databaseService.deleteCategory(categoryId);
+      await refreshCategories();
+    } catch (e, stackTrace) {
+      log('Xóa danh mục thất bại: $e', name: 'CategoriesNotifier', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
 }
 
 /// Provider chính quản lý danh sách danh mục

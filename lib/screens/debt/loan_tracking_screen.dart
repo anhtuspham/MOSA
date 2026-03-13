@@ -13,7 +13,7 @@ import 'package:mosa/widgets/debt/person_debt_item.dart';
 import 'package:mosa/widgets/section_container.dart';
 
 import '../../router/app_routes.dart';
-import '../../utils/app_colors.dart';
+import '../../config/app_colors.dart';
 import '../../utils/helpers.dart';
 import '../../widgets/custom_expansion_tile.dart';
 import '../../widgets/custom_list_tile.dart';
@@ -42,7 +42,7 @@ class _LoanTrackingScreenState extends ConsumerState<LoanTrackingScreen> {
         icon: const Icon(Icons.arrow_back),
       ),
       actions: const [Icon(Icons.search)],
-      appBarBackgroundColor: AppColors.background,
+      appBarBackgroundColor: Theme.of(context).colorScheme.surface,
       tabs: [Tab(text: "Cho vay"), Tab(text: "Còn Nợ")],
       children: [
         _loanTrackingContent(
@@ -206,7 +206,7 @@ class _LoanTrackingScreenState extends ConsumerState<LoanTrackingScreen> {
         children: [
           Text(
             Helpers.formatCurrency(totalAmount),
-            style: TextStyle(fontSize: 16.sp, color: AppColors.textPrimary),
+            style: TextStyle(fontSize: 16.sp, color: Theme.of(context).colorScheme.onSurface),
           ),
           SizedBox(width: 8.w),
           Icon(Icons.check_circle, color: AppColors.success),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mosa/utils/app_colors.dart';
+import 'package:mosa/config/app_colors.dart';
 
 class OperationGridItemWidget extends StatefulWidget {
   final String iconPath;
@@ -21,7 +21,7 @@ class _OperationGridItemWidgetState extends State<OperationGridItemWidget> {
     return Container(
       constraints: BoxConstraints(maxWidth: double.infinity),
       decoration: BoxDecoration(
-        color: AppColors.background,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(6),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),

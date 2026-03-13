@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mosa/providers/dashboard_provider.dart';
-import 'package:mosa/utils/app_colors.dart';
+import 'package:mosa/config/app_colors.dart';
 import 'package:mosa/utils/currency_formatter.dart';
 
 class AssetDebtSummaryCard extends StatelessWidget {
@@ -18,11 +18,11 @@ class AssetDebtSummaryCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Tài sản ròng',
               style: TextStyle(
                 fontSize: 14,
-                color: AppColors.textSecondary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -42,6 +42,7 @@ class AssetDebtSummaryCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: _buildSummaryItem(
+                    context,
                     'Tài sản',
                     data.totalAssets,
                     AppColors.income,
@@ -51,10 +52,11 @@ class AssetDebtSummaryCard extends StatelessWidget {
                 Container(
                   width: 1,
                   height: 40,
-                  color: AppColors.borderLight,
+                  color: Theme.of(context).colorScheme.outlineVariant,
                 ),
                 Expanded(
                   child: _buildSummaryItem(
+                    context,
                     'Cho vay',
                     data.totalLent,
                     AppColors.primary,
@@ -64,10 +66,11 @@ class AssetDebtSummaryCard extends StatelessWidget {
                 Container(
                   width: 1,
                   height: 40,
-                  color: AppColors.borderLight,
+                  color: Theme.of(context).colorScheme.outlineVariant,
                 ),
                 Expanded(
                   child: _buildSummaryItem(
+                    context,
                     'Đi vay',
                     data.totalDebt,
                     AppColors.expense,
@@ -83,6 +86,7 @@ class AssetDebtSummaryCard extends StatelessWidget {
   }
 
   Widget _buildSummaryItem(
+    BuildContext context,
     String label,
     double amount,
     Color color,
@@ -94,9 +98,9 @@ class AssetDebtSummaryCard extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
-            color: AppColors.textSecondary,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
         ),
         const SizedBox(height: 4),

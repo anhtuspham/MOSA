@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mosa/models/enums.dart';
-import 'package:mosa/utils/app_colors.dart';
+import 'package:mosa/config/app_colors.dart';
 
 /// Cấu hình hiển thị cho từng loại giao dịch
 class TransactionTypeConfig {

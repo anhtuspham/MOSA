@@ -8,7 +8,7 @@ import 'package:mosa/utils/helpers.dart';
 import 'package:mosa/utils/utils.dart';
 import 'package:mosa/screens/overview/widgets/transaction_in_period_time.dart';
 
-import 'package:mosa/utils/app_colors.dart';
+
 import 'package:mosa/utils/toast.dart';
 
 class OverviewScreen extends ConsumerStatefulWidget {
@@ -88,7 +88,7 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: Theme.of(context).colorScheme.outline),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
@@ -132,7 +132,7 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
             ),
           ),
           Container(
-            color: AppColors.borderLight,
+            color: Theme.of(context).colorScheme.outlineVariant,
             width: 1,
             height: 50,
             margin: const EdgeInsets.symmetric(horizontal: 4),

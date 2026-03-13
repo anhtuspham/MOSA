@@ -6,7 +6,7 @@ import 'package:mosa/models/category.dart';
 import 'package:mosa/models/enums.dart';
 import 'package:mosa/providers/budget_provider.dart';
 import 'package:mosa/providers/transaction_provider.dart';
-import 'package:mosa/utils/app_colors.dart';
+import 'package:mosa/config/app_colors.dart';
 import 'package:mosa/utils/number_input_formatter.dart';
 import 'package:mosa/widgets/common_scaffold.dart';
 import 'package:mosa/utils/toast.dart';
@@ -82,7 +82,7 @@ class _AddBudgetScreenState extends ConsumerState<AddBudgetScreen> {
       appBarBackgroundColor: AppColors.primary,
       elevation: false,
       body: Container(
-        color: AppColors.background,
+        color: Theme.of(context).colorScheme.surface,
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
@@ -103,7 +103,7 @@ class _AddBudgetScreenState extends ConsumerState<AddBudgetScreen> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: AppColors.borderLighter),
+                  border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
                 ),
                 child: Row(
                   children: [
@@ -117,7 +117,7 @@ class _AddBudgetScreenState extends ConsumerState<AddBudgetScreen> {
                         _selectedCategory?.name ?? 'Chọn Danh Mục',
                         style: TextStyle(
                           fontSize: 16,
-                          color: _selectedCategory == null ? AppColors.textHint : AppColors.textPrimary,
+                          color: _selectedCategory == null ? Theme.of(context).colorScheme.onSurfaceVariant : Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                     ),
@@ -132,7 +132,7 @@ class _AddBudgetScreenState extends ConsumerState<AddBudgetScreen> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: AppColors.borderLighter),
+                border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
               ),
               child: Row(
                 children: [

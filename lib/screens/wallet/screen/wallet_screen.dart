@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:mosa/router/app_routes.dart';
 import 'package:mosa/screens/wallet/widgets/account_tab_screen.dart';
 import 'package:mosa/screens/wallet/widgets/accumulated_tab_screen.dart';
-import 'package:mosa/utils/app_colors.dart';
+import 'package:mosa/config/app_colors.dart';
 import 'package:mosa/utils/app_icons.dart';
 import 'package:mosa/widgets/custom_list_tile.dart';
 import 'package:mosa/widgets/common_scaffold.dart';
@@ -29,7 +29,7 @@ class WalletShellScreen extends StatelessWidget {
         Tab(text: 'Sổ tiết kiệm'),
         Tab(text: 'Tích lũy'),
       ],
-      appBarBackgroundColor: AppColors.background,
+      appBarBackgroundColor: Theme.of(context).colorScheme.surface,
       floatingActionButton: FloatingActionButton(
         onPressed: () => context.push(AppRoutes.addWallet),
         shape: CircleBorder(),
@@ -39,14 +39,14 @@ class WalletShellScreen extends StatelessWidget {
       ),
       children: [
         AccountTabScreen(),
-        _buildWalletTab('Sổ tiết kiệm'),
+        _buildWalletTab(context, 'Sổ tiết kiệm'),
         AccumulatedTabScreen(),
       ],
     );
   }
 
   /// Build wallet content for each tab
-  static Widget _buildWalletTab(String tabTitle) {
+  static Widget _buildWalletTab(BuildContext context, String tabTitle) {
     return Column(
       children: [
         Container(
@@ -80,7 +80,7 @@ class WalletShellScreen extends StatelessWidget {
                   subTitle: Text('913.024đ'),
                   trailing: IconButton(
                     onPressed: null,
-                    icon: Icon(Icons.more_vert, color: AppColors.textPrimary),
+                    icon: Icon(Icons.more_vert, color: Theme.of(context).colorScheme.onSurface),
                   ),
                 ),
                 CustomListTile(
@@ -92,7 +92,7 @@ class WalletShellScreen extends StatelessWidget {
                   subTitle: Text('913.024đ'),
                   trailing: IconButton(
                     onPressed: null,
-                    icon: Icon(Icons.more_vert, color: AppColors.textPrimary),
+                    icon: Icon(Icons.more_vert, color: Theme.of(context).colorScheme.onSurface),
                   ),
                 ),
                 CustomListTile(
@@ -104,7 +104,7 @@ class WalletShellScreen extends StatelessWidget {
                   subTitle: Text('913.024đ'),
                   trailing: IconButton(
                     onPressed: null,
-                    icon: Icon(Icons.more_vert, color: AppColors.textPrimary),
+                    icon: Icon(Icons.more_vert, color: Theme.of(context).colorScheme.onSurface),
                   ),
                 ),
                 CustomListTile(
@@ -116,7 +116,7 @@ class WalletShellScreen extends StatelessWidget {
                   subTitle: Text('913.024đ'),
                   trailing: IconButton(
                     onPressed: null,
-                    icon: Icon(Icons.more_vert, color: AppColors.textPrimary),
+                    icon: Icon(Icons.more_vert, color: Theme.of(context).colorScheme.onSurface),
                   ),
                 ),
               ],

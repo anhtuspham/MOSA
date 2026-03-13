@@ -8,7 +8,7 @@ import 'package:mosa/utils/helpers.dart';
 import 'package:mosa/utils/utils.dart';
 import 'package:mosa/widgets/error_widget.dart';
 import 'package:mosa/widgets/loading_widget.dart';
-import '../../../utils/app_colors.dart';
+
 
 class TransactionItem extends ConsumerWidget {
   final Category category;
@@ -47,7 +47,7 @@ class TransactionItem extends ConsumerWidget {
                     transaction.note!,
                     style: TextStyle(
                       fontSize: 10.sp,
-                      color: AppColors.textSecondary,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
               ],
@@ -73,7 +73,7 @@ class TransactionItem extends ConsumerWidget {
                         wallet?.name ?? '',
                         style: TextStyle(
                           fontSize: 10.sp,
-                          color: AppColors.textSecondary,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ],

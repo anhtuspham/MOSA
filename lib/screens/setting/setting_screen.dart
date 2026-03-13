@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mosa/router/app_routes.dart';
-import 'package:mosa/utils/app_colors.dart';
+import 'package:mosa/config/app_colors.dart';
 import 'package:mosa/utils/app_icons.dart';
 import 'package:mosa/widgets/category_grid_view.dart';
 import 'package:mosa/widgets/item_widget.dart';
@@ -64,7 +64,7 @@ class SettingsShellScreen extends StatelessWidget {
           children: [
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(color: AppColors.surface),
+              decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface),
               child: Column(
                 children: [
                   Text('Tính năng', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18)),
@@ -81,7 +81,12 @@ class SettingsShellScreen extends StatelessWidget {
                         },
                       ),
                       ItemWidget(itemId: '2', iconPath: AppIcons.sampleRecord, name: 'Ghi chép mẫu'),
-                      ItemWidget(itemId: '3', iconPath: AppIcons.categoryRecord, name: 'Hạng mục thu chi'),
+                      ItemWidget(
+                        itemId: '3',
+                        iconPath: AppIcons.categoryRecord,
+                        name: 'Hạng mục thu chi',
+                        onTap: () => context.pushNamed('categoryManagement'),
+                      ),
                       ItemWidget(
                         itemId: '4',
                         icon: Icons.account_balance_outlined,

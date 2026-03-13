@@ -1,7 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mosa/utils/app_colors.dart';
+import 'package:mosa/config/app_colors.dart';
 
 class LatestMonthStatisticWidget extends StatefulWidget {
   const LatestMonthStatisticWidget({super.key});
@@ -15,7 +15,7 @@ class _LatestMonthStatisticWidgetState extends State<LatestMonthStatisticWidget>
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(color: AppColors.background, borderRadius: BorderRadius.circular(6)),
+      decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, borderRadius: BorderRadius.circular(6)),
       child: InkWell(
         onTap: () {},
         child: Column(
@@ -26,11 +26,11 @@ class _LatestMonthStatisticWidgetState extends State<LatestMonthStatisticWidget>
                 RichText(
                   text: TextSpan(
                     text: 'Tình hình thu chi\n',
-                    style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textPrimary, fontSize: 16),
+                    style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
                     children: [
                       TextSpan(
                         text: '5 tháng gần nhất',
-                        style: TextStyle(fontWeight: FontWeight.w400, color: AppColors.textPrimary, fontSize: 14),
+                        style: TextStyle(fontWeight: FontWeight.w400, color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
                       ),
                     ],
                   ),
@@ -83,10 +83,10 @@ class _LatestMonthStatisticWidgetState extends State<LatestMonthStatisticWidget>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
+                        Text(
                           'Chi tiêu so với tháng 2',
                           style: TextStyle(
-                            color: AppColors.textSecondary,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                             fontSize: 14,
                           ),
                         ),

@@ -9,7 +9,7 @@ import 'package:mosa/widgets/error_widget.dart';
 import 'package:mosa/widgets/loading_widget.dart';
 
 import '../../providers/transaction_provider.dart';
-import '../../utils/app_colors.dart';
+import '../../config/app_colors.dart';
 import '../../widgets/category_pie_chart.dart';
 import '../../widgets/progress_info_item.dart';
 

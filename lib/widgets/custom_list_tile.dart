@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mosa/utils/app_colors.dart';
+import 'package:mosa/config/app_colors.dart';
 
 /// Một Custom List Tile có thể tùy chỉnh phần leading, title, trailing và hành động khi nhấn
 class CustomListTile extends StatelessWidget {

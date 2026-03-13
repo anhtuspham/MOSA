@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mosa/providers/wallet_provider.dart';
-import 'package:mosa/utils/app_colors.dart';
+import 'package:mosa/config/app_colors.dart';
 import 'package:mosa/utils/helpers.dart';
 import 'package:mosa/utils/number_input_formatter.dart';
 import 'package:mosa/utils/transaction_constants.dart';

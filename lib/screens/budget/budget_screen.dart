@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mosa/providers/budget_provider.dart';
 import 'package:mosa/screens/budget/widgets/budget_progress_card.dart';
-import 'package:mosa/utils/app_colors.dart';
+import 'package:mosa/config/app_colors.dart';
 import 'package:mosa/widgets/common_scaffold.dart';
 
 class BudgetScreen extends ConsumerStatefulWidget {
@@ -37,7 +37,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
         )
       ],
       body: Container(
-        color: AppColors.background,
+        color: Theme.of(context).colorScheme.surface,
         child: budgetProgressAsync.when(
           data: (progressList) {
             if (progressList.isEmpty) {
@@ -47,9 +47,9 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
                   children: [
                     Icon(Icons.account_balance_wallet_outlined, size: 64, color: AppColors.textHint),
                     const SizedBox(height: 16),
-                    const Text(
+                    Text(
                       'Bạn chưa tạo ngân sách nào cho tháng này.',
-                      style: TextStyle(color: AppColors.textSecondary, fontSize: 16),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 16),
                     ),
                     const SizedBox(height: 16),
                     ElevatedButton(

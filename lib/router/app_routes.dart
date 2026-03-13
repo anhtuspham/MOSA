@@ -41,6 +41,7 @@ abstract class AppRoutes {
 
   // ===== CATEGORY MANAGEMENT =====
   static const String categoryList = '/categories';
+  static const String categoryManagement = '/categoryManagement';
 
   // ==== SELECT WALLET ====
   static const String selectWallet = '/selectWallet';

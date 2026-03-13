@@ -7,7 +7,7 @@ import 'package:mosa/providers/category_provider.dart';
 import 'package:mosa/providers/person_provider.dart';
 import 'package:mosa/providers/transaction_prefill_data_provider.dart';
 import 'package:mosa/router/app_routes.dart';
-import 'package:mosa/utils/app_colors.dart';
+
 import 'package:mosa/widgets/custom_expansion_tile.dart';
 import 'package:mosa/widgets/item_widget.dart';
 import 'package:mosa/widgets/search_bar_widget.dart';
@@ -99,7 +99,7 @@ class _CategoryTabState extends ConsumerState<CategoryTab> {
     );
 
     return Container(
-      decoration: BoxDecoration(color: AppColors.secondaryBackground),
+      decoration: BoxDecoration(color: Theme.of(context).colorScheme.surfaceContainer),
       child: Column(
         children: [
           Padding(
@@ -125,7 +125,7 @@ class _CategoryTabState extends ConsumerState<CategoryTab> {
                     // Nếu không có con, hiển thị dạng item đơn giản
                     if (category.children?.isEmpty ?? true) {
                       return Container(
-                        color: AppColors.background,
+                        color: Theme.of(context).colorScheme.surface,
                         margin: const EdgeInsets.symmetric(vertical: 3),
                         padding: const EdgeInsets.symmetric(
                           horizontal: 18,

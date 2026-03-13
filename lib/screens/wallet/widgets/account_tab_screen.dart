@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:mosa/models/wallets.dart';
 import 'package:mosa/providers/wallet_provider.dart';
 import 'package:mosa/router/app_routes.dart';
-import 'package:mosa/utils/app_colors.dart';
+import 'package:mosa/config/app_colors.dart';
 import 'package:mosa/utils/helpers.dart';
 import 'package:mosa/utils/toast.dart';
 import 'package:mosa/widgets/custom_list_tile.dart';
@@ -44,7 +44,7 @@ class _AccountTabScreenState extends ConsumerState<AccountTabScreen> {
                   fontSize: 16,
                   color:
                       totalBalance >= 0
-                          ? AppColors.textPrimary
+                          ? Theme.of(context).colorScheme.onSurface
                           : AppColors.expense,
                 ),
               ),
@@ -75,7 +75,7 @@ class _AccountTabScreenState extends ConsumerState<AccountTabScreen> {
                             style: TextStyle(
                               color:
                                   wallet.balance >= 0
-                                      ? AppColors.textPrimary
+                                      ? Theme.of(context).colorScheme.onSurface
                                       : AppColors.expense,
                             ),
                           ),
@@ -83,7 +83,7 @@ class _AccountTabScreenState extends ConsumerState<AccountTabScreen> {
                             onPressed: () => _handleShowBottomSheet(wallet),
                             icon: Icon(
                               Icons.more_vert,
-                              color: AppColors.textPrimary,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                         );

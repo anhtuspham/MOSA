@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mosa/screens/stats/widgets/latest_month_statistic_widget.dart';
-import 'package:mosa/utils/app_colors.dart';
+import 'package:mosa/config/app_colors.dart';
 import 'package:mosa/utils/helpers.dart';
 import 'package:mosa/widgets/section_container.dart';
 import 'package:mosa/widgets/stat_card.dart';
@@ -19,9 +19,9 @@ class StatsShellScreen extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.borderLighter.withOpacity(0.5)),
+          border: Border.all(color: Theme.of(context).colorScheme.outlineVariant.withOpacity(0.5)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -31,7 +31,7 @@ class StatsShellScreen extends ConsumerWidget {
             const SizedBox(height: 12),
             Text(
               label,
-              style: const TextStyle(fontSize: 14, color: AppColors.textPrimary, fontWeight: FontWeight.w500),
+              style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w500),
             ),
           ],
         ),
@@ -45,7 +45,7 @@ class StatsShellScreen extends ConsumerWidget {
     return CommonScaffold(
       title: const Text('Báo cáo', style: TextStyle(fontWeight: FontWeight.w600)),
       centerTitle: true,
-      appBarBackgroundColor: AppColors.background,
+      appBarBackgroundColor: Theme.of(context).colorScheme.surface,
       body: SectionContainer(
         // backgroundColor: AppColors.background,
         child: SingleChildScrollView(
@@ -65,11 +65,11 @@ class StatsShellScreen extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const Text('Tài chính hiện tại', style: TextStyle(color: AppColors.textWhite, fontSize: 14)),
+                    Text('Tài chính hiện tại', style: TextStyle(color: Theme.of(context).colorScheme.onPrimary, fontSize: 14)),
                     const SizedBox(height: 4),
                     Text(
                       Helpers.formatCurrency(totalBalance),
-                      style: const TextStyle(color: AppColors.textWhite, fontWeight: FontWeight.bold, fontSize: 28),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onPrimary, fontWeight: FontWeight.bold, fontSize: 28),
                     ),
                     const SizedBox(height: 20),
                     Row(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../utils/app_colors.dart';
+import '../config/app_colors.dart';
 import '../utils/number_input_formatter.dart';
 
 class AmountTextField extends StatelessWidget {

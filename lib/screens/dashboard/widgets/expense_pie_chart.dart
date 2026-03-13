@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mosa/models/enums.dart';
 import 'package:mosa/providers/transaction_provider.dart';
-import 'package:mosa/utils/app_colors.dart';
+
 import 'package:mosa/utils/currency_formatter.dart';
 
 class ExpensePieChart extends ConsumerWidget {
@@ -22,24 +22,25 @@ class ExpensePieChart extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Cơ cấu chi tiêu',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
+
             const SizedBox(height: 24),
             pieDataAsync.when(
               data: (dataMap) {
                 if (dataMap.isEmpty || dataMap.values.every((v) => v <= 0)) {
-                  return const SizedBox(
+                  return SizedBox(
                     height: 200,
                     child: Center(
                       child: Text(
                         'Chưa có dữ liệu chi tiêu',
-                        style: TextStyle(color: AppColors.textSecondary),
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
                       ),
                     ),
                   );
@@ -100,6 +101,7 @@ class ExpensePieChart extends ConsumerWidget {
                       children: dataMap.entries.map((entry) {
                         final idx = dataMap.keys.toList().indexOf(entry.key);
                         return _buildIndicator(
+                          context,
                           color: colors[idx % colors.length],
                           text: entry.key,
                           value: entry.value,
@@ -126,7 +128,8 @@ class ExpensePieChart extends ConsumerWidget {
     );
   }
 
-  Widget _buildIndicator({
+  Widget _buildIndicator(
+    BuildContext context, {
     required Color color,
     required String text,
     required double value,
@@ -142,14 +145,14 @@ class ExpensePieChart extends ConsumerWidget {
         const SizedBox(width: 6),
         Text(
           text,
-          style: const TextStyle(fontSize: 12, color: AppColors.textPrimary),
+          style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface),
         ),
         const SizedBox(width: 4),
         Text(
           '(${CurrencyFormatter.formatNumber(value)})',
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 11,
-            color: AppColors.textSecondary,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
         ),
       ],

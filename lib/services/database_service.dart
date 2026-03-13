@@ -721,17 +721,17 @@ class DatabaseService {
       AppConstants.tableCategories,
       orderBy: 'name ASC',
     );
-    return List.generate(maps.length, (i) => Category.fromJson(maps[i]));
+    return List.generate(maps.length, (i) => Category.fromMap(maps[i]));
   }
 
   /// Thêm danh mục mới
-  Future<int> insertCategory(Category category) async {
+  Future<String> insertCategory(Category category) async {
     try {
       final db = await database;
 
       // Check for duplicate name
       final existing = await db.query(
-        AppConstants.tablePersons,
+        AppConstants.tableCategories,
         where: 'name = ?',
         whereArgs: [category.name],
       );
@@ -739,9 +739,9 @@ class DatabaseService {
         throw 'Tên category đã tồn tại';
       }
 
-      final id = await db.insert(AppConstants.tablePersons, category.toJson());
-      log('Person inserted with id: $id');
-      return id;
+      await db.insert(AppConstants.tableCategories, category.toMap());
+      log('Category inserted with id: ${category.id}');
+      return category.id;
     } catch (e) {
       log('Insert category failed: $e');
       if (e.toString().contains('UNIQUE constraint')) {
@@ -756,7 +756,7 @@ class DatabaseService {
     try {
       final db = await database;
 
-      // Check if another person has the same name
+      // Check if another category has the same name
       final existing = await db.query(
         AppConstants.tableCategories,
         where: 'name = ? AND id != ?',
@@ -768,14 +768,43 @@ class DatabaseService {
 
       final count = await db.update(
         AppConstants.tableCategories,
-        category.toJson(),
+        category.toMap(),
         where: 'id = ?',
         whereArgs: [category.id],
       );
-      log('category updated: $count rows affected');
+      log('Category updated: $count rows affected');
       return count;
     } catch (e) {
       log('Update category failed: $e');
+      rethrow;
+    }
+  }
+
+  /// Xóa danh mục
+  Future<void> deleteCategory(String id) async {
+    try {
+      final db = await database;
+      
+      // Kiểm tra danh mục có giao dịch liên quan không
+      final transactions = await db.query(
+        AppConstants.tableTransactions,
+        where: 'categoryId = ?',
+        whereArgs: [id],
+        limit: 1,
+      );
+      
+      if (transactions.isNotEmpty) {
+        throw 'Không thể xóa danh mục đang có giao dịch liên quan';
+      }
+
+      await db.delete(
+        AppConstants.tableCategories,
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+      log('Category deleted: $id');
+    } catch (e) {
+      log('Delete category failed: $e');
       rethrow;
     }
   }

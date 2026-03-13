@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mosa/router/app_routes.dart';
 import 'package:mosa/screens/category/category_screen.dart';
+import 'package:mosa/screens/category/category_management_screen.dart';
 import 'package:mosa/screens/debt/debt_selection_screen.dart';
 import 'package:mosa/screens/debt/loan_tracking_screen.dart';
 import 'package:mosa/screens/debt/person_debt_detail_screen.dart';
@@ -110,6 +111,11 @@ final goRouter = GoRouter(
 
     GoRoute(path: AppRoutes.login, name: 'login', builder: (context, state) => LoginScreen()),
     GoRoute(path: AppRoutes.categoryList, name: 'categoryList', builder: (context, state) => CategoryScreen()),
+    GoRoute(
+      path: AppRoutes.categoryManagement,
+      name: 'categoryManagement',
+      builder: (context, state) => CategoryManagementScreen(),
+    ),
     GoRoute(path: AppRoutes.selectWallet, name: 'selectWallet', builder: (context, state) => SelectWalletScreen()),
     GoRoute(
       path: AppRoutes.selectTransferOutWallet,
