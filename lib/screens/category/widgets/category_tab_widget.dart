@@ -44,9 +44,7 @@ class _CategoryTabState extends ConsumerState<CategoryTab> {
 
     if (categoryId == 'lend_payback' || categoryName == 'trả nợ') {
       // Repayment - show borrowed debts
-      final result = await context.push(
-        '${AppRoutes.debtSelection}?type=borrowed',
-      );
+      final result = await context.push('${AppRoutes.debtSelection}?type=borrowed');
 
       if (result != null && result is Map) {
         final personId = result['personId'];
@@ -54,9 +52,7 @@ class _CategoryTabState extends ConsumerState<CategoryTab> {
 
         final person = ref.watch(personByIdProvider(personId));
         // User selected a debt
-        ref
-            .read(transactionPrefillDataProvider.notifier)
-            .state = TransactionPrefill(
+        ref.read(transactionPrefillDataProvider.notifier).state = TransactionPrefill(
           amount: debtAmount,
           person: person,
           category: category,
@@ -74,9 +70,7 @@ class _CategoryTabState extends ConsumerState<CategoryTab> {
 
         final person = ref.watch(personByIdProvider(personId));
         // User selected a debt
-        ref
-            .read(transactionPrefillDataProvider.notifier)
-            .state = TransactionPrefill(
+        ref.read(transactionPrefillDataProvider.notifier).state = TransactionPrefill(
           amount: debtAmount,
           person: person,
           category: category,
@@ -86,17 +80,17 @@ class _CategoryTabState extends ConsumerState<CategoryTab> {
       }
     } else {
       // Regular category - normal flow
-      ref.read(transactionPrefillDataProvider.notifier).state =
-          TransactionPrefill(category: category, type: transactionType);
+      ref.read(transactionPrefillDataProvider.notifier).state = TransactionPrefill(
+        category: category,
+        type: transactionType,
+      );
       context.pop(category);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final asyncCategories = ref.watch(
-      categoryByTypeProvider(widget.categoryType),
-    );
+    final asyncCategories = ref.watch(categoryByTypeProvider(widget.categoryType));
 
     return Container(
       decoration: BoxDecoration(color: Theme.of(context).colorScheme.surfaceContainer),
@@ -127,15 +121,11 @@ class _CategoryTabState extends ConsumerState<CategoryTab> {
                       return Container(
                         color: Theme.of(context).colorScheme.surface,
                         margin: const EdgeInsets.symmetric(vertical: 3),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 18,
-                          vertical: 8,
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
                         child: ItemWidget(
                           category: category,
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          onTap:
-                              () => _handleCategorySelection(context, category),
+                          onTap: () => _handleCategorySelection(context, category),
                         ),
                       );
                     } else {
@@ -145,30 +135,21 @@ class _CategoryTabState extends ConsumerState<CategoryTab> {
                         header: ItemWidget(
                           category: category,
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          onTap:
-                              () => _handleCategorySelection(context, category),
+                          onTap: () => _handleCategorySelection(context, category),
                         ),
                         children: [
                           GridView.builder(
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
                             itemCount: category.children!.length,
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 4,
-                                  crossAxisSpacing: 10,
-                                  childAspectRatio: 1.4,
-                                ),
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 4,
+                              crossAxisSpacing: 10,
+                              childAspectRatio: 1.1,
+                            ),
                             itemBuilder: (context, index) {
                               final child = category.children![index];
-                              return ItemWidget(
-                                category: child,
-                                onTap:
-                                    () => _handleCategorySelection(
-                                      context,
-                                      child,
-                                    ),
-                              );
+                              return ItemWidget(category: child, onTap: () => _handleCategorySelection(context, child));
                             },
                           ),
                         ],
@@ -178,15 +159,10 @@ class _CategoryTabState extends ConsumerState<CategoryTab> {
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error:
-                  (error, stackTrace) {
-                    log(
-                      'Lỗi tải danh mục: $error',
-                      name: 'CategoryTab',
-                      stackTrace: stackTrace,
-                    );
-                    return Center(child: Text('Lỗi: $error'));
-                  },
+              error: (error, stackTrace) {
+                log('Lỗi tải danh mục: $error', name: 'CategoryTab', stackTrace: stackTrace);
+                return Center(child: Text('Lỗi: $error'));
+              },
             ),
           ),
         ],

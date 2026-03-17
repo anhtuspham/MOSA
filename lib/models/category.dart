@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 /// Model lưu trữ thông tin danh mục giao dịch
@@ -145,6 +147,15 @@ class Category {
 
     if (iconType == 'custom') {
       return Image.asset(iconPath, width: size, height: size);
+    } else if (iconType == 'local_file') {
+      return Image.file(
+        File(iconPath),
+        width: size,
+        height: size,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) =>
+            Icon(Icons.broken_image, color: Colors.grey, size: size),
+      );
     } else {
       return Icon(_getMaterialIcon(iconPath), color: color, size: size);
     }

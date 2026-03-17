@@ -57,59 +57,91 @@ class SettingsShellScreen extends StatelessWidget {
           ),
         ),
       ),
-      body: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
+      body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Tính năng', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18)),
-                  const SizedBox(height: 12),
-                  CategoryGridView(
-                    numberItemPerPage: 3,
-                    categories: [
-                      ItemWidget(
-                        itemId: '1',
-                        iconPath: AppIcons.interface,
-                        name: 'Giao diện',
-                        onTap: () {
-                          _showThemeSelectionSheet(context);
-                        },
+                  Row(
+                    children: [
+                      Container(
+                        width: 4,
+                        height: 20,
+                        decoration: BoxDecoration(
+                          color: AppColors.goldColor,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
                       ),
-                      ItemWidget(itemId: '2', iconPath: AppIcons.sampleRecord, name: 'Ghi chép mẫu'),
-                      ItemWidget(
-                        itemId: '3',
-                        iconPath: AppIcons.categoryRecord,
-                        name: 'Hạng mục thu chi',
-                        onTap: () => context.pushNamed('categoryManagement'),
-                      ),
-                      ItemWidget(
-                        itemId: '4',
-                        icon: Icons.account_balance_outlined,
-                        name: 'Quản lý ngân sách',
-                        onTap: () => context.pushNamed('budgets'),
-                      ),
-                      ItemWidget(itemId: '5', iconPath: AppIcons.scanBill, name: 'Trích xuất hóa đơn'),
-                      ItemWidget(itemId: '6', iconPath: AppIcons.shopList, name: 'Danh sách mua sắm'),
-                      ItemWidget(itemId: '7', iconPath: AppIcons.limitTransaction, name: 'Hạn mức thu/chi'),
-                      ItemWidget(
-                        itemId: '8',
-                        iconPath: AppIcons.debtTracking,
-                        onTap: () {
-                          context.push(AppRoutes.loanTracking);
-                        },
-                        name: 'Theo dõi vay nợ',
+                      const SizedBox(width: 8),
+                      Text(
+                        'Tính năng',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18.sp,
+                          letterSpacing: 0.5,
+                        ),
                       ),
                     ],
+                  ),
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.03),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                    ),
+                    child: CategoryGridView(
+                      numberItemPerPage: 3,
+                      categories: [
+                        ItemWidget(
+                          itemId: '1',
+                          iconPath: AppIcons.interface,
+                          name: 'Giao diện',
+                          onTap: () {
+                            _showThemeSelectionSheet(context);
+                          },
+                        ),
+                        ItemWidget(itemId: '2', iconPath: AppIcons.sampleRecord, name: 'Ghi chép mẫu'),
+                        ItemWidget(
+                          itemId: '3',
+                          iconPath: AppIcons.categoryRecord,
+                          name: 'Hạng mục thu chi',
+                          onTap: () => context.pushNamed('categoryManagement'),
+                        ),
+                        ItemWidget(
+                          itemId: '4',
+                          icon: Icons.account_balance_outlined,
+                          name: 'Quản lý ngân sách',
+                          onTap: () => context.pushNamed('budgets'),
+                        ),
+                        ItemWidget(itemId: '5', iconPath: AppIcons.scanBill, name: 'Trích xuất hóa đơn'),
+                        ItemWidget(itemId: '6', iconPath: AppIcons.shopList, name: 'Danh sách mua sắm'),
+                        ItemWidget(itemId: '7', iconPath: AppIcons.limitTransaction, name: 'Hạn mức thu/chi'),
+                        ItemWidget(
+                          itemId: '8',
+                          iconPath: AppIcons.debtTracking,
+                          onTap: () {
+                            context.push(AppRoutes.loanTracking);
+                          },
+                          name: 'Theo dõi vay nợ',
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 8),
           ],
         ),
       ),

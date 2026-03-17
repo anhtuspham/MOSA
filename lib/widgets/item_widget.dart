@@ -28,31 +28,52 @@ class ItemWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return InkWell(
       onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: crossAxisAlignment ?? CrossAxisAlignment.center,
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.white, // Nền trắng đảm bảo logo luôn nổi bật bất kể theme
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.5), width: 1),
+              color: colorScheme.surface,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: colorScheme.shadow.withValues(alpha: 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+              border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.3), width: 1),
             ),
             child:
                 icon != null
-                    ? Icon(icon, color: Colors.black)
-                    : category?.getIcon() ?? Image.asset(iconPath ?? 'assets/icons/default.png', width: 24, height: 24),
+                    ? Icon(icon, color: colorScheme.primary, size: 28)
+                    : category?.getIcon() ??
+                        Image.asset(
+                          iconPath ?? 'assets/icons/default.png',
+                          width: 28,
+                          height: 28,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Icon(Icons.category_outlined, color: colorScheme.primary);
+                          },
+                        ),
           ),
-          const SizedBox(height: 4),
-          Text(
-            category?.name ?? name ?? '',
-            style: TextStyle(fontSize: 11),
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Text(
+              category?.name ?? name ?? '',
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: colorScheme.onSurface, height: 1.2),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         ],
       ),

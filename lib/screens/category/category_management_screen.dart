@@ -17,18 +17,16 @@ class _CategoryManagementScreenState extends ConsumerState<CategoryManagementScr
 
   void _showAddCategorySheet() {
     final defaultType = switch (_currentIndex) {
-      0 => 'income',
-      1 => 'expense',
-      2 => 'other',
-      _ => 'income',
+      0 => 'expense',
+      1 => 'income',
+      // 2 => 'other',
+      _ => 'expense',
     };
-    
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (context) => CategoryFormBottomSheet(
-        initialType: defaultType,
-      ),
+      builder: (context) => CategoryFormBottomSheet(initialType: defaultType),
     );
   }
 
@@ -36,30 +34,20 @@ class _CategoryManagementScreenState extends ConsumerState<CategoryManagementScr
   Widget build(BuildContext context) {
     return CommonScaffold(
       title: const Text('Quản lý hạng mục'),
-      leading: IconButton(
-        onPressed: () => context.pop(),
-        icon: const Icon(Icons.arrow_back),
-      ),
+      leading: IconButton(onPressed: () => context.pop(), icon: const Icon(Icons.arrow_back)),
       appBarBackgroundColor: Theme.of(context).colorScheme.surface,
-      tabs: const [
-        Tab(child: Text('Thu nhập')),
-        Tab(child: Text('Chi tiêu')),
-        Tab(child: Text('Khác')),
-      ],
-      children: const [
-        CategoryManagementTab(categoryType: 'income'),
-        CategoryManagementTab(categoryType: 'expense'),
-        CategoryManagementTab(categoryType: 'other'),
-      ],
+      tabs: const [Tab(child: Text('Chi tiêu')), Tab(child: Text('Thu nhập'))],
       onTabChanged: (index) {
         setState(() {
           _currentIndex = index;
         });
       },
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showAddCategorySheet,
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: FloatingActionButton(onPressed: _showAddCategorySheet, child: const Icon(Icons.add)),
+      children: const [
+        CategoryManagementTab(categoryType: 'expense'),
+        CategoryManagementTab(categoryType: 'income'),
+        // CategoryManagementTab(categoryType: 'other'),
+      ],
     );
   }
 }
