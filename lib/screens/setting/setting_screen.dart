@@ -104,7 +104,7 @@ class SettingsShellScreen extends StatelessWidget {
                     child: CategoryGridView(
                       numberItemPerPage: 3,
                       categories: [
-                        ItemWidget(
+                        ItemWidget.iconPath(
                           itemId: '1',
                           iconPath: AppIcons.interface,
                           name: 'Giao diện',
@@ -112,23 +112,23 @@ class SettingsShellScreen extends StatelessWidget {
                             _showThemeSelectionSheet(context);
                           },
                         ),
-                        ItemWidget(itemId: '2', iconPath: AppIcons.sampleRecord, name: 'Ghi chép mẫu'),
-                        ItemWidget(
+                        ItemWidget.iconPath(itemId: '2', iconPath: AppIcons.sampleRecord, name: 'Ghi chép mẫu'),
+                        ItemWidget.iconPath(
                           itemId: '3',
                           iconPath: AppIcons.categoryRecord,
                           name: 'Hạng mục thu chi',
                           onTap: () => context.pushNamed('categoryManagement'),
                         ),
-                        ItemWidget(
+                        ItemWidget.icon(
                           itemId: '4',
                           icon: Icons.account_balance_outlined,
                           name: 'Quản lý ngân sách',
                           onTap: () => context.pushNamed('budgets'),
                         ),
-                        ItemWidget(itemId: '5', iconPath: AppIcons.scanBill, name: 'Trích xuất hóa đơn'),
-                        ItemWidget(itemId: '6', iconPath: AppIcons.shopList, name: 'Danh sách mua sắm'),
-                        ItemWidget(itemId: '7', iconPath: AppIcons.limitTransaction, name: 'Hạn mức thu/chi'),
-                        ItemWidget(
+                        ItemWidget.iconPath(itemId: '5', iconPath: AppIcons.scanBill, name: 'Trích xuất hóa đơn'),
+                        ItemWidget.iconPath(itemId: '6', iconPath: AppIcons.shopList, name: 'Danh sách mua sắm'),
+                        ItemWidget.iconPath(itemId: '7', iconPath: AppIcons.limitTransaction, name: 'Hạn mức thu/chi'),
+                        ItemWidget.iconPath(
                           itemId: '8',
                           iconPath: AppIcons.debtTracking,
                           onTap: () {

@@ -122,7 +122,7 @@ class _CategoryTabState extends ConsumerState<CategoryTab> {
                         color: Theme.of(context).colorScheme.surface,
                         margin: const EdgeInsets.symmetric(vertical: 3),
                         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-                        child: ItemWidget(
+                        child: ItemWidget.category(
                           category: category,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           onTap: () => _handleCategorySelection(context, category),
@@ -132,7 +132,7 @@ class _CategoryTabState extends ConsumerState<CategoryTab> {
                       // Nếu có con, hiển thị dạng ExpansionTile
                       return CustomExpansionTile(
                         initialExpand: true,
-                        header: ItemWidget(
+                        header: ItemWidget.category(
                           category: category,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           onTap: () => _handleCategorySelection(context, category),
@@ -149,7 +149,7 @@ class _CategoryTabState extends ConsumerState<CategoryTab> {
                             ),
                             itemBuilder: (context, index) {
                               final child = category.children![index];
-                              return ItemWidget(category: child, onTap: () => _handleCategorySelection(context, child));
+                              return ItemWidget.category(category: child, onTap: () => _handleCategorySelection(context, child));
                             },
                           ),
                         ],
