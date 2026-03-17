@@ -38,7 +38,7 @@ class _IncomeScreenState extends ConsumerState<IncomeScreen> {
             Container(
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               margin: const EdgeInsets.symmetric(vertical: 12),
-              decoration: BoxDecoration(color: Colors.white),
+              decoration: BoxDecoration(color: Theme.of(context).colorScheme.onPrimary),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

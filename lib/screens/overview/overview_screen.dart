@@ -8,8 +8,8 @@ import 'package:mosa/utils/helpers.dart';
 import 'package:mosa/utils/utils.dart';
 import 'package:mosa/screens/overview/widgets/transaction_in_period_time.dart';
 
-
 import 'package:mosa/utils/toast.dart';
+import 'package:mosa/widgets/section_container.dart';
 
 class OverviewScreen extends ConsumerStatefulWidget {
   const OverviewScreen({super.key});
@@ -23,45 +23,46 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
   Widget build(BuildContext context) {
     final groupedTransactions = ref.watch(transactionGroupByDateProvider);
 
-    return RefreshIndicator(
-      onRefresh: _handleOnRefresh,
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(color: Colors.white),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Lịch sử ghi chép',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  selectDateTypeDropdown(),
-                ],
+    return SectionContainer(
+      child: RefreshIndicator(
+        onRefresh: _handleOnRefresh,
+        color: Theme.of(context).colorScheme.primary,
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Lịch sử ghi chép', style: TextStyle(fontWeight: FontWeight.bold)),
+                    selectDateTypeDropdown(),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            overviewDataSection(),
-            const SizedBox(height: 8),
-            groupedTransactions.when(
-              data: (grouped) {
-                return ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: grouped.length,
-                  itemBuilder: (context, index) {
-                    final date = grouped.keys.elementAt(index);
-                    // list transaction item
-                    return TransactionInPeriodTime(date: date);
-                  },
-                );
-              },
-              error: (_, _) => Center(child: Text('Error')),
-              loading: () => CircularProgressIndicator(),
-            ),
-          ],
+              const SizedBox(height: 8),
+              // overviewDataSection(),
+              const SizedBox(height: 8),
+              groupedTransactions.when(
+                data: (grouped) {
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: grouped.length,
+                    itemBuilder: (context, index) {
+                      final date = grouped.keys.elementAt(index);
+                      // list transaction item
+                      return TransactionInPeriodTime(date: date);
+                    },
+                  );
+                },
+                error: (_, _) => Center(child: Text('Error')),
+                loading: () => CircularProgressIndicator(),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -73,17 +74,14 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
     return PopupMenuButton(
       initialValue: dateFilterNotifier.name,
       onSelected: (value) {
-        ref.read(dateRangeFilterProvider.notifier).state = DateRangeFilter
-            .values
-            .firstWhere((element) => element.name == value);
+        ref.read(dateRangeFilterProvider.notifier).state = DateRangeFilter.values.firstWhere(
+          (element) => element.name == value,
+        );
       },
       itemBuilder:
           (context) =>
               DateRangeFilter.values.map((e) {
-                return PopupMenuItem(
-                  value: e.name,
-                  child: Text(_getFilterLabel(e)),
-                );
+                return PopupMenuItem(value: e.name, child: Text(_getFilterLabel(e)));
               }).toList(),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -93,10 +91,7 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
         ),
         child: Row(
           children: [
-            Text(
-              _getFilterLabel(dateFilterNotifier),
-              style: TextStyle(fontWeight: FontWeight.w500),
-            ),
+            Text(_getFilterLabel(dateFilterNotifier), style: TextStyle(fontWeight: FontWeight.w500)),
             const Icon(Icons.keyboard_arrow_down),
           ],
         ),
@@ -110,7 +105,7 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(color: Colors.white),
+      decoration: BoxDecoration(color: Theme.of(context).colorScheme.onPrimary),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
@@ -121,9 +116,7 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
                 Text(
                   Helpers.formatCurrency(totalIncome),
                   style: TextStyle(
-                    color: getTransactionTypeColor(
-                      type: TransactionType.income,
-                    ),
+                    color: getTransactionTypeColor(type: TransactionType.income),
                     fontSize: 18,
                     fontWeight: FontWeight.w500,
                   ),
@@ -144,9 +137,7 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
                 Text(
                   Helpers.formatCurrency(totalExpense),
                   style: TextStyle(
-                    color: getTransactionTypeColor(
-                      type: TransactionType.expense,
-                    ),
+                    color: getTransactionTypeColor(type: TransactionType.expense),
                     fontSize: 18,
                     fontWeight: FontWeight.w500,
                   ),

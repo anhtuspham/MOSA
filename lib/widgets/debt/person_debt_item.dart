@@ -29,26 +29,15 @@ class PersonDebtItem extends ConsumerWidget {
     final debt = isLent ? debtLent : debtBorrowed;
 
     return CustomListTile(
-      leading: CircleAvatar(
-        child: Text(person?.name.substring(0, 1).toUpperCase() ?? 'T'),
-      ),
-      title: Text(
-        person?.name ?? 'Unknown',
-        style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.sp),
-      ),
+      leading: CircleAvatar(child: Text(person?.name.substring(0, 1).toUpperCase() ?? 'T')),
+      title: Text(person?.name ?? 'Unknown', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.sp)),
       trailing: Row(
         children: [
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               handleShowBottomSheet != null
-                  ? Text(
-                    Helpers.formatCurrency(debt.totalDebt),
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      color: AppColors.textPrimary,
-                    ),
-                  )
+                  ? Text(Helpers.formatCurrency(debt.totalDebt), style: TextStyle(fontSize: 16.sp))
                   : const SizedBox(),
               Text(
                 Helpers.formatCurrency(debt.totalDebtRemaining),

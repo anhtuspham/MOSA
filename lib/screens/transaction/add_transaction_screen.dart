@@ -34,15 +34,13 @@ class AddTransactionScreen extends ConsumerStatefulWidget {
   const AddTransactionScreen({super.key});
 
   @override
-  ConsumerState<AddTransactionScreen> createState() =>
-      _AddTransactionScreenState();
+  ConsumerState<AddTransactionScreen> createState() => _AddTransactionScreenState();
 }
 
 class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _noteController = TextEditingController();
-  final TextEditingController _actualBalanceController =
-      TextEditingController();
+  final TextEditingController _actualBalanceController = TextEditingController();
   late DateTime _selectedDateTime = DateTime.now();
   DateTime? _selectedLoanDateTime;
 
@@ -55,8 +53,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   /// Khởi tạo dữ liệu điền trước từ provider
   void _initializePrefillData() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(activeTransactionTypeProvider.notifier).state =
-          TransactionType.expense;
+      ref.read(activeTransactionTypeProvider.notifier).state = TransactionType.expense;
       final prefill = ref.read(transactionPrefillDataProvider);
       if (prefill != null) {
         _applyPrefill(prefill);
@@ -77,9 +74,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       ref.read(selectedPersonProvider.notifier).state = prefill.person;
     }
     if (prefill.category != null) {
-      ref
-          .read(selectedCategoryProvider.notifier)
-          .selectCategory(prefill.category);
+      ref.read(selectedCategoryProvider.notifier).selectCategory(prefill.category);
     }
   }
 
@@ -94,29 +89,20 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   @override
   Widget build(BuildContext context) {
     _listenToPrefillChanges();
-    final selectedTransactionType =
-        ref.watch(activeTransactionTypeProvider) ?? TransactionType.expense;
-
+    final selectedTransactionType = ref.watch(activeTransactionTypeProvider) ?? TransactionType.expense;
     return CommonScaffold(
       title: _buildAppBarTitle(),
       centerTitle: true,
       leading: const Icon(Icons.history),
-      actions: [
-        IconButton(onPressed: _saveTransaction, icon: const Icon(Icons.check)),
-      ],
-      appBarBackgroundColor: AppColors.primaryBackground,
-      body: SectionContainer(
-        child: _buildTransactionDetail(selectedTransactionType),
-      ),
+      actions: [IconButton(onPressed: _saveTransaction, icon: const Icon(Icons.check))],
+      appBarBackgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+      body: SectionContainer(child: _buildTransactionDetail(selectedTransactionType)),
     );
   }
 
   /// Lắng nghe thay đổi của dữ liệu điền trước
   void _listenToPrefillChanges() {
-    ref.listen<TransactionPrefill?>(transactionPrefillDataProvider, (
-      previous,
-      next,
-    ) {
+    ref.listen<TransactionPrefill?>(transactionPrefillDataProvider, (previous, next) {
       if (next != null) {
         _applyPrefill(next);
         Future.microtask(() {
@@ -135,9 +121,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       ),
       alignment: Alignment.center,
       constraints: const BoxConstraints(maxWidth: 180),
-      child: TransactionTypeDropdown(
-        onTypeChanged: (_) => _resetForm(),
-      ),
+      child: TransactionTypeDropdown(onTypeChanged: (_) => _resetForm()),
     );
   }
 
@@ -147,9 +131,11 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     _actualBalanceController.clear();
     _selectedDateTime = DateTime.now();
     _selectedLoanDateTime = null;
-    ref
-        .read(transactionPrefillDataProvider.notifier)
-        .state = TransactionPrefill(amount: 0, person: null, category: null);
+    ref.read(transactionPrefillDataProvider.notifier).state = TransactionPrefill(
+      amount: 0,
+      person: null,
+      category: null,
+    );
   }
 
   /// Phương thức lưu giao dịch chính
@@ -157,8 +143,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     if (!mounted) return;
 
     try {
-      final type =
-          ref.read(activeTransactionTypeProvider) ?? TransactionType.expense;
+      final type = ref.read(activeTransactionTypeProvider) ?? TransactionType.expense;
       final service = ref.read(transactionServiceProvider);
 
       switch (type) {
@@ -196,10 +181,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   }
 
   /// Lưu giao dịch cho vay hoặc đi vay
-  Future<void> _handleSaveLendOrBorrow(
-    TransactionService service,
-    TransactionType type,
-  ) async {
+  Future<void> _handleSaveLendOrBorrow(TransactionService service, TransactionType type) async {
     final person = ref.read(selectedPersonProvider);
     service.validatePerson(person);
     service.validateAmount(_amountController.text);
@@ -240,10 +222,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   }
 
   /// Lưu giao dịch thu nhập/chi phí thông thường
-  Future<void> _handleSaveRegularTransaction(
-    TransactionService service,
-    TransactionType type,
-  ) async {
+  Future<void> _handleSaveRegularTransaction(TransactionService service, TransactionType type) async {
     final category = ref.read(selectedCategoryProvider);
     service.validateCategory(category);
     service.validateAmount(_amountController.text);
@@ -277,18 +256,10 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
     if (type == TransactionType.income) {
       service.validatePersonDebt(person, DebtType.lent);
-      await service.saveDebtCollectionTransaction(
-        amount: amount,
-        person: person!,
-        wallet: wallet,
-      );
+      await service.saveDebtCollectionTransaction(amount: amount, person: person!, wallet: wallet);
     } else if (type == TransactionType.expense) {
       service.validatePersonDebt(person, DebtType.borrowed);
-      await service.saveDebtRepaymentTransaction(
-        amount: amount,
-        person: person!,
-        wallet: wallet,
-      );
+      await service.saveDebtRepaymentTransaction(amount: amount, person: person!, wallet: wallet);
     }
   }
 
@@ -373,10 +344,7 @@ class _WalletAndDetailSection extends StatelessWidget {
         children: [
           const WalletSelectorSection(),
           const SizedBox(height: 8),
-          DateTimeSelectorSection(
-            selectedDateTime: selectedDateTime,
-            onDateTimeChanged: onDateTimeChanged,
-          ),
+          DateTimeSelectorSection(selectedDateTime: selectedDateTime, onDateTimeChanged: onDateTimeChanged),
           TextSelectorSection(
             controller: noteController,
             leading: const Icon(Icons.notes_sharp),
@@ -396,11 +364,7 @@ class _MediaActionSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return CardSection(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      child: MediaActionBar(
-        onMicTap: () {},
-        onImageTap: () {},
-        onCameraTap: () {},
-      ),
+      child: MediaActionBar(onMicTap: () {}, onImageTap: () {}, onCameraTap: () {}),
     );
   }
 }
@@ -456,10 +420,7 @@ class _LoanTransactionBody extends StatelessWidget {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                AmountInputSection(
-                  controller: amountController,
-                  transactionType: type,
-                ),
+                AmountInputSection(controller: amountController, transactionType: type),
                 const SizedBox(height: 12),
                 const CategorySelectorSection(),
                 const PersonSelectorSection(),
@@ -510,24 +471,12 @@ class _TransferTransactionBody extends StatelessWidget {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                AmountInputSection(
-                  controller: amountController,
-                  transactionType: TransactionType.transfer,
-                ),
+                AmountInputSection(controller: amountController, transactionType: TransactionType.transfer),
                 const SizedBox(height: 12),
-                TransferWalletSection(
-                  title: TransactionConstants.fromAccountLabel,
-                  isTransferOut: true,
-                ),
-                TransferWalletSection(
-                  title: TransactionConstants.toAccountLabel,
-                  isTransferOut: false,
-                ),
+                TransferWalletSection(title: TransactionConstants.fromAccountLabel, isTransferOut: true),
+                TransferWalletSection(title: TransactionConstants.toAccountLabel, isTransferOut: false),
                 const SizedBox(height: 12),
-                DateTimeSelectorSection(
-                  selectedDateTime: selectedDate,
-                  onDateTimeChanged: onDateChanged,
-                ),
+                DateTimeSelectorSection(selectedDateTime: selectedDate, onDateTimeChanged: onDateChanged),
                 TextSelectorSection(
                   controller: noteController,
                   leading: const Icon(Icons.notes_sharp),
@@ -570,14 +519,9 @@ class _AdjustBalanceBody extends StatelessWidget {
               children: [
                 const WalletSelectorSection(),
                 const SizedBox(height: 12),
-                AdjustBalanceSection(
-                  actualBalanceController: actualBalanceController,
-                ),
+                AdjustBalanceSection(actualBalanceController: actualBalanceController),
                 const SizedBox(height: 12),
-                DateTimeSelectorSection(
-                  selectedDateTime: selectedDate,
-                  onDateTimeChanged: onDateChanged,
-                ),
+                DateTimeSelectorSection(selectedDateTime: selectedDate, onDateTimeChanged: onDateChanged),
                 TextSelectorSection(
                   controller: noteController,
                   leading: const Icon(Icons.notes_sharp),
@@ -630,10 +574,7 @@ class _DefaultTransactionBody extends ConsumerWidget {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                AmountInputSection(
-                  controller: amountController,
-                  transactionType: type,
-                ),
+                AmountInputSection(controller: amountController, transactionType: type),
                 const SizedBox(height: 12),
                 const CategorySelectorSection(),
                 const SizedBox(height: 12),

@@ -6,6 +6,7 @@ import 'package:mosa/router/app_routes.dart';
 import 'package:mosa/widgets/custom_list_tile.dart';
 import 'package:mosa/widgets/error_widget.dart';
 import 'package:mosa/widgets/loading_widget.dart';
+import 'package:mosa/widgets/logo_container.dart';
 
 /// Widget for wallet selection section
 class WalletSelectorSection extends ConsumerWidget {
@@ -18,7 +19,7 @@ class WalletSelectorSection extends ConsumerWidget {
     return effectiveWallet.when(
       data: (walletData) {
         return CustomListTile(
-          leading: Image.asset(walletData.iconPath, width: 22),
+          leading: LogoContainer(assetPath: walletData.iconPath, size: 18),
           title: Text(walletData.name),
           trailing: const Icon(Icons.chevron_right),
           onTap: () {

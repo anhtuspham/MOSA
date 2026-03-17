@@ -15,32 +15,20 @@ class TransactionInPeriodTime extends ConsumerStatefulWidget {
   final String typeDate;
   final DateTime date;
 
-  const TransactionInPeriodTime({
-    super.key,
-    this.typeDate = 'day',
-    required this.date,
-  });
+  const TransactionInPeriodTime({super.key, this.typeDate = 'day', required this.date});
 
   @override
-  ConsumerState<TransactionInPeriodTime> createState() =>
-      _TransactionInPeriodTimeState();
+  ConsumerState<TransactionInPeriodTime> createState() => _TransactionInPeriodTimeState();
 }
 
-class _TransactionInPeriodTimeState
-    extends ConsumerState<TransactionInPeriodTime> {
+class _TransactionInPeriodTimeState extends ConsumerState<TransactionInPeriodTime> {
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(color: Colors.white),
-      child: Column(
-        children: [
-          dateHeaderSection(),
-          const SizedBox(height: 8),
-          transactionListSection(),
-        ],
-      ),
+      decoration: BoxDecoration(color: Theme.of(context).colorScheme.onPrimary),
+      child: Column(children: [dateHeaderSection(), const SizedBox(height: 8), transactionListSection()]),
     );
   }
 
@@ -52,10 +40,7 @@ class _TransactionInPeriodTimeState
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              convertDateTimeToString(widget.date),
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
+            Text(convertDateTimeToString(widget.date), style: TextStyle(fontWeight: FontWeight.bold)),
             Text(widget.date.weekdayLabel),
           ],
         ),
@@ -67,22 +52,12 @@ class _TransactionInPeriodTimeState
                   if (totalData.income > 0)
                     Text(
                       Helpers.formatCurrency(totalData.income),
-                      style: TextStyle(
-                        color: getTransactionTypeColor(
-                          type: TransactionType.income,
-                        ),
-                        fontSize: 14,
-                      ),
+                      style: TextStyle(color: getTransactionTypeColor(type: TransactionType.income), fontSize: 14),
                     ),
                   if (totalData.expense > 0)
                     Text(
                       Helpers.formatCurrency(totalData.expense),
-                      style: TextStyle(
-                        color: getTransactionTypeColor(
-                          type: TransactionType.expense,
-                        ),
-                        fontSize: 14,
-                      ),
+                      style: TextStyle(color: getTransactionTypeColor(type: TransactionType.expense), fontSize: 14),
                     ),
                 ],
               ),
@@ -94,12 +69,8 @@ class _TransactionInPeriodTimeState
   }
 
   Widget transactionListSection() {
-    final enrichedTransactionGroupState = ref.watch(
-      enrichedTransactionGroupByDateProvider,
-    );
-    final enrichedTransactionOfDay = enrichedTransactionGroupState.whenData(
-      (group) => group[widget.date] ?? [],
-    );
+    final enrichedTransactionGroupState = ref.watch(enrichedTransactionGroupByDateProvider);
+    final enrichedTransactionOfDay = enrichedTransactionGroupState.whenData((group) => group[widget.date] ?? []);
 
     return enrichedTransactionOfDay.when(
       data: (enrichedData) {
@@ -109,10 +80,7 @@ class _TransactionInPeriodTimeState
           physics: NeverScrollableScrollPhysics(),
           itemBuilder: (context, index) {
             final item = enrichedData[index];
-            return TransactionItem(
-              category: item.category ?? Category.empty(),
-              transaction: item.transaction,
-            );
+            return TransactionItem(category: item.category ?? Category.empty(), transaction: item.transaction);
           },
         );
       },

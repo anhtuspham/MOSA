@@ -2,32 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mosa/config/tab_bar_config.dart';
 
-/// A reusable scaffold widget that provides consistent structure for screens with optional tab navigation.
+/// Widget scaffold dùng chung cho toàn bộ màn hình trong ứng dụng MOSA.
 ///
-/// This widget serves as a unified solution for building screens in the app, handling both
-/// simple screens and complex tabbed interfaces. It automatically manages [TabController]
-/// lifecycle and provides a clean API for common AppBar configurations.
+/// Cung cấp AppBar thống nhất và hỗ trợ điều hướng theo tab.
+/// Tự động quản lý vòng đời [TabController] khi dùng tab.
 ///
-/// ## Usage Modes
+/// ## Các chế độ sử dụng
 ///
-/// ### Mode 1: Simple Screen (No Tabs)
-/// Use this mode for standard screens without tab navigation:
+/// ### Chế độ 1: Màn hình đơn (không có tab)
 /// ```dart
 /// CommonScaffold(
-///   title: Text('Profile'),
+///   title: Text('Hồ sơ'),
 ///   body: ProfileScreen(),
 /// )
 /// ```
 ///
-/// ### Mode 2: Tabbed Screen with Automatic TabBarView
-/// The recommended approach for most tabbed screens. Automatically creates and manages
-/// a [TabBarView] with the provided children:
+/// ### Chế độ 2: Màn hình có tab — tự động tạo [TabBarView]
+/// Khuyến nghị cho hầu hết các màn hình có tab:
 /// ```dart
 /// CommonScaffold(
-///   title: Text('Statistics'),
+///   title: Text('Thống kê'),
 ///   tabs: [
-///     Tab(text: 'Income'),
-///     Tab(text: 'Expense'),
+///     Tab(text: 'Thu nhập'),
+///     Tab(text: 'Chi tiêu'),
 ///   ],
 ///   children: [
 ///     IncomeStatsScreen(),
@@ -36,121 +33,83 @@ import 'package:mosa/config/tab_bar_config.dart';
 /// )
 /// ```
 ///
-/// ### Mode 3: Tabbed Screen with Manual Body Control
-/// Use this when you need custom TabBarView configuration or complex nested navigation:
+/// ### Chế độ 3: Màn hình có tab — tự quản lý [TabBarView]
+/// Dùng khi cần cấu hình đặc biệt (ví dụ: tắt swipe):
 /// ```dart
 /// CommonScaffold(
-///   title: Text('Debt Management'),
+///   title: Text('Quản lý nợ'),
 ///   tabs: [
-///     Tab(icon: Icon(Icons.arrow_upward), text: 'Lent'),
-///     Tab(icon: Icon(Icons.arrow_downward), text: 'Borrowed'),
+///     Tab(icon: Icon(Icons.arrow_upward), text: 'Cho vay'),
+///     Tab(icon: Icon(Icons.arrow_downward), text: 'Đi vay'),
 ///   ],
 ///   body: TabBarView(
 ///     physics: NeverScrollableScrollPhysics(),
-///     children: [
-///       LentDebtsScreen(),
-///       BorrowedDebtsScreen(),
-///     ],
+///     children: [LentScreen(), BorrowedScreen()],
 ///   ),
 /// )
 /// ```
 ///
-/// ## Key Features
-///
-/// - **Automatic State Management**: Handles [TabController] creation, updates, and disposal
-/// - **Dynamic Tab Updates**: Safely handles tab count changes and tab addition/removal
-/// - **Memory Efficient**: Properly disposes controllers and removes listeners to prevent leaks
-/// - **Flexible Styling**: Supports custom [TabBarConfig] for consistent theming
-/// - **Callback Support**: Optional [onTabChanged] for analytics or data refreshing
-/// - **Screen Util Integration**: Uses flutter_screenutil for responsive sizing
-///
-/// ## Important Notes
-///
-/// - When using tabs, either [children] (recommended) or [body] must be provided
-/// - The number of [children] must match the number of [tabs]
-/// - The widget uses [TickerProviderStateMixin] for smooth tab animations
-/// - Tab controllers are automatically recreated when tab count changes
+/// ## Lưu ý quan trọng
+/// - Khi có tab: cung cấp [children] (khuyến nghị) hoặc [body].
+/// - Số lượng [children] phải bằng số lượng [tabs].
+/// - Dùng [TickerProviderStateMixin] để hỗ trợ animation tab mượt mà.
 class CommonScaffold extends StatefulWidget {
-  /// The primary title widget displayed in the center or start of the AppBar.
-  /// Typically a [Text] widget with the screen name.
+  /// Tiêu đề hiển thị trên AppBar. Thường là widget [Text].
   final Widget title;
 
-  /// Widget displayed at the start of the AppBar before the title.
-  /// Commonly used for back buttons, drawer menu icons, or custom navigation.
+  /// Widget ở đầu AppBar (bên trái). Thường là nút Back hoặc icon menu.
   final Widget? leading;
 
-  /// Action widgets displayed at the end of the AppBar.
-  /// Commonly used for search, settings, or overflow menu buttons.
+  /// Danh sách widget hành động ở cuối AppBar (bên phải).
   final List<Widget>? actions;
 
-  /// Tab widgets that define the navigation options.
-  /// Each tab typically contains text, an icon, or both.
-  /// When null or empty, the scaffold displays without a TabBar.
-  /// The number of tabs must match the number of children in the body when using tabs.
+  /// Danh sách tab hiển thị trên AppBar.
+  /// Khi null hoặc rỗng, màn hình hiển thị không có tab.
   final List<Widget>? tabs;
 
-  /// Custom body widget for advanced use cases.
-  /// When provided, you're responsible for managing the TabBarView and controller.
-  /// For simpler usage, prefer the [children] parameter instead.
+  /// Widget nội dung chính.
+  /// Dùng khi không có tab, hoặc khi tự quản lý [TabBarView] (chế độ 3).
+  /// Nếu có [children], ưu tiên dùng [children] thay thế.
   final Widget? body;
 
-  /// Content widgets for each tab.
-  /// When provided with tabs, automatically creates a managed TabBarView.
-  /// This is the recommended approach for most tab-based use cases.
-  /// The number of children must match the number of tabs.
-  /// Ignored when tabs are not provided.
+  /// Danh sách widget nội dung tương ứng với từng tab.
+  /// Khi cung cấp cùng [tabs], widget sẽ tự động tạo và quản lý [TabBarView].
+  /// Số phần tử phải bằng số lượng [tabs].
   final List<Widget>? children;
 
-  /// Whether to center the title text in the AppBar.
-  /// Defaults to false, which aligns the title to the start (left).
+  /// Có căn giữa tiêu đề trên AppBar không. Mặc định: `false`.
   final bool? centerTitle;
 
-  /// Styling configuration for the TabBar.
-  /// Controls indicator appearance, text styles, padding, and physics.
-  /// If not provided, uses default theme-based configuration.
+  /// Cấu hình giao diện cho TabBar (màu indicator, style chữ, v.v.).
+  /// Nếu không cung cấp, dùng cấu hình mặc định từ theme.
   final TabBarConfig? tabBarConfig;
 
-  /// Background color of the AppBar.
-  /// Defaults to theme's inversePrimary color if not specified.
+  /// Màu nền AppBar. Mặc định dùng màu `onSecondary` từ ColorScheme.
   final Color? appBarBackgroundColor;
 
-  /// Called when the user selects a different tab.
-  /// Receives the index of the newly selected tab.
-  /// Useful for analytics tracking or lazy data loading.
+  /// Callback được gọi khi người dùng chuyển tab.
+  /// Nhận vào chỉ số (index) của tab mới được chọn.
   final ValueChanged<int>? onTabChanged;
 
-  /// Index of the tab to display initially.
-  /// Must be valid within the range of available tabs.
+  /// Chỉ số tab được chọn mặc định khi khởi tạo. Mặc định: `0`.
   final int initialIndex;
 
-  /// Controls the shadow elevation of the AppBar.
-  /// Set to false for a flat appearance.
+  /// Có hiển thị bóng đổ (shadow) cho AppBar không. Mặc định: `true`.
   final bool elevation;
 
-  /// Override the default AppBar height.
-  /// Useful for creating more compact or spacious headers.
+  /// Chiều cao tùy chỉnh cho AppBar. Nếu null, dùng chiều cao mặc định.
   final double? appBarHeight;
 
-  /// Floating action button displayed over the content.
-  /// Typically used for primary actions like 'Add' or 'Create'.
+  /// Nút hành động nổi (FAB) hiển thị phía trên nội dung.
   final FloatingActionButton? floatingActionButton;
 
-  /// Creates a [CommonScaffold] with consistent AppBar and optional tab navigation.
+  /// Tạo [CommonScaffold] với AppBar thống nhất và hỗ trợ điều hướng tab tùy chọn.
   ///
-  /// The [title] parameter is required and displayed in the AppBar.
+  /// Bắt buộc cung cấp [title] và ít nhất một trong [body] hoặc [children].
   ///
-  /// For screens without tabs, provide either:
-  /// - [body]: A single widget for the screen content
-  /// - [children]: A list with one widget (less common)
-  ///
-  /// For screens with tabs, provide:
-  /// - [tabs]: List of Tab widgets defining navigation options
-  /// - [children]: Matching list of content widgets (recommended), OR
-  /// - [body]: Custom TabBarView for advanced use cases
-  ///
-  /// Throws [AssertionError] if:
-  /// - Neither [body] nor [children] is provided
-  /// - [tabs] count doesn't match [children] count
+  /// Ném [AssertionError] nếu:
+  /// - Không cung cấp cả [body] lẫn [children].
+  /// - Số lượng [children] không khớp với [tabs] (khi không dùng [body]).
   CommonScaffold({
     super.key,
     required this.title,
@@ -169,144 +128,104 @@ class CommonScaffold extends StatefulWidget {
     this.floatingActionButton,
   }) : assert(
          body != null || children != null,
-         'Either body or children must be provided',
+         'Phải cung cấp body hoặc children',
        ),
        assert(
          tabs == null ||
              tabs.isEmpty ||
              (children != null && children.length == tabs.length) ||
              body != null,
-         'When using tabs, either provide children with matching length or a custom body',
+         'Khi dùng tabs, phải cung cấp children với số lượng tương ứng hoặc body tùy chỉnh',
        );
 
   @override
   State<CommonScaffold> createState() => _CommonScaffoldState();
 }
 
-/// Private state class for [CommonScaffold].
+/// State nội bộ của [CommonScaffold].
 ///
-/// Manages the lifecycle of [TabController] and handles dynamic updates to tabs.
-/// Uses [TickerProviderStateMixin] to provide animation tickers for smooth tab transitions.
+/// Quản lý vòng đời [TabController] và xử lý các thay đổi cấu hình tab động.
+/// Dùng [TickerProviderStateMixin] để cung cấp ticker cho animation tab.
 class _CommonScaffoldState extends State<CommonScaffold>
     with TickerProviderStateMixin {
-  /// Controller for managing tab selection and animation.
-  /// Only initialized when tabs are present.
-  late TabController _tabController;
+  /// Controller quản lý trạng thái và animation của tab.
+  /// Nullable — chỉ khởi tạo khi màn hình có tab, an toàn hơn so với `late`.
+  TabController? _tabController;
 
-  /// Configuration object for TabBar styling.
-  /// Initialized from widget parameter or uses defaults.
+  /// Cấu hình giao diện TabBar. Chỉ hợp lệ khi có tab.
   late TabBarConfig _tabBarConfig;
 
   @override
   void initState() {
     super.initState();
-    // Set up tab controller on first build if tabs are present
-    _initializeTabController();
+    _initTabController();
   }
 
-  /// Initializes the [TabController] and [TabBarConfig] if tabs are present.
-  ///
-  /// This method:
-  /// 1. Checks if tabs exist via [_hasTabs]
-  /// 2. Sets up tab bar styling configuration
-  /// 3. Creates a new controller with the correct tab count
-  /// 4. Attaches a listener for tab change notifications
-  ///
-  /// Called during [initState] and when tab configuration changes in [didUpdateWidget].
-  void _initializeTabController() {
-    if (_hasTabs) {
-      // Use custom config or fall back to theme-based defaults
-      _tabBarConfig = widget.tabBarConfig ?? TabBarConfig.defaultConfig();
+  /// Khởi tạo [TabController] và [TabBarConfig] nếu màn hình có tab.
+  void _initTabController() {
+    if (!_hasTabs) return;
 
-      // Create controller with animation ticker from TickerProviderStateMixin
-      _tabController = TabController(
-        length: widget.tabs!.length,
-        initialIndex: widget.initialIndex,
-        vsync: this,
-      );
+    // Dùng config tùy chỉnh hoặc fallback về config mặc định từ theme
+    _tabBarConfig = widget.tabBarConfig ?? TabBarConfig.defaultConfig();
 
-      // Listen for tab changes to notify parent widget
-      _tabController.addListener(_onTabChanged);
-    }
+    _tabController = TabController(
+      length: widget.tabs!.length,
+      initialIndex: widget.initialIndex,
+      vsync: this,
+    );
+
+    // Lắng nghe sự kiện chuyển tab để thông báo cho widget cha
+    _tabController!.addListener(_onTabChanged);
   }
 
-  /// Checks whether the widget currently has tabs configured.
-  ///
-  /// Returns true if [tabs] is non-null and contains at least one tab.
-  /// Used throughout the widget to conditionally render tab-related UI.
+  /// Kiểm tra xem màn hình có cấu hình tab hay không.
   bool get _hasTabs => widget.tabs != null && widget.tabs!.isNotEmpty;
 
-  /// Handles updates to the widget configuration.
-  ///
-  /// This method is critical for managing dynamic tab changes. It handles three scenarios:
-  ///
-  /// 1. **Tab count changed**: Disposes old controller and creates new one with updated count
-  /// 2. **Tabs added**: Creates controller when transitioning from no tabs to having tabs
-  /// 3. **Tabs removed**: Disposes controller when transitioning from tabs to no tabs
-  ///
-  /// This ensures proper memory management and prevents controller/tab count mismatches
-  /// that would cause runtime errors or UI glitches.
   @override
   void didUpdateWidget(CommonScaffold oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    // Determine if the previous widget configuration had tabs
     final hadTabs = oldWidget.tabs != null && oldWidget.tabs!.isNotEmpty;
 
-    // Scenario 1: Tab count changed (e.g., from 2 tabs to 3 tabs)
-    if (_hasTabs && hadTabs && widget.tabs!.length != oldWidget.tabs!.length) {
-      // Clean up old controller to prevent memory leak
-      _tabController.removeListener(_onTabChanged);
-      _tabController.dispose();
-      // Create new controller with updated tab count
-      _initializeTabController();
-    }
-    // Scenario 2: Switched from no tabs to having tabs
-    else if (_hasTabs && !hadTabs) {
-      _initializeTabController();
-    }
-    // Scenario 3: Switched from having tabs to no tabs
-    else if (!_hasTabs && hadTabs) {
-      // Clean up controller that's no longer needed
-      _tabController.removeListener(_onTabChanged);
-      _tabController.dispose();
+    if (_hasTabs && hadTabs) {
+      // Trường hợp số tab thay đổi: tái tạo controller với số lượng mới
+      if (widget.tabs!.length != oldWidget.tabs!.length) {
+        _disposeTabController();
+        _initTabController();
+      }
+    } else if (_hasTabs && !hadTabs) {
+      // Chuyển từ màn hình không có tab sang có tab
+      _initTabController();
+    } else if (!_hasTabs && hadTabs) {
+      // Chuyển từ màn hình có tab sang không có tab
+      _disposeTabController();
     }
   }
 
-  /// Callback invoked when the user switches tabs.
-  ///
-  /// Notifies the parent widget via [onTabChanged] callback if provided.
-  /// Useful for triggering data refreshes, analytics tracking, or other side effects.
+  /// Hủy [TabController] và gỡ listener để tránh memory leak.
+  void _disposeTabController() {
+    _tabController?.removeListener(_onTabChanged);
+    _tabController?.dispose();
+    _tabController = null;
+  }
+
+  /// Callback khi người dùng chuyển tab.
+  /// Thông báo index tab mới cho widget cha qua [onTabChanged].
   void _onTabChanged() {
-    widget.onTabChanged?.call(_tabController.index);
+    final index = _tabController?.index;
+    if (index != null) {
+      widget.onTabChanged?.call(index);
+    }
   }
 
-  /// Cleans up resources when the widget is removed from the tree.
-  ///
-  /// Ensures proper disposal of the [TabController] and removes all listeners
-  /// to prevent memory leaks. This is critical for tab-based screens that may
-  /// be frequently pushed/popped in navigation.
   @override
   void dispose() {
-    if (_hasTabs) {
-      // Remove listener first to avoid callbacks during disposal
-      _tabController.removeListener(_onTabChanged);
-      // Dispose controller to free animation resources
-      _tabController.dispose();
-    }
+    _disposeTabController();
     super.dispose();
   }
 
-  /// Creates a styled TabBar using the provided configuration.
-  ///
-  /// Applies styling from [_tabBarConfig] including:
-  /// - Indicator color, size, and weight
-  /// - Selected and unselected label text styles
-  /// - Label padding for consistent spacing
-  /// - Scroll physics for tab overflow behavior
-  ///
-  /// The [TabBar] is connected to [_tabController] for state synchronization.
-  Widget _buildStyledTabBar() {
+  /// Xây dựng [TabBar] với cấu hình giao diện từ [_tabBarConfig].
+  Widget _buildTabBar() {
     return TabBar(
       controller: _tabController,
       indicatorColor: _tabBarConfig.indicatorColor,
@@ -320,45 +239,24 @@ class _CommonScaffoldState extends State<CommonScaffold>
     );
   }
 
-  /// Constructs the main content area based on the widget configuration.
+  /// Xây dựng nội dung chính dựa trên cấu hình widget:
   ///
-  /// Three possible return values:
-  ///
-  /// 1. **No tabs mode**: Returns [body] if provided, or first [children] item, or empty widget
-  /// 2. **Auto TabBarView mode**: Creates a [TabBarView] from [children] with managed controller
-  /// 3. **Manual body mode**: Returns custom [body] that should contain its own TabBarView
-  ///
-  /// The method prioritizes [children] over [body] when tabs are present, as [children]
-  /// provides automatic controller management and is the recommended approach.
-  Widget _buildTabContent() {
-    // Scenario 1: No tabs - simple body rendering
+  /// - Không có tab → trả về [body] hoặc widget đầu tiên trong [children].
+  /// - Có tab + [children] → tự động tạo [TabBarView] (chế độ khuyến nghị).
+  /// - Có tab + [body] → trả về [body] để người dùng tự quản lý.
+  Widget _buildBody() {
     if (!_hasTabs) {
-      return widget.body ?? (widget.children?.first ?? const SizedBox.shrink());
+      return widget.body ??
+          (widget.children?.first ?? const SizedBox.shrink());
     }
 
-    // Scenario 2: Tabs with children - auto-create TabBarView
-    // This is the recommended pattern for most use cases
     if (widget.children != null) {
       return TabBarView(controller: _tabController, children: widget.children!);
     }
 
-    // Scenario 3: Tabs with custom body - advanced use case
-    // User is responsible for TabBarView and controller management
     return widget.body!;
   }
 
-  /// Builds the complete scaffold structure with AppBar and content.
-  ///
-  /// The AppBar configuration includes:
-  /// - Title, leading widget, and action buttons
-  /// - Responsive padding using flutter_screenutil
-  /// - Theme-based or custom background color
-  /// - Optional elevation for shadow effect
-  /// - Optional custom toolbar height
-  /// - TabBar in the bottom slot if tabs are present
-  ///
-  /// The body is built using [_buildTabContent] which handles both
-  /// tabbed and non-tabbed content rendering.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -366,48 +264,24 @@ class _CommonScaffoldState extends State<CommonScaffold>
         title: widget.title,
         leading: widget.leading,
         actions: widget.actions,
-        // Responsive horizontal padding for action buttons
         actionsPadding: EdgeInsets.symmetric(horizontal: 12.w),
-        // Use custom color or fall back to theme's inversePrimary
         backgroundColor:
             widget.appBarBackgroundColor ??
-            Theme.of(context).colorScheme.inversePrimary,
-        // Set elevation to 0 for flat look, or use default Material elevation
+            Theme.of(context).colorScheme.onSecondary,
+        // null → dùng elevation mặc định của Material; 0 → phẳng (không bóng)
         elevation: widget.elevation ? null : 0,
-        // Custom toolbar height for compact or spacious layouts
         toolbarHeight: widget.appBarHeight,
-        // Add TabBar at bottom of AppBar if tabs exist
         bottom:
             _hasTabs
                 ? PreferredSize(
-                  preferredSize: Size.fromHeight(kToolbarHeight),
-                  child: _buildStyledTabBar(),
+                  preferredSize: const Size.fromHeight(kToolbarHeight),
+                  child: _buildTabBar(),
                 )
                 : null,
         centerTitle: widget.centerTitle,
       ),
-      // Main content area - handles both tabbed and simple layouts
-      body: _buildTabContent(),
+      body: _buildBody(),
       floatingActionButton: widget.floatingActionButton,
     );
   }
 }
-
-/// Legacy alias maintained for backward compatibility with older code.
-///
-/// This typedef allows existing code using [CustomTabAppBar] to continue working
-/// without modifications. However, new code should use [CommonScaffold] directly.
-///
-/// **Deprecated**: This alias will be removed in a future version.
-/// Please migrate to [CommonScaffold] for better code clarity.
-///
-/// Example migration:
-/// ```dart
-/// // Old code
-/// CustomTabAppBar(title: Text('Home'), body: HomeScreen())
-///
-/// // New code
-/// CommonScaffold(title: Text('Home'), body: HomeScreen())
-/// ```
-@Deprecated('Use CommonScaffold instead. This alias will be removed in v3.0')
-typedef CustomTabAppBar = CommonScaffold;

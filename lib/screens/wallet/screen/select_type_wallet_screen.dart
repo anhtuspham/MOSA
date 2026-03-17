@@ -7,6 +7,7 @@ import 'package:mosa/widgets/custom_list_tile.dart';
 import 'package:mosa/widgets/error_widget.dart';
 import 'package:mosa/widgets/loading_widget.dart';
 import 'package:mosa/widgets/common_scaffold.dart';
+import 'package:mosa/widgets/logo_container.dart';
 
 import '../../../config/app_colors.dart';
 
@@ -14,8 +15,7 @@ class SelectTypeWalletScreen extends ConsumerStatefulWidget {
   const SelectTypeWalletScreen({super.key});
 
   @override
-  ConsumerState<SelectTypeWalletScreen> createState() =>
-      _TypeWalletScreenState();
+  ConsumerState<SelectTypeWalletScreen> createState() => _TypeWalletScreenState();
 }
 
 class _TypeWalletScreenState extends ConsumerState<SelectTypeWalletScreen> {
@@ -41,20 +41,13 @@ class _TypeWalletScreenState extends ConsumerState<SelectTypeWalletScreen> {
               final isSelected = selectTypeWalletState?.id == typeWallet.id;
               return CustomListTile(
                 title: Text(typeWallet.name ?? ''),
-                leading: Image.asset(typeWallet.iconPath ?? '', width: 30),
-                backgroundColor:
-                    isSelected ? AppColors.lightBackGroundColor : null,
+                leading: LogoContainer(assetPath: typeWallet.iconPath ?? '', size: 25),
+                backgroundColor: isSelected ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.3) : null,
                 trailing:
-                    isSelected
-                        ? IconButton(
-                          onPressed: null,
-                          icon: Icon(Icons.check, color: AppColors.primary),
-                        )
-                        : null,
+                    isSelected ? IconButton(onPressed: null, icon: Icon(Icons.check, color: AppColors.primary)) : null,
 
                 onTap: () {
-                  ref.read(selectedTypeWalletProvider.notifier).state =
-                      typeWallet;
+                  ref.read(selectedTypeWalletProvider.notifier).state = typeWallet;
                   ref.read(selectedBankProvider.notifier).state = null;
                   context.pop();
                 },

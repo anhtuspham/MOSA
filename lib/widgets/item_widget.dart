@@ -37,12 +37,13 @@ class ItemWidget extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
+              color: Colors.white, // Nền trắng đảm bảo logo luôn nổi bật bất kể theme
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.5), width: 1),
             ),
             child:
                 icon != null
-                    ? Icon(icon, color: Theme.of(context).primaryColor)
+                    ? Icon(icon, color: Colors.black)
                     : category?.getIcon() ?? Image.asset(iconPath ?? 'assets/icons/default.png', width: 24, height: 24),
           ),
           const SizedBox(height: 4),

@@ -5,6 +5,7 @@ import 'package:mosa/providers/person_provider.dart';
 import 'package:mosa/router/app_routes.dart';
 import 'package:mosa/utils/transaction_constants.dart';
 import 'package:mosa/widgets/custom_list_tile.dart';
+import 'package:mosa/widgets/logo_container.dart';
 
 /// Widget for person selection section (for loan transactions)
 class PersonSelectorSection extends ConsumerWidget {
@@ -17,12 +18,7 @@ class PersonSelectorSection extends ConsumerWidget {
     return CustomListTile(
       leading:
           selectedPerson != null
-              ? Image.asset(
-                selectedPerson.iconPath ?? 'assets/images/icon.png',
-                width: 22,
-                errorBuilder:
-                    (_, __, ___) => const Icon(Icons.person, size: 22),
-              )
+              ? LogoContainer(assetPath: selectedPerson.iconPath ?? 'assets/images/icon.png', size: 18)
               : const Icon(Icons.person_add_outlined),
       title: Text(selectedPerson?.name ?? TransactionConstants.selectPerson),
       trailing: const Icon(Icons.chevron_right),

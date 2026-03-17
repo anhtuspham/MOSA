@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mosa/providers/refresh_provider.dart';
 import 'package:mosa/utils/toast.dart';
+import 'package:mosa/widgets/common_scaffold.dart';
 
 import '../overview/income_screen.dart';
 import '../overview/outcome_screen.dart';
@@ -27,81 +28,43 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         error: (error, stackTrace) => showResultToast('Lấy dữ liệu thất bại'),
       );
     });
-    return DefaultTabController(
-      length: 3,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Xin chào!', style: TextStyle(fontSize: 12.sp)),
-              Text(
-                'Pham Anh Tu',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.sp),
+    return CommonScaffold(
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Xin chào!', style: TextStyle(fontSize: 12.sp)),
+          Text('Pham Anh Tu', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.sp)),
+        ],
+      ),
+      leading: Container(
+        margin: EdgeInsets.only(left: 8.w),
+        child: CircleAvatar(radius: 20, backgroundColor: Colors.blueAccent, child: Text('P')),
+      ),
+      actions: [
+        IconButton(
+          onPressed: refreshState.isLoading ? null : () => ref.read(refreshAllProvider.notifier).refresh(),
+          icon: Icon(Icons.sync, color: Colors.white),
+        ),
+        const SizedBox(width: 8),
+        Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Icon(Icons.notifications, color: Colors.white, size: 28),
+            Positioned(
+              right: -1,
+              top: -8,
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(color: Colors.redAccent, shape: BoxShape.circle),
+                child: Text('3', textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 12)),
               ),
-            ],
-          ),
-          leading: Container(
-            margin: EdgeInsets.only(left: 8.w),
-            child: CircleAvatar(
-              radius: 20,
-              backgroundColor: Colors.blueAccent,
-              child: Text('P'),
-            ),
-          ),
-          actionsPadding: EdgeInsets.symmetric(horizontal: 12.w),
-          actions: [
-            IconButton(
-              onPressed:
-                  refreshState.isLoading
-                      ? null
-                      : () => ref.read(refreshAllProvider.notifier).refresh(),
-              icon: Icon(Icons.sync, color: Colors.white),
-            ),
-            const SizedBox(width: 8),
-            Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Icon(Icons.notifications, color: Colors.white, size: 28),
-                Positioned(
-                  right: -1,
-                  top: -8,
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: Colors.redAccent,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Text(
-                      '3',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.white, fontSize: 12),
-                    ),
-                  ),
-                ),
-              ],
             ),
           ],
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-          bottom: TabBar(
-            indicatorColor: Colors.black,
-            indicatorSize: TabBarIndicatorSize.tab,
-            unselectedLabelStyle: TextStyle(color: Colors.white),
-            labelStyle: TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.bold,
-            ),
-            tabs: [
-              Tab(child: Text('Tất cả')),
-              Tab(child: Text('Thu nhập ')),
-              Tab(child: Text('Chi tiêu')),
-            ],
-          ),
         ),
-        body: TabBarView(
-          children: [OverviewScreen(), IncomeScreen(), OutcomeScreen()],
-        ),
-      ),
+      ],
+      appBarBackgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+      tabs: [Tab(child: Text('Tất cả')), Tab(child: Text('Thu nhập ')), Tab(child: Text('Chi tiêu'))],
+      children: [OverviewScreen(), IncomeScreen(), OutcomeScreen()],
     );
   }
 }

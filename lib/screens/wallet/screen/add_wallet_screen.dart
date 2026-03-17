@@ -5,6 +5,7 @@ import 'package:mosa/providers/bank_provider.dart';
 import 'package:mosa/providers/wallet_provider.dart';
 import 'package:mosa/utils/app_icons.dart';
 import 'package:mosa/utils/toast.dart';
+import 'package:mosa/widgets/logo_container.dart';
 import 'package:mosa/widgets/text_selector_section.dart';
 import 'package:mosa/widgets/section_container.dart';
 import 'package:mosa/widgets/common_scaffold.dart';
@@ -52,8 +53,7 @@ class _AddWalletScreenState extends ConsumerState<AddWalletScreen> {
       final newWallet = Wallet(
         id: generateId(),
         name: _walletNameController.text,
-        initialBalance:
-            double.tryParse(_amountController.text.replaceAll('.', '')) ?? 0,
+        initialBalance: double.tryParse(_amountController.text.replaceAll('.', '')) ?? 0,
         balance: 0,
         note: _noteController.text,
         typeWalletId: selectTypeWalletController?.id ?? 99,
@@ -95,16 +95,10 @@ class _AddWalletScreenState extends ConsumerState<AddWalletScreen> {
         },
         icon: Icon(Icons.arrow_back),
       ),
-      appBarBackgroundColor: AppColors.primaryBackground,
+      // appBarBackgroundColor: AppColors.primaryBackground,
       actions: [IconButton(onPressed: _submit, icon: Icon(Icons.check))],
       body: SectionContainer(
-        child: Column(
-          children: [
-            amountInputSection(),
-            const SizedBox(height: 12),
-            walletAndDetailSection(),
-          ],
-        ),
+        child: Column(children: [amountInputSection(), const SizedBox(height: 12), walletAndDetailSection()]),
       ),
     );
   }
@@ -114,10 +108,7 @@ class _AddWalletScreenState extends ConsumerState<AddWalletScreen> {
       child: Column(
         children: [
           Text('Số dư ban đầu'),
-          AmountTextField(
-            controller: _amountController,
-            amountColor: AppColors.primary,
-          ),
+          AmountTextField(controller: _amountController, amountColor: AppColors.primary),
         ],
       ),
     );
@@ -138,7 +129,7 @@ class _AddWalletScreenState extends ConsumerState<AddWalletScreen> {
           CustomListTile(
             leading:
                 selectedTypeWallet != null
-                    ? Image.asset(selectedTypeWallet.iconPath ?? '', width: 22)
+                    ? LogoContainer(assetPath: selectedTypeWallet.iconPath ?? '', size: 16)
                     : Icon(Icons.wallet_sharp),
             title: Text((selectedTypeWallet?.name ?? '')),
 
@@ -148,15 +139,8 @@ class _AddWalletScreenState extends ConsumerState<AddWalletScreen> {
             },
           ),
           const SizedBox(height: 8),
-          if (selectedTypeWallet?.id == 2) ...[
-            bankSelectorSection(),
-            const SizedBox(height: 8),
-          ],
-          TextSelectorSection(
-            controller: _noteController,
-            leading: Icon(Icons.notes_sharp),
-            hintText: 'Diễn giải',
-          ),
+          if (selectedTypeWallet?.id == 2) ...[bankSelectorSection(), const SizedBox(height: 8)],
+          TextSelectorSection(controller: _noteController, leading: Icon(Icons.notes_sharp), hintText: 'Diễn giải'),
         ],
       ),
     );
@@ -166,10 +150,7 @@ class _AddWalletScreenState extends ConsumerState<AddWalletScreen> {
     final selectedBank = ref.watch(selectedBankProvider);
 
     return CustomListTile(
-      leading:
-          selectedBank != null
-              ? Image.asset(selectedBank.iconPath, width: 22)
-              : Icon(Icons.add_circle_sharp),
+      leading: selectedBank != null ? Image.asset(selectedBank.iconPath, width: 22) : Icon(Icons.add_circle_sharp),
       title: Text((selectedBank?.name ?? 'Chọn ngân hàng')),
 
       trailing: Icon(Icons.chevron_right),

@@ -16,7 +16,7 @@ class SectionContainer extends StatelessWidget {
       margin: effectiveConfig.margin,
       padding: effectiveConfig.padding,
       decoration: BoxDecoration(
-        color: effectiveConfig.backgroundColor,
+        color: effectiveConfig.backgroundColor ?? Theme.of(context).colorScheme.surfaceContainerHigh,
         borderRadius: effectiveConfig.borderRadius,
         border: effectiveConfig.border,
         boxShadow: effectiveConfig.boxShadow,

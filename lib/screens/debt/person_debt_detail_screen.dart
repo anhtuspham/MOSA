@@ -61,7 +61,7 @@ class _PersonDebtDetailScreenState extends ConsumerState<PersonDebtDetailScreen>
         } else {
           totalBorrowedRemaining += d.remainingAmount;
         }
-        
+
         if (d.dueDate != null && d.dueDate!.isBefore(DateTime.now())) {
           hasOverdue = true;
         }
@@ -85,9 +85,11 @@ class _PersonDebtDetailScreenState extends ConsumerState<PersonDebtDetailScreen>
                   children: [
                     CircleAvatar(
                       radius: 30,
-                      backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
+                      // backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
                       child: Text(
-                        person?.name != null && person!.name.isNotEmpty ? person.name.substring(0, 1).toUpperCase() : '?',
+                        person?.name != null && person!.name.isNotEmpty
+                            ? person.name.substring(0, 1).toUpperCase()
+                            : '?',
                         style: GoogleFonts.inter(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -104,10 +106,7 @@ class _PersonDebtDetailScreenState extends ConsumerState<PersonDebtDetailScreen>
                             children: [
                               Text(
                                 person?.name ?? 'Unknown',
-                                style: GoogleFonts.inter(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.bold),
                               ),
                               if (hasOverdue) ...[
                                 const SizedBox(width: 8),
@@ -118,16 +117,20 @@ class _PersonDebtDetailScreenState extends ConsumerState<PersonDebtDetailScreen>
                                     borderRadius: BorderRadius.circular(4),
                                     border: Border.all(color: Colors.red[200]!),
                                   ),
-                                  child: Text('Quá hạn', style: GoogleFonts.inter(fontSize: 10, color: Colors.red[700], fontWeight: FontWeight.bold)),
+                                  child: Text(
+                                    'Quá hạn',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 10,
+                                      color: Colors.red[700],
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 ),
                               ],
                             ],
                           ),
                           const SizedBox(height: 4),
-                          Text(
-                            'Đối tác',
-                            style: GoogleFonts.inter(fontSize: 14, color: Colors.grey[600]),
-                          ),
+                          Text('Đối tác', style: GoogleFonts.inter(fontSize: 14, color: Colors.grey[600])),
                         ],
                       ),
                     ),
@@ -147,20 +150,22 @@ class _PersonDebtDetailScreenState extends ConsumerState<PersonDebtDetailScreen>
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Trạng thái nợ', style: GoogleFonts.inter(fontSize: 13, color: Colors.grey[600])),
+                          Text(
+                            'Trạng thái nợ',
+                            style: GoogleFonts.inter(fontSize: 13, color: Theme.of(context).hintColor),
+                          ),
                           const SizedBox(height: 4),
                           Text(
                             netBalance == 0
                                 ? 'Đã thanh toán hết'
-                                : (netBalance > 0
-                                    ? 'Người này nợ bạn'
-                                    : 'Bạn nợ người này'),
+                                : (netBalance > 0 ? 'Người này nợ bạn' : 'Bạn nợ người này'),
                             style: GoogleFonts.inter(
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
-                              color: netBalance == 0
-                                  ? Colors.green[700]
-                                  : (netBalance > 0 ? Colors.green[700] : Colors.red[700]),
+                              color:
+                                  netBalance == 0
+                                      ? Colors.green[700]
+                                      : (netBalance > 0 ? Colors.green[700] : Colors.red[700]),
                             ),
                           ),
                         ],
@@ -170,9 +175,10 @@ class _PersonDebtDetailScreenState extends ConsumerState<PersonDebtDetailScreen>
                         style: GoogleFonts.inter(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: netBalance == 0
-                              ? Colors.green[700]
-                              : (netBalance > 0 ? Colors.green[700] : Colors.red[700]),
+                          color:
+                              netBalance == 0
+                                  ? Colors.green[700]
+                                  : (netBalance > 0 ? Colors.green[700] : Colors.red[700]),
                         ),
                       ),
                     ],
@@ -181,18 +187,15 @@ class _PersonDebtDetailScreenState extends ConsumerState<PersonDebtDetailScreen>
               ],
             ),
           ),
-          
+
           // Tabs
           TabBar(
             controller: _tabController,
             labelStyle: GoogleFonts.inter(fontWeight: FontWeight.w600),
             unselectedLabelStyle: GoogleFonts.inter(fontWeight: FontWeight.normal),
-            tabs: const [
-              Tab(text: 'Danh sách nợ'),
-              Tab(text: 'Lịch sử'),
-            ],
+            tabs: const [Tab(text: 'Danh sách nợ'), Tab(text: 'Lịch sử')],
           ),
-          
+
           Expanded(
             child: TabBarView(
               controller: _tabController,
@@ -201,23 +204,23 @@ class _PersonDebtDetailScreenState extends ConsumerState<PersonDebtDetailScreen>
                 debts.isEmpty
                     ? const Center(child: Text('Chưa có khoản nợ nào.'))
                     : ListView.builder(
-                        itemCount: debts.length,
-                        itemBuilder: (context, index) {
-                          final debt = debts[index];
-                          return DebtItemCard(
-                            debt: debt,
-                            onTap: () {
-                              ref.read(selectedDebtProvider.notifier).state = debt;
-                              showModalBottomSheet(
-                                context: context,
-                                isScrollControlled: true,
-                                builder: (_) => const DebtBottomSheet(),
-                              );
-                            },
-                          );
-                        },
-                      ),
-                      
+                      itemCount: debts.length,
+                      itemBuilder: (context, index) {
+                        final debt = debts[index];
+                        return DebtItemCard(
+                          debt: debt,
+                          onTap: () {
+                            ref.read(selectedDebtProvider.notifier).state = debt;
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              builder: (_) => const DebtBottomSheet(),
+                            );
+                          },
+                        );
+                      },
+                    ),
+
                 // Tab 2: Lịch sử Timeline
                 timelineAsync.when(
                   data: (timeline) {
@@ -229,29 +232,30 @@ class _PersonDebtDetailScreenState extends ConsumerState<PersonDebtDetailScreen>
                       itemBuilder: (context, index) {
                         final record = timeline[index];
                         bool isLentContent = true;
-                        
+
                         if (record is Debt) {
                           isLentContent = record.type == DebtType.lent;
                         } else if (record is TransactionModel) {
                           final parentDebt = debts.firstWhere(
                             (d) => d.id == record.debtId,
-                            orElse: () => debts.isNotEmpty ? debts.first : Debt(
-                              personId: 0, 
-                              amount: 0, 
-                              type: DebtType.lent, 
-                              status: DebtStatus.active, 
-                              createdDate: DateTime.now(), 
-                              description: 'Unknown',
-                              walletId: 0,
-                            ),
+                            orElse:
+                                () =>
+                                    debts.isNotEmpty
+                                        ? debts.first
+                                        : Debt(
+                                          personId: 0,
+                                          amount: 0,
+                                          type: DebtType.lent,
+                                          status: DebtStatus.active,
+                                          createdDate: DateTime.now(),
+                                          description: 'Unknown',
+                                          walletId: 0,
+                                        ),
                           );
                           isLentContent = parentDebt.type == DebtType.lent;
                         }
-                        
-                        return DebtTimelineItem(
-                          record: record,
-                          isLent: isLentContent,
-                        );
+
+                        return DebtTimelineItem(record: record, isLent: isLentContent);
                       },
                     );
                   },

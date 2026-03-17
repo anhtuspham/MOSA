@@ -18,7 +18,7 @@ class CardSection extends StatelessWidget {
       margin: margin,
       padding: padding ?? const EdgeInsets.symmetric(vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.onPrimary,
         borderRadius: BorderRadius.circular(6),
       ),
       child: child,

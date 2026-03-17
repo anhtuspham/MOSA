@@ -22,7 +22,7 @@ class SectionContainerConfig {
   // Default config
   static const SectionContainerConfig defaultConfig = SectionContainerConfig(
     padding: EdgeInsets.symmetric(horizontal: 12, vertical: 18),
-    backgroundColor: AppColors.primaryBackground,
+    backgroundColor: null,
     borderRadius: BorderRadius.all(Radius.circular(10)),
   );
 
@@ -30,7 +30,7 @@ class SectionContainerConfig {
   static const SectionContainerConfig compact = SectionContainerConfig(
     padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
     margin: EdgeInsets.only(bottom: 12),
-    backgroundColor: Colors.white,
+    backgroundColor: null,
     borderRadius: BorderRadius.all(Radius.circular(10)),
   );
 
@@ -38,7 +38,7 @@ class SectionContainerConfig {
   static const SectionContainerConfig card = SectionContainerConfig(
     padding: EdgeInsets.all(16),
     margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-    backgroundColor: Colors.white,
+    backgroundColor: null,
     borderRadius: BorderRadius.all(Radius.circular(12)),
     boxShadow: [
       BoxShadow(color: Color(0x0F000000), blurRadius: 8, offset: Offset(0, 2)),
@@ -49,14 +49,14 @@ class SectionContainerConfig {
   static const SectionContainerConfig listItem = SectionContainerConfig(
     padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
     margin: EdgeInsets.only(bottom: 8),
-    backgroundColor: Colors.white,
+    backgroundColor: null,
     borderRadius: BorderRadius.all(Radius.circular(8)),
   );
 
   // No margin config
   static const SectionContainerConfig noMargin = SectionContainerConfig(
     padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-    backgroundColor: Colors.white,
+    backgroundColor: null,
     borderRadius: BorderRadius.all(Radius.circular(10)),
   );
 
@@ -64,7 +64,7 @@ class SectionContainerConfig {
   static const SectionContainerConfig noPadding = SectionContainerConfig(
     padding: EdgeInsets.zero,
     margin: EdgeInsets.only(bottom: 12),
-    backgroundColor: Colors.white,
+    backgroundColor: null,
     borderRadius: BorderRadius.all(Radius.circular(10)),
   );
 

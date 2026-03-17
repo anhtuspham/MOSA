@@ -7,28 +7,18 @@ class DebtItemCard extends StatelessWidget {
   final Debt debt;
   final VoidCallback? onTap;
 
-  const DebtItemCard({
-    super.key,
-    required this.debt,
-    this.onTap,
-  });
+  const DebtItemCard({super.key, required this.debt, this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    final currencyFormat = NumberFormat.currency(
-      locale: 'vi_VN',
-      symbol: 'đ',
-      decimalDigits: 0,
-    );
+    final currencyFormat = NumberFormat.currency(locale: 'vi_VN', symbol: 'đ', decimalDigits: 0);
     final dateFormat = DateFormat('dd/MM/yyyy');
 
     final remainingAmount = debt.amount - debt.paidAmount;
     final progress = debt.amount > 0 ? (debt.paidAmount / debt.amount) : 0.0;
-    
+
     // Check if overdue
-    final isOverdue = debt.status != DebtStatus.paid &&
-        debt.dueDate != null &&
-        debt.dueDate!.isBefore(DateTime.now());
+    final isOverdue = debt.status != DebtStatus.paid && debt.dueDate != null && debt.dueDate!.isBefore(DateTime.now());
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -53,11 +43,10 @@ class DebtItemCard extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      debt.description.isNotEmpty ? debt.description : (debt.type == DebtType.lent ? 'Khoản cho vay' : 'Khoản đi vay'),
-                      style: GoogleFonts.inter(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      debt.description.isNotEmpty
+                          ? debt.description
+                          : (debt.type == DebtType.lent ? 'Khoản cho vay' : 'Khoản đi vay'),
+                      style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -66,7 +55,7 @@ class DebtItemCard extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 12),
-              
+
               // Amounts row
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -74,26 +63,17 @@ class DebtItemCard extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Tổng cộng',
-                        style: GoogleFonts.inter(fontSize: 12, color: Colors.grey[600]),
-                      ),
+                      Text('Tổng cộng', style: GoogleFonts.inter(fontSize: 12, color: Theme.of(context).hintColor)),
                       Text(
                         currencyFormat.format(debt.amount),
-                        style: GoogleFonts.inter(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600),
                       ),
                     ],
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Text(
-                        'Còn lại',
-                        style: GoogleFonts.inter(fontSize: 12, color: Colors.grey[600]),
-                      ),
+                      Text('Còn lại', style: GoogleFonts.inter(fontSize: 12, color: Theme.of(context).hintColor)),
                       Text(
                         currencyFormat.format(remainingAmount),
                         style: GoogleFonts.inter(
@@ -107,7 +87,7 @@ class DebtItemCard extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 12),
-              
+
               // Progress bar
               ClipRRect(
                 borderRadius: BorderRadius.circular(4),
@@ -121,21 +101,21 @@ class DebtItemCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              
+
               // Dates
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     'Ngày tạo: ${dateFormat.format(debt.createdDate)}',
-                    style: GoogleFonts.inter(fontSize: 11, color: Colors.grey[500]),
+                    style: GoogleFonts.inter(fontSize: 11, color: Theme.of(context).hintColor),
                   ),
                   if (debt.dueDate != null)
                     Text(
                       'Hạn trả: ${dateFormat.format(debt.dueDate!)}',
                       style: GoogleFonts.inter(
-                        fontSize: 11, 
-                        color: isOverdue ? Colors.red : Colors.grey[500],
+                        fontSize: 11,
+                        color: isOverdue ? Colors.red : Theme.of(context).hintColor,
                         fontWeight: isOverdue ? FontWeight.w600 : FontWeight.normal,
                       ),
                     ),
@@ -183,18 +163,8 @@ class DebtItemCard extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Text(
-        text,
-        style: GoogleFonts.inter(
-          fontSize: 11,
-          fontWeight: FontWeight.w600,
-          color: textColor,
-        ),
-      ),
+      decoration: BoxDecoration(color: bgColor, borderRadius: BorderRadius.circular(12)),
+      child: Text(text, style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: textColor)),
     );
   }
 }

@@ -24,12 +24,8 @@ class _OutcomeScreenState extends ConsumerState<OutcomeScreen> {
   @override
   Widget build(BuildContext context) {
     final totalExpense = ref.watch(totalExpenseProvider);
-    final groupCategoryAsync = ref.watch(
-      transactionGroupByCategoryProvider(TransactionType.expense),
-    );
-    final pieChartAsync = ref.watch(
-      groupPieChartProvider(TransactionType.expense),
-    );
+    final groupCategoryAsync = ref.watch(transactionGroupByCategoryProvider(TransactionType.expense));
+    final pieChartAsync = ref.watch(groupPieChartProvider(TransactionType.expense));
 
     return RefreshIndicator(
       onRefresh: _handleOnRefresh,
@@ -39,15 +35,12 @@ class _OutcomeScreenState extends ConsumerState<OutcomeScreen> {
             Container(
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               margin: const EdgeInsets.symmetric(vertical: 12),
-              decoration: BoxDecoration(color: Colors.white),
+              decoration: BoxDecoration(color: Theme.of(context).colorScheme.onPrimary),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text('Tổng chi'),
-                  Text(
-                    Helpers.formatCurrency(totalExpense),
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
+                  Text(Helpers.formatCurrency(totalExpense), style: TextStyle(fontWeight: FontWeight.bold)),
                 ],
               ),
             ),
@@ -67,29 +60,20 @@ class _OutcomeScreenState extends ConsumerState<OutcomeScreen> {
                         final group = entry.value;
 
                         return ProgressInfoItem(
-                          leadingIcon:
-                              group.category?.getIcon() ?? Icon(Icons.help),
+                          leadingIcon: group.category?.getIcon() ?? Icon(Icons.help),
                           title: Text(group.category?.name ?? ''),
                           currentProgress: group.percentage / 100,
-                          linearColors:
-                              AppColors.chartColors[index %
-                                  AppColors.chartColors.length],
+                          linearColors: AppColors.chartColors[index % AppColors.chartColors.length],
                           trailing: Row(
                             children: [
                               Text(
                                 '(${group.percentage.toStringAsFixed(2)}%)',
-                                style: TextStyle(
-                                  color: Colors.grey[500],
-                                  fontSize: 11.sp,
-                                ),
+                                style: TextStyle(color: Colors.grey[500], fontSize: 11.sp),
                               ),
                               const SizedBox(width: 3),
                               Text(
                                 Helpers.formatCurrency(group.total),
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16.sp,
-                                ),
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
                               ),
                             ],
                           ),
@@ -110,17 +94,10 @@ class _OutcomeScreenState extends ConsumerState<OutcomeScreen> {
   Future<void> _handleOnRefresh() async {
     try {
       ref.invalidate(totalExpenseProvider);
-      ref.invalidate(
-        transactionGroupByCategoryProvider(TransactionType.expense),
-      );
+      ref.invalidate(transactionGroupByCategoryProvider(TransactionType.expense));
       ref.invalidate(groupPieChartProvider(TransactionType.expense));
     } catch (e, str) {
-      log(
-        'Error on refresh: $e',
-        error: e,
-        stackTrace: str,
-        name: 'OutcomeScreen',
-      );
+      log('Error on refresh: $e', error: e, stackTrace: str, name: 'OutcomeScreen');
     }
   }
 }

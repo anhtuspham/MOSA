@@ -9,6 +9,7 @@ import 'package:mosa/widgets/loading_widget.dart';
 import 'package:mosa/widgets/common_scaffold.dart';
 import 'package:mosa/config/app_colors.dart';
 import 'package:mosa/utils/toast.dart';
+import 'package:mosa/widgets/logo_container.dart';
 
 class SelectPersonScreen extends ConsumerStatefulWidget {
   const SelectPersonScreen({super.key});
@@ -25,10 +26,7 @@ class _SelectPersonScreenState extends ConsumerState<SelectPersonScreen> {
 
     return CommonScaffold(
       title: Text('Chọn người'),
-      leading: IconButton(
-        onPressed: () => context.pop(),
-        icon: const Icon(Icons.arrow_back),
-      ),
+      leading: IconButton(onPressed: () => context.pop(), icon: const Icon(Icons.arrow_back)),
       actions: [
         // Add person button
         IconButton(
@@ -44,16 +42,9 @@ class _SelectPersonScreenState extends ConsumerState<SelectPersonScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.person_outline,
-                    size: 64,
-                    color: AppColors.textSecondary,
-                  ),
+                  Icon(Icons.person_outline, size: 64, color: AppColors.textSecondary),
                   const SizedBox(height: 16),
-                  Text(
-                    'Chưa có người nào',
-                    style: TextStyle(color: AppColors.textSecondary),
-                  ),
+                  Text('Chưa có người nào', style: TextStyle(color: AppColors.textSecondary)),
                   const SizedBox(height: 8),
                   ElevatedButton.icon(
                     onPressed: () => _showAddPersonDialog(context),
@@ -73,13 +64,8 @@ class _SelectPersonScreenState extends ConsumerState<SelectPersonScreen> {
 
               return CustomListTile(
                 title: Text(person.name),
-                leading: Image.asset(
-                  person.iconPath ?? 'assets/images/icon.png',
-                  width: 30,
-                  errorBuilder: (_, __, ___) => Icon(Icons.person, size: 30),
-                ),
-                backgroundColor:
-                    isSelected ? AppColors.lightBackGroundColor : null,
+                leading: LogoContainer(assetPath: person.iconPath ?? 'assets/images/icon.png', size: 25),
+                backgroundColor: isSelected ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.3) : null,
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -117,17 +103,11 @@ class _SelectPersonScreenState extends ConsumerState<SelectPersonScreen> {
             title: Text('Thêm người mới'),
             content: TextField(
               controller: nameController,
-              decoration: InputDecoration(
-                labelText: 'Tên người',
-                hintText: 'Nhập tên người',
-              ),
+              decoration: InputDecoration(labelText: 'Tên người', hintText: 'Nhập tên người'),
               autofocus: true,
             ),
             actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text('Hủy'),
-              ),
+              TextButton(onPressed: () => Navigator.pop(context), child: Text('Hủy')),
               ElevatedButton(
                 onPressed: () async {
                   final name = nameController.text.trim();
@@ -143,9 +123,7 @@ class _SelectPersonScreenState extends ConsumerState<SelectPersonScreen> {
                       iconPath: 'assets/icons/person_default.png',
                     );
 
-                    await ref
-                        .read(personProvider.notifier)
-                        .addPerson(newPerson);
+                    await ref.read(personProvider.notifier).addPerson(newPerson);
 
                     if (mounted) {
                       Navigator.pop(context);
@@ -174,17 +152,11 @@ class _SelectPersonScreenState extends ConsumerState<SelectPersonScreen> {
             title: Text('Sửa thông tin'),
             content: TextField(
               controller: nameController,
-              decoration: InputDecoration(
-                labelText: 'Tên người',
-                hintText: 'Nhập tên người',
-              ),
+              decoration: InputDecoration(labelText: 'Tên người', hintText: 'Nhập tên người'),
               autofocus: true,
             ),
             actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text('Hủy'),
-              ),
+              TextButton(onPressed: () => Navigator.pop(context), child: Text('Hủy')),
               ElevatedButton(
                 onPressed: () async {
                   final name = nameController.text.trim();
@@ -195,9 +167,7 @@ class _SelectPersonScreenState extends ConsumerState<SelectPersonScreen> {
 
                   try {
                     final updatedPerson = person.copyWith(name: name);
-                    await ref
-                        .read(personProvider.notifier)
-                        .updatePerson(updatedPerson);
+                    await ref.read(personProvider.notifier).updatePerson(updatedPerson);
 
                     if (mounted) {
                       Navigator.pop(context);

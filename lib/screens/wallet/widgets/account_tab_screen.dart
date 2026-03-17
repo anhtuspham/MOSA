@@ -11,6 +11,7 @@ import 'package:mosa/widgets/custom_list_tile.dart';
 import 'package:mosa/widgets/custom_modal_bottom_sheet.dart';
 import 'package:mosa/widgets/error_widget.dart';
 import 'package:mosa/widgets/loading_widget.dart';
+import 'package:mosa/widgets/logo_container.dart';
 
 class AccountTabScreen extends ConsumerStatefulWidget {
   const AccountTabScreen({super.key});
@@ -29,23 +30,17 @@ class _AccountTabScreenState extends ConsumerState<AccountTabScreen> {
       children: [
         Container(
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(color: AppColors.secondary),
+          decoration: BoxDecoration(color: Theme.of(context).colorScheme.onPrimaryFixedVariant),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Tổng tiền',
-                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
-              ),
+              Text('Tổng tiền', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: Colors.white)),
               Text(
                 Helpers.formatCurrency(totalBalance),
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 16,
-                  color:
-                      totalBalance >= 0
-                          ? Theme.of(context).colorScheme.onSurface
-                          : AppColors.expense,
+                  color: totalBalance >= 0 ? Colors.white : AppColors.expense,
                 ),
               ),
             ],
@@ -62,37 +57,24 @@ class _AccountTabScreenState extends ConsumerState<AccountTabScreen> {
                       children: List.generate(wallets.length, (index) {
                         final wallet = wallets[index];
                         return CustomListTile(
-                          leading: Image.asset(wallet.iconPath, width: 30),
-                          title: Text(
-                            wallet.name,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 16,
-                            ),
-                          ),
+                          leading: LogoContainer(assetPath: wallet.iconPath),
+                          title: Text(wallet.name, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
                           subTitle: Text(
                             Helpers.formatCurrency(wallet.balance),
                             style: TextStyle(
-                              color:
-                                  wallet.balance >= 0
-                                      ? Theme.of(context).colorScheme.onSurface
-                                      : AppColors.expense,
+                              color: wallet.balance >= 0 ? Theme.of(context).colorScheme.onSurface : AppColors.expense,
                             ),
                           ),
                           trailing: IconButton(
                             onPressed: () => _handleShowBottomSheet(wallet),
-                            icon: Icon(
-                              Icons.more_vert,
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
+                            icon: Icon(Icons.more_vert, color: Theme.of(context).colorScheme.onSurface),
                           ),
                         );
                       }),
                     );
                   },
                   loading: () => LoadingSectionWidget(),
-                  error:
-                      (error, stackTrace) => ErrorSectionWidget(error: error),
+                  error: (error, stackTrace) => ErrorSectionWidget(error: error),
                 ),
               ],
             ),
@@ -111,9 +93,7 @@ class _AccountTabScreenState extends ConsumerState<AccountTabScreen> {
           title: Text('Chuyển khoản', style: TextStyle(fontSize: 16)),
           onTap: () async {
             Navigator.pop(context); // Close bottom sheet with Navigator
-            await Future.delayed(
-              Duration(milliseconds: 150),
-            ); // Wait for close animation
+            await Future.delayed(Duration(milliseconds: 150)); // Wait for close animation
             if (mounted) {
               context.go(AppRoutes.addTransaction);
             }
@@ -177,10 +157,7 @@ class _AccountTabScreenState extends ConsumerState<AccountTabScreen> {
             title: Text('Xác nhận xóa'),
             content: Text('Bạn có chắc chắn muốn xóa ví "${wallet.name}"?'),
             actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text('Hủy'),
-              ),
+              TextButton(onPressed: () => Navigator.pop(context), child: Text('Hủy')),
               TextButton(
                 onPressed: () {
                   Navigator.pop(context);

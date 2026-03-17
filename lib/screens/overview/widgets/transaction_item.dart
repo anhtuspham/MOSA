@@ -9,26 +9,19 @@ import 'package:mosa/utils/utils.dart';
 import 'package:mosa/widgets/error_widget.dart';
 import 'package:mosa/widgets/loading_widget.dart';
 
-
 class TransactionItem extends ConsumerWidget {
   final Category category;
   final TransactionModel transaction;
 
-  const TransactionItem({
-    super.key,
-    required this.category,
-    required this.transaction,
-  });
+  const TransactionItem({super.key, required this.category, required this.transaction});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final walletController = ref.watch(
-      getWalletByIdProvider(transaction.walletId),
-    );
+    final walletController = ref.watch(getWalletByIdProvider(transaction.walletId));
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.onPrimary,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
@@ -45,10 +38,7 @@ class TransactionItem extends ConsumerWidget {
                 if (transaction.note != null)
                   Text(
                     transaction.note!,
-                    style: TextStyle(
-                      fontSize: 10.sp,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                    style: TextStyle(fontSize: 10.sp, color: Theme.of(context).colorScheme.onSurfaceVariant),
                   ),
               ],
             ),
@@ -58,10 +48,7 @@ class TransactionItem extends ConsumerWidget {
             children: [
               Text(
                 Helpers.formatCurrency(transaction.amount),
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  color: getTransactionTypeColor(type: transaction.type),
-                ),
+                style: TextStyle(fontSize: 16.sp, color: getTransactionTypeColor(type: transaction.type)),
               ),
               walletController.when(
                 data: (wallet) {
@@ -71,10 +58,7 @@ class TransactionItem extends ConsumerWidget {
                       const SizedBox(width: 4),
                       Text(
                         wallet?.name ?? '',
-                        style: TextStyle(
-                          fontSize: 10.sp,
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
+                        style: TextStyle(fontSize: 10.sp, color: Theme.of(context).colorScheme.onSurfaceVariant),
                       ),
                     ],
                   );

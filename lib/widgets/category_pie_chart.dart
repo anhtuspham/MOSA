@@ -16,7 +16,7 @@ class CategoryPieChart extends StatelessWidget {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return Container(
-      decoration: BoxDecoration(color: Colors.white),
+      decoration: BoxDecoration(color: Theme.of(context).colorScheme.onPrimary),
       margin: const EdgeInsets.only(bottom: 12),
       child: Row(
         children: [
