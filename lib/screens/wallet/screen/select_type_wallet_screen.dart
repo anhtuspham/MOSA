@@ -24,8 +24,8 @@ class _TypeWalletScreenState extends ConsumerState<SelectTypeWalletScreen> {
     final typeWalletState = ref.watch(typeWalletProvider);
     final selectTypeWalletState = ref.watch(selectedTypeWalletProvider);
 
-    return CommonScaffold(
-      title: Text('Loại tài khoản'),
+    return CommonScaffold.single(
+      title: const Text('Loại tài khoản'),
       leading: IconButton(
         onPressed: () {
           context.pop();

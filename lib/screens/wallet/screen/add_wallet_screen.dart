@@ -86,8 +86,8 @@ class _AddWalletScreenState extends ConsumerState<AddWalletScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return CommonScaffold(
-      title: Text('Thêm tài khoản'),
+    return CommonScaffold.single(
+      title: const Text('Thêm tài khoản'),
       centerTitle: true,
       leading: IconButton(
         onPressed: () {

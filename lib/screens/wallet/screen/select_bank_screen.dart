@@ -23,8 +23,8 @@ class _BankScreenState extends ConsumerState<SelectBankScreen> {
     final bankListState = ref.watch(bankListProvider);
     final selectBankState = ref.watch(selectedBankProvider);
 
-    return CommonScaffold(
-      title: Text('Chọn ngân hàng'),
+    return CommonScaffold.single(
+      title: const Text('Chọn ngân hàng'),
       leading: IconButton(
         onPressed: () {
           context.pop();

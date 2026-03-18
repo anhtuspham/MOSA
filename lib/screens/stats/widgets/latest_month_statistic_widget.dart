@@ -26,11 +26,19 @@ class _LatestMonthStatisticWidgetState extends State<LatestMonthStatisticWidget>
                 RichText(
                   text: TextSpan(
                     text: 'Tình hình thu chi\n',
-                    style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontSize: 16,
+                    ),
                     children: [
                       TextSpan(
                         text: '5 tháng gần nhất',
-                        style: TextStyle(fontWeight: FontWeight.w400, color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
+                        style: TextStyle(
+                          fontWeight: FontWeight.w400,
+                          color: Theme.of(context).colorScheme.onSurface,
+                          fontSize: 14,
+                        ),
                       ),
                     ],
                   ),
@@ -85,28 +93,17 @@ class _LatestMonthStatisticWidgetState extends State<LatestMonthStatisticWidget>
                       children: [
                         Text(
                           'Chi tiêu so với tháng 2',
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
-                            fontSize: 14,
-                          ),
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 14),
                         ),
                         const SizedBox(height: 12),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            const Icon(
-                              Icons.arrow_upward_rounded,
-                              color: AppColors.expense,
-                              size: 20,
-                            ),
+                            const Icon(Icons.arrow_upward_rounded, color: AppColors.expense, size: 20),
                             const SizedBox(width: 4),
                             const Text(
                               '26%',
-                              style: TextStyle(
-                                color: AppColors.expense,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 24,
-                              ),
+                              style: TextStyle(color: AppColors.expense, fontWeight: FontWeight.bold, fontSize: 24),
                             ),
                           ],
                         ),

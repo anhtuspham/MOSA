@@ -32,7 +32,7 @@ class _CategoryManagementScreenState extends ConsumerState<CategoryManagementScr
 
   @override
   Widget build(BuildContext context) {
-    return CommonScaffold(
+    return CommonScaffold.tabbed(
       title: const Text('Quản lý hạng mục'),
       leading: IconButton(onPressed: () => context.pop(), icon: const Icon(Icons.arrow_back)),
       appBarBackgroundColor: Theme.of(context).colorScheme.surface,

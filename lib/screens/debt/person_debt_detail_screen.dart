@@ -71,7 +71,7 @@ class _PersonDebtDetailScreenState extends ConsumerState<PersonDebtDetailScreen>
     final netBalance = totalLentRemaining - totalBorrowedRemaining;
     final currencyFormat = NumberFormat.currency(locale: 'vi_VN', symbol: 'đ', decimalDigits: 0);
 
-    return CommonScaffold(
+    return CommonScaffold.single(
       title: const Text('Chi tiết đối tác'),
       body: Column(
         children: [

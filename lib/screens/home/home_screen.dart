@@ -28,7 +28,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         error: (error, stackTrace) => showResultToast('Lấy dữ liệu thất bại'),
       );
     });
-    return CommonScaffold(
+    return CommonScaffold.tabbed(
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -63,7 +63,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
       ],
       appBarBackgroundColor: Theme.of(context).colorScheme.secondaryContainer,
-      tabs: [Tab(child: Text('Tất cả')), Tab(child: Text('Thu nhập ')), Tab(child: Text('Chi tiêu'))],
+      tabs: const [Tab(child: Text('Tất cả')), Tab(child: Text('Thu nhập ')), Tab(child: Text('Chi tiêu'))],
       children: [OverviewScreen(), IncomeScreen(), OutcomeScreen()],
     );
   }

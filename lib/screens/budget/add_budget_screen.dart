@@ -51,15 +51,10 @@ class _AddBudgetScreenState extends ConsumerState<AddBudgetScreen> {
 
     try {
       final date = ref.read(budgetDateFilterProvider);
-      final budget = Budget(
-        categoryId: _selectedCategory!.id,
-        amount: amount,
-        month: date.month,
-        year: date.year,
-      );
+      final budget = Budget(categoryId: _selectedCategory!.id, amount: amount, month: date.month, year: date.year);
 
       await ref.read(budgetProvider.notifier).upsertBudget(budget);
-      
+
       if (mounted) {
         context.pop();
         showResultToast('Lưu ngân sách thành công');
@@ -77,9 +72,10 @@ class _AddBudgetScreenState extends ConsumerState<AddBudgetScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return CommonScaffold(
+    final colorScheme = Theme.of(context).colorScheme;
+    return CommonScaffold.single(
       title: const Text('Thêm Ngân Sách', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-      appBarBackgroundColor: AppColors.primary,
+      appBarBackgroundColor: colorScheme.onPrimaryFixedVariant,
       elevation: false,
       body: Container(
         color: Theme.of(context).colorScheme.surface,
@@ -117,7 +113,10 @@ class _AddBudgetScreenState extends ConsumerState<AddBudgetScreen> {
                         _selectedCategory?.name ?? 'Chọn Danh Mục',
                         style: TextStyle(
                           fontSize: 16,
-                          color: _selectedCategory == null ? Theme.of(context).colorScheme.onSurfaceVariant : Theme.of(context).colorScheme.onSurface,
+                          color:
+                              _selectedCategory == null
+                                  ? Theme.of(context).colorScheme.onSurfaceVariant
+                                  : Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                     ),
@@ -165,16 +164,17 @@ class _AddBudgetScreenState extends ConsumerState<AddBudgetScreen> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
                 onPressed: _isLoading ? null : _saveBudget,
-                child: _isLoading
-                    ? const SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                      )
-                    : const Text(
-                        'Lưu',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-                      ),
+                child:
+                    _isLoading
+                        ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                        )
+                        : const Text(
+                          'Lưu',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                        ),
               ),
             ),
           ],

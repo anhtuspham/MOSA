@@ -2,57 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mosa/config/tab_bar_config.dart';
 
-/// Widget scaffold dùng chung cho toàn bộ màn hình trong ứng dụng MOSA.
+/// Widget Scaffold dùng chung cho toàn bộ màn hình trong ứng dụng MOSA.
 ///
-/// Cung cấp AppBar thống nhất và hỗ trợ điều hướng theo tab.
-/// Tự động quản lý vòng đời [TabController] khi dùng tab.
-///
-/// ## Các chế độ sử dụng
-///
-/// ### Chế độ 1: Màn hình đơn (không có tab)
-/// ```dart
-/// CommonScaffold(
-///   title: Text('Hồ sơ'),
-///   body: ProfileScreen(),
-/// )
-/// ```
-///
-/// ### Chế độ 2: Màn hình có tab — tự động tạo [TabBarView]
-/// Khuyến nghị cho hầu hết các màn hình có tab:
-/// ```dart
-/// CommonScaffold(
-///   title: Text('Thống kê'),
-///   tabs: [
-///     Tab(text: 'Thu nhập'),
-///     Tab(text: 'Chi tiêu'),
-///   ],
-///   children: [
-///     IncomeStatsScreen(),
-///     ExpenseStatsScreen(),
-///   ],
-/// )
-/// ```
-///
-/// ### Chế độ 3: Màn hình có tab — tự quản lý [TabBarView]
-/// Dùng khi cần cấu hình đặc biệt (ví dụ: tắt swipe):
-/// ```dart
-/// CommonScaffold(
-///   title: Text('Quản lý nợ'),
-///   tabs: [
-///     Tab(icon: Icon(Icons.arrow_upward), text: 'Cho vay'),
-///     Tab(icon: Icon(Icons.arrow_downward), text: 'Đi vay'),
-///   ],
-///   body: TabBarView(
-///     physics: NeverScrollableScrollPhysics(),
-///     children: [LentScreen(), BorrowedScreen()],
-///   ),
-/// )
-/// ```
-///
-/// ## Lưu ý quan trọng
-/// - Khi có tab: cung cấp [children] (khuyến nghị) hoặc [body].
-/// - Số lượng [children] phải bằng số lượng [tabs].
-/// - Dùng [TickerProviderStateMixin] để hỗ trợ animation tab mượt mà.
+/// [CommonScaffold] cung cấp một AppBar thống nhất và hỗ trợ các chế độ hiển thị linh hoạt:
+/// 1. [CommonScaffold.single]: Cho màn hình đơn giản, không có tab.
+/// 2. [CommonScaffold.tabbed]: Cho màn hình có nhiều tab, tự động quản lý [TabBarView].
+/// 3. [CommonScaffold.customTabbed]: Cho màn hình có tab nhưng muốn tự tùy chỉnh nội dung (ví dụ: tắt vuốt tab).
 class CommonScaffold extends StatefulWidget {
   /// Tiêu đề hiển thị trên AppBar. Thường là widget [Text].
   final Widget title;
@@ -64,31 +19,26 @@ class CommonScaffold extends StatefulWidget {
   final List<Widget>? actions;
 
   /// Danh sách tab hiển thị trên AppBar.
-  /// Khi null hoặc rỗng, màn hình hiển thị không có tab.
   final List<Widget>? tabs;
 
   /// Widget nội dung chính.
-  /// Dùng khi không có tab, hoặc khi tự quản lý [TabBarView] (chế độ 3).
-  /// Nếu có [children], ưu tiên dùng [children] thay thế.
+  /// Được sử dụng trong chế độ [single] hoặc [customTabbed].
   final Widget? body;
 
   /// Danh sách widget nội dung tương ứng với từng tab.
-  /// Khi cung cấp cùng [tabs], widget sẽ tự động tạo và quản lý [TabBarView].
-  /// Số phần tử phải bằng số lượng [tabs].
+  /// Được sử dụng trong chế độ [tabbed] để tự động tạo [TabBarView].
   final List<Widget>? children;
 
   /// Có căn giữa tiêu đề trên AppBar không. Mặc định: `false`.
   final bool? centerTitle;
 
   /// Cấu hình giao diện cho TabBar (màu indicator, style chữ, v.v.).
-  /// Nếu không cung cấp, dùng cấu hình mặc định từ theme.
   final TabBarConfig? tabBarConfig;
 
   /// Màu nền AppBar. Mặc định dùng màu `onSecondary` từ ColorScheme.
   final Color? appBarBackgroundColor;
 
   /// Callback được gọi khi người dùng chuyển tab.
-  /// Nhận vào chỉ số (index) của tab mới được chọn.
   final ValueChanged<int>? onTabChanged;
 
   /// Chỉ số tab được chọn mặc định khi khởi tạo. Mặc định: `0`.
@@ -103,14 +53,8 @@ class CommonScaffold extends StatefulWidget {
   /// Nút hành động nổi (FAB) hiển thị phía trên nội dung.
   final FloatingActionButton? floatingActionButton;
 
-  /// Tạo [CommonScaffold] với AppBar thống nhất và hỗ trợ điều hướng tab tùy chọn.
-  ///
-  /// Bắt buộc cung cấp [title] và ít nhất một trong [body] hoặc [children].
-  ///
-  /// Ném [AssertionError] nếu:
-  /// - Không cung cấp cả [body] lẫn [children].
-  /// - Số lượng [children] không khớp với [tabs] (khi không dùng [body]).
-  CommonScaffold({
+  /// Constructor mặc định (Private)
+  const CommonScaffold._({
     super.key,
     required this.title,
     this.tabs,
@@ -126,17 +70,114 @@ class CommonScaffold extends StatefulWidget {
     this.elevation = true,
     this.appBarHeight,
     this.floatingActionButton,
-  }) : assert(
-         body != null || children != null,
-         'Phải cung cấp body hoặc children',
-       ),
-       assert(
-         tabs == null ||
-             tabs.isEmpty ||
-             (children != null && children.length == tabs.length) ||
-             body != null,
-         'Khi dùng tabs, phải cung cấp children với số lượng tương ứng hoặc body tùy chỉnh',
-       );
+  });
+
+  /// 🌟 **Chế độ 1: Màn hình đơn (Single Screen)**
+  ///
+  /// Sử dụng khi màn hình chỉ có một nội dung duy nhất, không có hệ thống tab.
+  /// Chỉ nhận tham số [body].
+  factory CommonScaffold.single({
+    Key? key,
+    required Widget title,
+    required Widget body,
+    Widget? leading,
+    List<Widget>? actions,
+    bool? centerTitle,
+    Color? appBarBackgroundColor,
+    bool elevation = true,
+    double? appBarHeight,
+    FloatingActionButton? floatingActionButton,
+  }) {
+    return CommonScaffold._(
+      key: key,
+      title: title,
+      body: body,
+      leading: leading,
+      actions: actions,
+      centerTitle: centerTitle,
+      appBarBackgroundColor: appBarBackgroundColor,
+      elevation: elevation,
+      appBarHeight: appBarHeight,
+      floatingActionButton: floatingActionButton,
+    );
+  }
+
+  /// 🌟 **Chế độ 2: Màn hình Tab tự động (Auto Tabbed)**
+  ///
+  /// Sử dụng khi màn hình có nhiều tab và bạn muốn widget tự động tạo [TabBarView].
+  /// Yêu cầu cung cấp [tabs] và [children] với số lượng bằng nhau.
+  factory CommonScaffold.tabbed({
+    Key? key,
+    required Widget title,
+    required List<Widget> tabs,
+    required List<Widget> children,
+    Widget? leading,
+    List<Widget>? actions,
+    bool? centerTitle,
+    TabBarConfig? tabBarConfig,
+    Color? appBarBackgroundColor,
+    ValueChanged<int>? onTabChanged,
+    int initialIndex = 0,
+    bool elevation = true,
+    double? appBarHeight,
+    FloatingActionButton? floatingActionButton,
+  }) {
+    assert(tabs.length == children.length, 'Số lượng tabs và children phải bằng nhau');
+    return CommonScaffold._(
+      key: key,
+      title: title,
+      tabs: tabs,
+      leading: leading,
+      actions: actions,
+      centerTitle: centerTitle,
+      tabBarConfig: tabBarConfig,
+      appBarBackgroundColor: appBarBackgroundColor,
+      onTabChanged: onTabChanged,
+      initialIndex: initialIndex,
+      elevation: elevation,
+      appBarHeight: appBarHeight,
+      floatingActionButton: floatingActionButton,
+      children: children,
+    );
+  }
+
+  /// 🌟 **Chế độ 3: Màn hình Tab tùy chỉnh (Custom Tabbed)**
+  ///
+  /// Sử dụng khi màn hình có tab nhưng bạn muốn tự quản lý nội dung chính [body]
+  /// (ví dụ: lồng các widget phức tạp hơn [TabBarView]).
+  factory CommonScaffold.customTabbed({
+    Key? key,
+    required Widget title,
+    required List<Widget> tabs,
+    required Widget body,
+    Widget? leading,
+    List<Widget>? actions,
+    bool? centerTitle,
+    TabBarConfig? tabBarConfig,
+    Color? appBarBackgroundColor,
+    ValueChanged<int>? onTabChanged,
+    int initialIndex = 0,
+    bool elevation = true,
+    double? appBarHeight,
+    FloatingActionButton? floatingActionButton,
+  }) {
+    return CommonScaffold._(
+      key: key,
+      title: title,
+      tabs: tabs,
+      body: body,
+      leading: leading,
+      actions: actions,
+      centerTitle: centerTitle,
+      tabBarConfig: tabBarConfig,
+      appBarBackgroundColor: appBarBackgroundColor,
+      onTabChanged: onTabChanged,
+      initialIndex: initialIndex,
+      elevation: elevation,
+      appBarHeight: appBarHeight,
+      floatingActionButton: floatingActionButton,
+    );
+  }
 
   @override
   State<CommonScaffold> createState() => _CommonScaffoldState();

@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mosa/models/debt.dart';
 import 'package:mosa/models/enums.dart';
 import 'package:mosa/providers/category_provider.dart';
@@ -90,12 +91,12 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   Widget build(BuildContext context) {
     _listenToPrefillChanges();
     final selectedTransactionType = ref.watch(activeTransactionTypeProvider) ?? TransactionType.expense;
-    return CommonScaffold(
+    return CommonScaffold.single(
       title: _buildAppBarTitle(),
       centerTitle: true,
       leading: const Icon(Icons.history),
       actions: [IconButton(onPressed: _saveTransaction, icon: const Icon(Icons.check))],
-      appBarBackgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+      appBarBackgroundColor: Theme.of(context).colorScheme.surface,
       body: SectionContainer(child: _buildTransactionDetail(selectedTransactionType)),
     );
   }

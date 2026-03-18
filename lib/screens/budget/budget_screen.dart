@@ -25,16 +25,17 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
   @override
   Widget build(BuildContext context) {
     final budgetProgressAsync = ref.watch(budgetProgressProvider);
+    final colorScheme = Theme.of(context).colorScheme;
 
-    return CommonScaffold(
+    return CommonScaffold.single(
       title: const Text('Ngân sách', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-      appBarBackgroundColor: AppColors.primary,
+      appBarBackgroundColor: colorScheme.onPrimaryFixedVariant,
       elevation: false,
       actions: [
         IconButton(
           icon: const Icon(Icons.add_circle_outline, color: Colors.white),
           onPressed: () => context.pushNamed('add-budget'),
-        )
+        ),
       ],
       body: Container(
         color: Theme.of(context).colorScheme.surface,

@@ -35,15 +35,15 @@ class _LoanTrackingScreenState extends ConsumerState<LoanTrackingScreen> {
       totalDebtByTypeProvider(DebtType.borrowed),
     );
 
-    return CommonScaffold(
-      title: Text("Theo dõi vay nợ"),
+    return CommonScaffold.tabbed(
+      title: const Text("Theo dõi vay nợ"),
       leading: IconButton(
         onPressed: () => context.pop(),
         icon: const Icon(Icons.arrow_back),
       ),
       actions: const [Icon(Icons.search)],
       appBarBackgroundColor: Theme.of(context).colorScheme.surface,
-      tabs: [Tab(text: "Cho vay"), Tab(text: "Còn Nợ")],
+      tabs: const [Tab(text: "Cho vay"), Tab(text: "Còn Nợ")],
       children: [
         _loanTrackingContent(
           DebtType.lent,

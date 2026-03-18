@@ -17,7 +17,7 @@ class DebtSelectionScreen extends ConsumerWidget {
     final debtSummaryByType = ref.watch(debtSummaryByTypeProvider(debtType));
     final isLent = debtType == DebtType.lent;
 
-    return CommonScaffold(
+    return CommonScaffold.single(
       title: Text(isLent ? 'Chọn khoản nợ cần thu' : 'Chọn khoản nợ cần trả'),
       leading: IconButton(
         onPressed: () => context.pop(),

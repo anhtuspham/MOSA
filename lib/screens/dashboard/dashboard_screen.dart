@@ -36,7 +36,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   Widget build(BuildContext context) {
     final dashboardData = ref.watch(dashboardProvider);
 
-    return CommonScaffold(
+    return CommonScaffold.single(
       title: const Text('Tổng quan', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
       appBarBackgroundColor: AppColors.primary,
       elevation: false,

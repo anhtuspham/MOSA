@@ -24,8 +24,8 @@ class _SelectPersonScreenState extends ConsumerState<SelectPersonScreen> {
     final personListState = ref.watch(personProvider);
     final selectedPerson = ref.watch(selectedPersonProvider);
 
-    return CommonScaffold(
-      title: Text('Chọn người'),
+    return CommonScaffold.single(
+      title: const Text('Chọn người'),
       leading: IconButton(onPressed: () => context.pop(), icon: const Icon(Icons.arrow_back)),
       actions: [
         // Add person button

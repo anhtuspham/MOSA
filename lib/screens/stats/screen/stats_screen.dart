@@ -31,7 +31,11 @@ class StatsShellScreen extends ConsumerWidget {
             const SizedBox(height: 12),
             Text(
               label,
-              style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w500),
+              style: TextStyle(
+                fontSize: 14,
+                color: Theme.of(context).colorScheme.onSurface,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ],
         ),
@@ -42,7 +46,9 @@ class StatsShellScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final totalBalance = ref.watch(totalBalanceWalletProvider);
-    return CommonScaffold(
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return CommonScaffold.single(
       title: const Text('Báo cáo', style: TextStyle(fontWeight: FontWeight.w600)),
       centerTitle: true,
       appBarBackgroundColor: Theme.of(context).colorScheme.surface,
@@ -56,8 +62,9 @@ class StatsShellScreen extends ConsumerWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF00C6FF), Color(0xFF0072FF)],
+                  gradient: LinearGradient(
+                    // colors: [Color(0xFF00C6FF), Color(0xFF0072FF)],
+                    colors: [colorScheme.secondaryContainer, colorScheme.onPrimaryFixed],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -65,11 +72,18 @@ class StatsShellScreen extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text('Tài chính hiện tại', style: TextStyle(color: Theme.of(context).colorScheme.onPrimary, fontSize: 14)),
+                    Text(
+                      'Tài chính hiện tại',
+                      style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color, fontSize: 14),
+                    ),
                     const SizedBox(height: 4),
                     Text(
                       Helpers.formatCurrency(totalBalance),
-                      style: TextStyle(color: Theme.of(context).colorScheme.onPrimary, fontWeight: FontWeight.bold, fontSize: 28),
+                      style: TextStyle(
+                        color: Theme.of(context).textTheme.bodyMedium?.color,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 28,
+                      ),
                     ),
                     const SizedBox(height: 20),
                     Row(
