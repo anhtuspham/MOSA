@@ -139,25 +139,27 @@ class Category {
   }
 
   /// Lấy icon của danh mục
-  Widget getIcon({double size = 24}) {
-    final color =
-        this.color != null
+  Widget getIcon({double size = 24, Color? color}) {
+    final iconColor =
+        color ??
+        (this.color != null
             ? Color(int.parse('0xFF${this.color!.substring(1)}'))
-            : Colors.grey;
+            : Colors.grey);
 
     if (iconType == 'custom') {
-      return Image.asset(iconPath, width: size, height: size);
+      return Image.asset(iconPath, width: size, height: size, color: color);
     } else if (iconType == 'local_file') {
       return Image.file(
         File(iconPath),
         width: size,
         height: size,
         fit: BoxFit.cover,
+        color: color,
         errorBuilder: (context, error, stackTrace) =>
             Icon(Icons.broken_image, color: Colors.grey, size: size),
       );
     } else {
-      return Icon(_getMaterialIcon(iconPath), color: color, size: size);
+      return Icon(_getMaterialIcon(iconPath), color: iconColor, size: size);
     }
   }
 

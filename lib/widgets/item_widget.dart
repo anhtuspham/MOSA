@@ -30,6 +30,9 @@ class ItemWidget extends ConsumerWidget {
   /// ID định danh của mục (tùy chọn)
   final String? itemId;
 
+  /// Màu sắc của icon (tùy chọn)
+  final Color? iconColor;
+
   /// Constructor mặc định (Private) - Khuyến khích sử dụng các named constructors bên dưới.
   const ItemWidget._({
     super.key,
@@ -40,6 +43,7 @@ class ItemWidget extends ConsumerWidget {
     this.onTap,
     this.crossAxisAlignment,
     this.itemId,
+    this.iconColor,
   });
 
   /// 🌟 **Option 1: Khởi tạo từ Category**
@@ -51,12 +55,14 @@ class ItemWidget extends ConsumerWidget {
     required Category category,
     void Function()? onTap,
     CrossAxisAlignment? crossAxisAlignment,
+    Color? iconColor,
   }) {
     return ItemWidget._(
       key: key,
       category: category,
       onTap: onTap,
       crossAxisAlignment: crossAxisAlignment,
+      iconColor: iconColor,
     );
   }
 
@@ -71,6 +77,7 @@ class ItemWidget extends ConsumerWidget {
     String? itemId,
     void Function()? onTap,
     CrossAxisAlignment? crossAxisAlignment,
+    Color? iconColor,
   }) {
     return ItemWidget._(
       key: key,
@@ -79,6 +86,7 @@ class ItemWidget extends ConsumerWidget {
       itemId: itemId,
       onTap: onTap,
       crossAxisAlignment: crossAxisAlignment,
+      iconColor: iconColor,
     );
   }
 
@@ -93,6 +101,7 @@ class ItemWidget extends ConsumerWidget {
     String? itemId,
     void Function()? onTap,
     CrossAxisAlignment? crossAxisAlignment,
+    Color? iconColor,
   }) {
     return ItemWidget._(
       key: key,
@@ -101,12 +110,15 @@ class ItemWidget extends ConsumerWidget {
       itemId: itemId,
       onTap: onTap,
       crossAxisAlignment: crossAxisAlignment,
+      iconColor: iconColor,
     );
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
+    final categoryColor = category?.color != null ? Color(int.parse('0xFF${category!.color!.substring(1)}')) : null;
+    final activeColor = iconColor ?? categoryColor ?? colorScheme.primary;
 
     return InkWell(
       onTap: onTap,
@@ -118,16 +130,9 @@ class ItemWidget extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: colorScheme.surface,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: colorScheme.shadow.withValues(alpha: 0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-              border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.3), width: 1),
+              color: activeColor.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: activeColor.withValues(alpha: 0.2), width: 1.5),
             ),
             child: _buildIcon(colorScheme),
           ),
@@ -149,19 +154,20 @@ class ItemWidget extends ConsumerWidget {
 
   Widget _buildIcon(ColorScheme colorScheme) {
     if (icon != null) {
-      return Icon(icon, color: colorScheme.primary, size: 28);
+      return Icon(icon, color: iconColor ?? colorScheme.primary, size: 28);
     }
 
     if (category != null) {
-      return category!.getIcon();
+      return category!.getIcon(size: 28, color: iconColor);
     }
 
     return Image.asset(
       iconPath ?? 'assets/icons/default.png',
       width: 28,
       height: 28,
+      color: iconColor,
       errorBuilder: (context, error, stackTrace) {
-        return Icon(Icons.category_outlined, color: colorScheme.primary);
+        return Icon(Icons.category_outlined, color: iconColor ?? colorScheme.primary);
       },
     );
   }

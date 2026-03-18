@@ -131,10 +131,10 @@ class SettingsShellScreen extends StatelessWidget {
                         ItemWidget.iconPath(
                           itemId: '8',
                           iconPath: AppIcons.debtTracking,
+                          name: 'Theo dõi vay nợ',
                           onTap: () {
                             context.push(AppRoutes.loanTracking);
                           },
-                          name: 'Theo dõi vay nợ',
                         ),
                       ],
                     ),
