@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:mosa/router/app_routes.dart';
 import 'package:mosa/config/app_colors.dart';
 import 'package:mosa/utils/app_icons.dart';
+import 'package:mosa/utils/toast.dart';
 import 'package:mosa/widgets/category_grid_view.dart';
 import 'package:mosa/widgets/item_widget.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -71,19 +72,12 @@ class SettingsShellScreen extends StatelessWidget {
                       Container(
                         width: 4,
                         height: 20,
-                        decoration: BoxDecoration(
-                          color: AppColors.goldColor,
-                          borderRadius: BorderRadius.circular(2),
-                        ),
+                        decoration: BoxDecoration(color: AppColors.goldColor, borderRadius: BorderRadius.circular(2)),
                       ),
                       const SizedBox(width: 8),
                       Text(
                         'Tính năng',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18.sp,
-                          letterSpacing: 0.5,
-                        ),
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.sp, letterSpacing: 0.5),
                       ),
                     ],
                   ),
@@ -125,17 +119,12 @@ class SettingsShellScreen extends StatelessWidget {
                           name: 'Quản lý ngân sách',
                           onTap: () => context.pushNamed('budgets'),
                         ),
-                        ItemWidget.iconPath(itemId: '5', iconPath: AppIcons.scanBill, name: 'Trích xuất hóa đơn'),
-                        ItemWidget.iconPath(itemId: '6', iconPath: AppIcons.shopList, name: 'Danh sách mua sắm'),
-                        ItemWidget.iconPath(itemId: '7', iconPath: AppIcons.limitTransaction, name: 'Hạn mức thu/chi'),
                         ItemWidget.iconPath(
-                          itemId: '8',
-                          iconPath: AppIcons.debtTracking,
-                          name: 'Theo dõi vay nợ',
-                          onTap: () {
-                            context.push(AppRoutes.loanTracking);
-                          },
+                          itemId: '5',
+                          iconPath: AppIcons.scanBill,
+                          name: 'Trích xuất hóa đơn',
                         ),
+                        ItemWidget.iconPath(itemId: '6', iconPath: AppIcons.shopList, name: 'Danh sách mua sắm'),
                       ],
                     ),
                   ),
@@ -164,13 +153,7 @@ class SettingsShellScreen extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Chọn giao diện',
-                      style: TextStyle(
-                        fontSize: 18.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    Text('Chọn giao diện', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 16),
                     RadioListTile<ThemeMode>(
                       title: const Text('Hệ thống'),
@@ -215,4 +198,3 @@ class SettingsShellScreen extends StatelessWidget {
     );
   }
 }
-

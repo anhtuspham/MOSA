@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mosa/models/category.dart';
+import 'package:mosa/utils/toast.dart';
 
 /// Widget hiển thị một mục (item) dưới dạng icon và nhãn văn bản bên dưới.
 ///
@@ -121,7 +122,7 @@ class ItemWidget extends ConsumerWidget {
     final activeColor = iconColor ?? categoryColor ?? colorScheme.primary;
 
     return InkWell(
-      onTap: onTap,
+      onTap: onTap ?? () => showInfoToast('Tính năng đang trong giai đoạn phát triển.'),
       borderRadius: BorderRadius.circular(16),
       child: Column(
         mainAxisSize: MainAxisSize.min,

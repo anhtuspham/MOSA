@@ -31,9 +31,10 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
       title: const Text('Ngân sách', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
       appBarBackgroundColor: colorScheme.onPrimaryFixedVariant,
       elevation: false,
+      leading: IconButton(icon: Icon(Icons.arrow_back, color: Colors.white), onPressed: () => context.pop()),
       actions: [
         IconButton(
-          icon: const Icon(Icons.add_circle_outline, color: Colors.white),
+          icon: Icon(Icons.add_circle_outline, color: Colors.white),
           onPressed: () => context.pushNamed('add-budget'),
         ),
       ],

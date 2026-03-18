@@ -14,6 +14,7 @@ import '../services/category_service.dart';
 import '../services/person_service.dart';
 import '../utils/constants.dart';
 import '../utils/utils.dart';
+import '../utils/exceptions.dart';
 
 class DatabaseService {
   static Database? _database;
@@ -677,7 +678,7 @@ class DatabaseService {
     } catch (e) {
       log('Insert person failed: $e');
       if (e.toString().contains('UNIQUE constraint')) {
-        throw 'Tên người đã tồn tại';
+        throw AppException('Tên người đã tồn tại');
       }
       rethrow;
     }
@@ -745,7 +746,7 @@ class DatabaseService {
     } catch (e) {
       log('Insert category failed: $e');
       if (e.toString().contains('UNIQUE constraint')) {
-        throw 'Tên category đã tồn tại';
+        throw AppException('Tên category đã tồn tại');
       }
       rethrow;
     }
@@ -794,7 +795,7 @@ class DatabaseService {
       );
       
       if (transactions.isNotEmpty) {
-        throw 'Không thể xóa danh mục đang có giao dịch liên quan';
+        throw AppException('Không thể xóa danh mục đang có giao dịch liên quan');
       }
 
       await db.delete(
@@ -1192,7 +1193,7 @@ class DatabaseService {
         whereArgs: [wallet.name],
       );
       if (existing.isNotEmpty) {
-        throw 'Tên ví đã tồn tại';
+        throw AppException('Tên ví đã tồn tại');
       }
 
       final id = await db.insert(AppConstants.tableWallets, wallet.toMap());
@@ -1204,19 +1205,19 @@ class DatabaseService {
       final errorMsg = e.toString();
 
       if (errorMsg.contains('has no column named')) {
-        throw 'Database lỗi. Vui lòng xóa và cài lại app.';
+        throw AppException('Database lỗi. Vui lòng xóa và cài lại app.');
       }
 
       if (errorMsg.contains('UNIQUE constraint')) {
-        throw 'Tên ví đã tồn tại';
+        throw AppException('Tên ví đã tồn tại');
       }
 
       if (errorMsg.contains('FOREIGN KEY constraint')) {
-        throw 'Loại ví không hợp lệ';
+        throw AppException('Loại ví không hợp lệ');
       }
 
       // Default error
-      throw 'Không thể lưu ví. Vui lòng thử lại.';
+      throw AppException('Không thể lưu ví. Vui lòng thử lại.');
     }
   }
 
@@ -1269,7 +1270,7 @@ class DatabaseService {
       final transactionCount = Sqflite.firstIntValue(result) ?? 0;
 
       if (transactionCount > 0) {
-        throw Exception(
+        throw AppException(
           'Cannot delete wallet with $transactionCount transaction(s). '
           'Please deactivate instead or move transactions to another wallet.',
         );
@@ -1403,7 +1404,7 @@ class DatabaseService {
       final walletCount = Sqflite.firstIntValue(result) ?? 0;
 
       if (walletCount > 0) {
-        throw Exception(
+        throw AppException(
           'Cannot delete type wallet with $walletCount wallet(s) using it. '
           'Please change wallet types or delete wallets first.',
         );

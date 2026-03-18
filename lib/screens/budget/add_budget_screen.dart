@@ -77,6 +77,7 @@ class _AddBudgetScreenState extends ConsumerState<AddBudgetScreen> {
       title: const Text('Thêm Ngân Sách', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
       appBarBackgroundColor: colorScheme.onPrimaryFixedVariant,
       elevation: false,
+      leading: IconButton(icon: Icon(Icons.arrow_back, color: Colors.white), onPressed: () => context.pop()),
       body: Container(
         color: Theme.of(context).colorScheme.surface,
         padding: const EdgeInsets.all(16.0),
@@ -97,7 +98,7 @@ class _AddBudgetScreenState extends ConsumerState<AddBudgetScreen> {
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
                 ),
@@ -129,7 +130,7 @@ class _AddBudgetScreenState extends ConsumerState<AddBudgetScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
               ),

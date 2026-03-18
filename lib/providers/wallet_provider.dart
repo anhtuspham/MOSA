@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:mosa/models/wallets.dart';
 import 'package:mosa/services/database_service.dart';
 import 'package:mosa/services/type_wallet_service.dart';
+import 'package:mosa/utils/exceptions.dart';
 
 import 'database_service_provider.dart';
 
@@ -77,7 +78,7 @@ class WalletsNotifier extends AsyncNotifier<List<Wallet>> {
     state = await AsyncValue.guard(() async {
       final status = await _databaseService.deleteWallet(id);
       if (status <= 0) {
-        throw Exception('Không thể xóa ví');
+        throw AppException('Không thể xóa ví');
       }
       // Return updated wallet list without the deleted wallet
       return state.requireValue.where((element) => element.id != id).toList();
@@ -127,7 +128,7 @@ final effectiveWalletProvider = FutureProvider<Wallet>((ref) async {
 
   final defaultWallet = wallets.firstWhere(
     (wallet) => wallet.isDefault,
-    orElse: () => throw Exception('Không có ví nào để lưu giao dịch'),
+    orElse: () => throw AppException('Không có ví nào để lưu giao dịch'),
   );
   return defaultWallet;
 });
@@ -147,6 +148,7 @@ final totalBalanceWalletProvider = Provider<double>((ref) {
   );
   return total;
 });
+
 
 /// Lấy danh sách loại ví
 final typeWalletProvider = FutureProvider<List<TypeWallet>>((ref) {

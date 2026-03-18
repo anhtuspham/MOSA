@@ -8,6 +8,7 @@ import 'package:mosa/models/wallets.dart';
 import 'package:mosa/providers/debt_provider.dart';
 import 'package:mosa/providers/transaction_provider.dart';
 import 'package:mosa/utils/utils.dart';
+import 'package:mosa/utils/exceptions.dart';
 
 /// Service class to handle transaction business logic
 /// Separates business logic from UI layer
@@ -51,7 +52,7 @@ class TransactionService {
     final adjustmentAmount = actualBalance - wallet.balance;
 
     if (adjustmentAmount == 0) {
-      throw Exception('Số dư thực tế giống với số dư hiện tại');
+      throw AppException('Số dư thực tế giống với số dư hiện tại');
     }
 
     final transaction = TransactionModel(
@@ -81,7 +82,7 @@ class TransactionService {
     DateTime? dueDate,
   }) async {
     if (type != TransactionType.lend && type != TransactionType.borrowing) {
-      throw Exception('Invalid transaction type for loan');
+      throw AppException('Invalid transaction type for loan');
     }
 
     final debt = Debt(
@@ -159,38 +160,38 @@ class TransactionService {
   /// Validate amount input
   void validateAmount(String amountText) {
     if (amountText.isEmpty) {
-      throw Exception('Vui lòng nhập số tiền');
+      throw AppException('Vui lòng nhập số tiền');
     }
 
     final amount = double.tryParse(amountText.replaceAll('.', ''));
     if (amount == null || amount <= 0) {
-      throw Exception('Số tiền không hợp lệ');
+      throw AppException('Số tiền không hợp lệ');
     }
   }
 
   /// Validate category selection
   void validateCategory(Category? category) {
     if (category == null) {
-      throw Exception('Vui lòng chọn hạng mục');
+      throw AppException('Vui lòng chọn hạng mục');
     }
   }
 
   /// Validate person selection
   void validatePerson(Person? person) {
     if (person == null) {
-      throw Exception('Vui lòng chọn người');
+      throw AppException('Vui lòng chọn người');
     }
   }
 
   /// Validate debt person selection
   void validatePersonDebt(Person? person, DebtType debtType) {
     if (person == null) {
-      throw Exception('Vui lòng chọn người');
+      throw AppException('Vui lòng chọn người');
     }
 
     final summary = ref.read(debtSummaryByTypeProvider(debtType));
     if (!summary.containsKey(person.id)) {
-      throw Exception(
+      throw AppException(
         'Người này không có khoản nợ ${debtType == DebtType.lent ? "cần thu" : "cần trả"}',
       );
     }
@@ -199,13 +200,13 @@ class TransactionService {
   /// Validate transfer wallets
   void validateTransferWallets(Wallet? fromWallet, Wallet? toWallet) {
     if (fromWallet == null) {
-      throw Exception('Vui lòng chọn tài khoản nguồn');
+      throw AppException('Vui lòng chọn tài khoản nguồn');
     }
     if (toWallet == null) {
-      throw Exception('Vui lòng chọn tài khoản đích');
+      throw AppException('Vui lòng chọn tài khoản đích');
     }
     if (fromWallet.id == toWallet.id) {
-      throw Exception('Không thể chuyển khoản vào cùng một tài khoản');
+      throw AppException('Không thể chuyển khoản vào cùng một tài khoản');
     }
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mosa/config/tab_bar_config.dart';
 
 /// Widget Scaffold dùng chung cho toàn bộ màn hình trong ứng dụng MOSA.
@@ -187,8 +188,7 @@ class CommonScaffold extends StatefulWidget {
 ///
 /// Quản lý vòng đời [TabController] và xử lý các thay đổi cấu hình tab động.
 /// Dùng [TickerProviderStateMixin] để cung cấp ticker cho animation tab.
-class _CommonScaffoldState extends State<CommonScaffold>
-    with TickerProviderStateMixin {
+class _CommonScaffoldState extends State<CommonScaffold> with TickerProviderStateMixin {
   /// Controller quản lý trạng thái và animation của tab.
   /// Nullable — chỉ khởi tạo khi màn hình có tab, an toàn hơn so với `late`.
   TabController? _tabController;
@@ -209,11 +209,7 @@ class _CommonScaffoldState extends State<CommonScaffold>
     // Dùng config tùy chỉnh hoặc fallback về config mặc định từ theme
     _tabBarConfig = widget.tabBarConfig ?? TabBarConfig.defaultConfig();
 
-    _tabController = TabController(
-      length: widget.tabs!.length,
-      initialIndex: widget.initialIndex,
-      vsync: this,
-    );
+    _tabController = TabController(length: widget.tabs!.length, initialIndex: widget.initialIndex, vsync: this);
 
     // Lắng nghe sự kiện chuyển tab để thông báo cho widget cha
     _tabController!.addListener(_onTabChanged);
@@ -287,8 +283,7 @@ class _CommonScaffoldState extends State<CommonScaffold>
   /// - Có tab + [body] → trả về [body] để người dùng tự quản lý.
   Widget _buildBody() {
     if (!_hasTabs) {
-      return widget.body ??
-          (widget.children?.first ?? const SizedBox.shrink());
+      return widget.body ?? (widget.children?.first ?? const SizedBox.shrink());
     }
 
     if (widget.children != null) {
@@ -304,20 +299,27 @@ class _CommonScaffoldState extends State<CommonScaffold>
       appBar: AppBar(
         title: widget.title,
         leading: widget.leading,
+        // leading:
+        //     widget.leading ??
+        //     IconButton(
+        //       onPressed: () => context.pop(),
+        //       icon: Icon(
+        //         Icons.arrow_back,
+        //         color:
+        //             _hasTabs
+        //                 ? Theme.of(context).colorScheme.onSecondary
+        //                 : Theme.of(context).colorScheme.onPrimaryContainer,
+        //       ),
+        //     ),
         actions: widget.actions,
         actionsPadding: EdgeInsets.symmetric(horizontal: 12.w),
-        backgroundColor:
-            widget.appBarBackgroundColor ??
-            Theme.of(context).colorScheme.onSecondary,
+        backgroundColor: widget.appBarBackgroundColor ?? Theme.of(context).colorScheme.onSecondary,
         // null → dùng elevation mặc định của Material; 0 → phẳng (không bóng)
         elevation: widget.elevation ? null : 0,
         toolbarHeight: widget.appBarHeight,
         bottom:
             _hasTabs
-                ? PreferredSize(
-                  preferredSize: const Size.fromHeight(kToolbarHeight),
-                  child: _buildTabBar(),
-                )
+                ? PreferredSize(preferredSize: const Size.fromHeight(kToolbarHeight), child: _buildTabBar())
                 : null,
         centerTitle: widget.centerTitle,
       ),

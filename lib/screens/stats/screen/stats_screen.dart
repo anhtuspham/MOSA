@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:mosa/router/app_routes.dart';
 import 'package:mosa/screens/stats/widgets/latest_month_statistic_widget.dart';
 import 'package:mosa/config/app_colors.dart';
 import 'package:mosa/utils/helpers.dart';
+import 'package:mosa/utils/toast.dart';
 import 'package:mosa/widgets/section_container.dart';
 import 'package:mosa/widgets/stat_card.dart';
 import 'package:mosa/widgets/common_scaffold.dart';
@@ -14,14 +17,14 @@ class StatsShellScreen extends ConsumerWidget {
 
   Widget _buildGridItem(BuildContext context, IconData icon, String label, Color iconColor, {VoidCallback? onTap}) {
     return InkWell(
-      onTap: onTap,
+      onTap: onTap ?? () => showInfoToast('Tính năng đang trong giai đoạn phát triển.'),
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Theme.of(context).colorScheme.outlineVariant.withOpacity(0.5)),
+          border: Border.all(color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.5)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -111,7 +114,13 @@ class StatsShellScreen extends ConsumerWidget {
                 children: [
                   _buildGridItem(context, Icons.trending_up, 'Phân tích chi tiêu', AppColors.primaryBlue),
                   _buildGridItem(context, Icons.trending_down, 'Phân tích thu', AppColors.primaryBlue),
-                  _buildGridItem(context, Icons.receipt_long, 'Theo dõi vay nợ', AppColors.primaryBlue),
+                  _buildGridItem(
+                    context,
+                    Icons.receipt_long,
+                    'Theo dõi vay nợ',
+                    AppColors.primaryBlue,
+                    onTap: () => context.push(AppRoutes.loanTracking),
+                  ),
                   _buildGridItem(context, Icons.people_alt_outlined, 'Đối tượng thu/chi', AppColors.primaryBlue),
                   _buildGridItem(context, Icons.calendar_today_outlined, 'Chuyến đi/Sự kiện', AppColors.primaryBlue),
                   _buildGridItem(
