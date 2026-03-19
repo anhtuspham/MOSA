@@ -77,7 +77,7 @@ class _IncomeScreenState extends ConsumerState<IncomeScreen> {
                               Text(
                                 '(${group.percentage.toStringAsFixed(2)}%)',
                                 style: TextStyle(
-                                  color: Colors.grey[500],
+                                  color: Theme.of(context).colorScheme.outlineVariant,
                                   fontSize: 11.sp,
                                 ),
                               ),

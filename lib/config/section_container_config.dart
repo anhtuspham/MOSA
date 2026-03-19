@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'app_colors.dart';
 
 class SectionContainerConfig {
   final EdgeInsetsGeometry? padding;

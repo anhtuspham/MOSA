@@ -19,7 +19,7 @@ class MediaActionBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveDividerColor = dividerColor ?? AppColors.borderLight;
+    final effectiveDividerColor = dividerColor ?? Theme.of(context).colorScheme.outlineVariant;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,

@@ -11,7 +11,7 @@ import 'package:mosa/screens/login/login_screen.dart';
 import 'package:mosa/screens/setting/setting_screen.dart';
 import 'package:mosa/screens/shell_scaffold/shell_scaffold_screen.dart';
 import 'package:mosa/screens/stats/screen/stats_screen.dart';
-import 'package:mosa/screens/transaction/add_transaction_screen.dart';
+import 'package:mosa/screens/transaction/screens/add_transaction_screen.dart';
 import 'package:mosa/screens/wallet/screen/add_wallet_screen.dart';
 import 'package:mosa/screens/wallet/screen/select_bank_screen.dart';
 import 'package:mosa/screens/wallet/screen/select_person_screen.dart';

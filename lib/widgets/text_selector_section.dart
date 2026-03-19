@@ -24,7 +24,7 @@ class TextSelectorSection extends StatelessWidget {
         controller: controller,
         decoration: InputDecoration(
           hintText: hintText,
-          hintStyle: TextStyle(fontSize: 14, color: AppColors.textHint),
+          hintStyle: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurfaceVariant),
           contentPadding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
           border: OutlineInputBorder(borderSide: BorderSide.none),
           isDense: true,

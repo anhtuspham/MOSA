@@ -40,7 +40,7 @@ class TransferWalletSection extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
               child: Text(
                 title!,
-                style: TextStyle(color: AppColors.textSecondary),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
               ),
             ),
           CustomListTile(

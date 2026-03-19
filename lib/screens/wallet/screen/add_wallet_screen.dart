@@ -95,7 +95,7 @@ class _AddWalletScreenState extends ConsumerState<AddWalletScreen> {
         },
         icon: Icon(Icons.arrow_back),
       ),
-      // appBarBackgroundColor: AppColors.primaryBackground,
+      // appBarBackgroundColor: Theme.of(context).colorScheme.surfaceContainer,
       actions: [IconButton(onPressed: _submit, icon: Icon(Icons.check))],
       body: SectionContainer(
         child: Column(children: [amountInputSection(), const SizedBox(height: 12), walletAndDetailSection()]),
@@ -108,7 +108,7 @@ class _AddWalletScreenState extends ConsumerState<AddWalletScreen> {
       child: Column(
         children: [
           Text('Số dư ban đầu'),
-          AmountTextField(controller: _amountController, amountColor: AppColors.primary),
+          AmountTextField(controller: _amountController, amountColor: Theme.of(context).colorScheme.primary),
         ],
       ),
     );

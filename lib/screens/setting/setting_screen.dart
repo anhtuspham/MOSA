@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mosa/router/app_routes.dart';
 import 'package:mosa/config/app_colors.dart';
 import 'package:mosa/utils/app_icons.dart';
-import 'package:mosa/utils/toast.dart';
 import 'package:mosa/widgets/category_grid_view.dart';
 import 'package:mosa/widgets/item_widget.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -89,7 +87,7 @@ class SettingsShellScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(24),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.03),
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.03),
                           blurRadius: 20,
                           offset: const Offset(0, 10),
                         ),

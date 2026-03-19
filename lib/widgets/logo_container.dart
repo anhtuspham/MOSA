@@ -10,7 +10,7 @@ class LogoContainer extends StatelessWidget {
     super.key,
     required this.assetPath,
     this.size = 28,
-    this.padding = 6,
+    this.padding = 2,
   });
 
   @override

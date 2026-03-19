@@ -45,7 +45,7 @@ class _SelectWalletScreenState extends ConsumerState<SelectWalletScreen> {
                 subTitle: Text(Helpers.formatCurrency(wallet.balance)),
                 backgroundColor: isSelected ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.3) : null,
                 trailing:
-                    isSelected ? IconButton(onPressed: null, icon: Icon(Icons.check, color: AppColors.primary)) : null,
+                    isSelected ? IconButton(onPressed: null, icon: Icon(Icons.check, color: Theme.of(context).colorScheme.primary)) : null,
 
                 onTap: () {
                   ref.read(selectedWalletProvider.notifier).state = wallet;

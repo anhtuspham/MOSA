@@ -6,15 +6,10 @@ class ShellScaffoldScreen extends ConsumerStatefulWidget {
   final Widget child;
   final StatefulNavigationShell navigationShell;
 
-  const ShellScaffoldScreen({
-    super.key,
-    required this.child,
-    required this.navigationShell,
-  });
+  const ShellScaffoldScreen({super.key, required this.child, required this.navigationShell});
 
   @override
-  ConsumerState<ShellScaffoldScreen> createState() =>
-      _ShellScaffoldScreenState();
+  ConsumerState<ShellScaffoldScreen> createState() => _ShellScaffoldScreenState();
 }
 
 class _ShellScaffoldScreenState extends ConsumerState<ShellScaffoldScreen> {
@@ -30,20 +25,11 @@ class _ShellScaffoldScreenState extends ConsumerState<ShellScaffoldScreen> {
         selectedIndex: widget.navigationShell.currentIndex,
         onDestinationSelected: _onNavTap,
         destinations: [
-          NavigationDestination(
-            icon: Icon(Icons.home_filled),
-            label: 'Tổng quan',
-          ),
+          NavigationDestination(icon: Icon(Icons.home_filled), label: 'Tổng quan'),
           NavigationDestination(icon: Icon(Icons.wallet), label: 'Tài khoản'),
-          NavigationDestination(
-            icon: Icon(Icons.add_circle_outlined),
-            label: 'Ghi chép',
-          ),
+          NavigationDestination(icon: Icon(Icons.add_circle_outlined), label: 'Ghi chép'),
           NavigationDestination(icon: Icon(Icons.analytics), label: 'Báo cáo'),
-          NavigationDestination(
-            icon: Icon(Icons.widgets_outlined),
-            label: 'Cài đặt',
-          ),
+          NavigationDestination(icon: Icon(Icons.widgets_outlined), label: 'Cài đặt'),
         ],
       ),
     );

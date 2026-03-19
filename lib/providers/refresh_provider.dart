@@ -15,7 +15,7 @@ final refreshAllProvider = AsyncNotifierProvider<RefreshAllNotifier, void>(
 /// Quản lý việc làm mới tất cả dữ liệu
 class RefreshAllNotifier extends AsyncNotifier<void> {
   @override
-  FutureOr<void> build() async {}
+  void build() {}
 
   /// Làm mới tất cả dữ liệu: danh mục, giao dịch, ví, người, nợ
   Future<void> refresh() async {

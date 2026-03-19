@@ -38,7 +38,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
     return CommonScaffold.single(
       title: const Text('Tổng quan', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-      appBarBackgroundColor: AppColors.primary,
+      appBarBackgroundColor: Theme.of(context).colorScheme.primary,
       elevation: false,
       body: Container(
         color: Theme.of(context).colorScheme.surface,

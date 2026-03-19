@@ -111,7 +111,7 @@ class DebtTimelineItem extends StatelessWidget {
                   dateFormat.format(date),
                   style: GoogleFonts.inter(
                     fontSize: 13,
-                    color: Colors.grey[500],
+                    color: Theme.of(context).colorScheme.outlineVariant,
                   ),
                 ),
                 if (isTransaction && (record as TransactionModel).note != null && record.note!.isNotEmpty) ...[
@@ -120,7 +120,7 @@ class DebtTimelineItem extends StatelessWidget {
                     record.note!,
                     style: GoogleFonts.inter(
                       fontSize: 13,
-                      color: Colors.grey[700],
+                      color: Theme.of(context).colorScheme.outlineVariant,
                       fontStyle: FontStyle.italic,
                     ),
                   ),

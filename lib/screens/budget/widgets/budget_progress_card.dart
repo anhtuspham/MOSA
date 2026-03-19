@@ -22,7 +22,7 @@ class BudgetProgressCard extends ConsumerWidget {
         border: Border.all(color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.5)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.03),
             blurRadius: 10,
             spreadRadius: 0,
             offset: const Offset(0, 4),

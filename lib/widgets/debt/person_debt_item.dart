@@ -48,7 +48,7 @@ class PersonDebtItem extends ConsumerWidget {
           handleShowBottomSheet != null
               ? IconButton(
                 onPressed: () => handleShowBottomSheet?.call(),
-                icon: Icon(Icons.more_vert, color: AppColors.textPrimary),
+                icon: Icon(Icons.more_vert, color: Theme.of(context).colorScheme.onSurface),
               )
               : const SizedBox(),
         ],

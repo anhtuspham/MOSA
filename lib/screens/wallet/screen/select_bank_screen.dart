@@ -43,7 +43,7 @@ class _BankScreenState extends ConsumerState<SelectBankScreen> {
                 leading: LogoContainer(assetPath: bank.iconPath, size: 25),
                 backgroundColor: isSelected ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.3) : null,
                 trailing:
-                    isSelected ? IconButton(onPressed: null, icon: Icon(Icons.check, color: AppColors.primary)) : null,
+                    isSelected ? IconButton(onPressed: null, icon: Icon(Icons.check, color: Theme.of(context).colorScheme.primary)) : null,
                 onTap: () {
                   ref.read(selectedBankProvider.notifier).state = bank;
                   context.pop();

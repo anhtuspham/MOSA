@@ -28,7 +28,7 @@ class _OperationGridItemWidgetState extends State<OperationGridItemWidget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Image.asset(widget.iconPath, width: 20, color: AppColors.primary),
+          Image.asset(widget.iconPath, width: 20, color: Theme.of(context).colorScheme.primary),
           const SizedBox(height: 8),
           Text(widget.title),
         ],

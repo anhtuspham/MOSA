@@ -59,7 +59,7 @@ class AssetDebtSummaryCard extends StatelessWidget {
                     context,
                     'Cho vay',
                     data.totalLent,
-                    AppColors.primary,
+                    Theme.of(context).colorScheme.primary,
                     Icons.trending_up,
                   ),
                 ),

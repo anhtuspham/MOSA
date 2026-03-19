@@ -130,7 +130,7 @@ class _PersonDebtDetailScreenState extends ConsumerState<PersonDebtDetailScreen>
                             ],
                           ),
                           const SizedBox(height: 4),
-                          Text('Đối tác', style: GoogleFonts.inter(fontSize: 14, color: Colors.grey[600])),
+                          Text('Đối tác', style: GoogleFonts.inter(fontSize: 14, color: Theme.of(context).colorScheme.outlineVariant)),
                         ],
                       ),
                     ),

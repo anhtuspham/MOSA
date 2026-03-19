@@ -12,7 +12,6 @@ import 'package:mosa/services/fcm_service.dart';
 import 'package:mosa/utils/notification_helper.dart';
 import 'package:toastification/toastification.dart';
 import 'package:timezone/data/latest.dart' as tz;
-import 'package:mosa/config/app_theme.dart';
 import 'package:mosa/providers/theme_provider.dart';
 
 void main() async {
@@ -30,7 +29,7 @@ void main() async {
   // Initialize notification helper
   await NotificationHelper.initialize();
 
-  // await DatabaseService().initializeDatabase(clearExisting: true);
+  await DatabaseService().initializeDatabase(clearExisting: true);
 
   runApp(ProviderScope(child: const MyApp()));
 }

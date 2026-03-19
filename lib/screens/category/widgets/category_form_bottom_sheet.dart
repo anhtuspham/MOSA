@@ -341,7 +341,7 @@ class _CategoryFormBottomSheetState extends ConsumerState<CategoryFormBottomShee
                           border:
                               isSelected
                                   ? Border.all(color: Theme.of(context).primaryColor, width: 2)
-                                  : Border.all(color: Colors.grey.shade300),
+                                  : Border.all(color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.3)),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         clipBehavior: Clip.hardEdge,
@@ -370,7 +370,7 @@ class _CategoryFormBottomSheetState extends ConsumerState<CategoryFormBottomShee
                         border:
                             isSelected
                                 ? Border.all(color: Theme.of(context).primaryColor, width: 2)
-                                : Border.all(color: Colors.grey.shade300),
+                                : Border.all(color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.3)),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Center(child: tempCategory.getIcon(size: 24)),

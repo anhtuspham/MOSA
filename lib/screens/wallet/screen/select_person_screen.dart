@@ -42,9 +42,9 @@ class _SelectPersonScreenState extends ConsumerState<SelectPersonScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.person_outline, size: 64, color: AppColors.textSecondary),
+                  Icon(Icons.person_outline, size: 64, color: Theme.of(context).colorScheme.onSurfaceVariant),
                   const SizedBox(height: 16),
-                  Text('Chưa có người nào', style: TextStyle(color: AppColors.textSecondary)),
+                  Text('Chưa có người nào', style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant)),
                   const SizedBox(height: 8),
                   ElevatedButton.icon(
                     onPressed: () => _showAddPersonDialog(context),
@@ -75,7 +75,7 @@ class _SelectPersonScreenState extends ConsumerState<SelectPersonScreen> {
                       onPressed: () => _showEditPersonDialog(context, person),
                     ),
                     // Selection checkmark
-                    if (isSelected) Icon(Icons.check, color: AppColors.primary),
+                    if (isSelected) Icon(Icons.check, color: Theme.of(context).colorScheme.primary),
                   ],
                 ),
 

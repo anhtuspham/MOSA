@@ -54,18 +54,18 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                   icon: Icon(Icons.close),
                 )
                 : null,
-        prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
+        prefixIcon: Icon(Icons.search, color: Theme.of(context).colorScheme.outlineVariant),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.grey[300]!),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.outlineVariant!),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.grey[300]!),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.outlineVariant!),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: AppColors.buttonPrimary, width: 2),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2),
         ),
         contentPadding: EdgeInsets.symmetric(horizontal: 4, vertical: 6),
         hintText: widget.hintText,

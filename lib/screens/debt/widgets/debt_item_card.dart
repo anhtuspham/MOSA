@@ -26,7 +26,7 @@ class DebtItemCard extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(
-          color: isOverdue ? Colors.red.withOpacity(0.5) : Colors.grey.withOpacity(0.2),
+          color: isOverdue ? Colors.red.withValues(alpha: 0.5) : Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.2),
           width: isOverdue ? 1.5 : 1,
         ),
       ),
@@ -51,7 +51,7 @@ class DebtItemCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  _buildStatusBadge(isOverdue),
+                  _buildStatusBadge(isOverdue, context),
                 ],
               ),
               const SizedBox(height: 12),
@@ -94,7 +94,7 @@ class DebtItemCard extends StatelessWidget {
                 child: LinearProgressIndicator(
                   value: progress,
                   minHeight: 8,
-                  backgroundColor: Colors.grey[200],
+                  backgroundColor: Theme.of(context).colorScheme.outlineVariant,
                   valueColor: AlwaysStoppedAnimation<Color>(
                     debt.status == DebtStatus.paid ? Colors.green : Colors.blue,
                   ),
@@ -128,7 +128,7 @@ class DebtItemCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusBadge(bool isOverdue) {
+  Widget _buildStatusBadge(bool isOverdue, BuildContext context) {
     Color bgColor;
     Color textColor;
     String text;
@@ -155,8 +155,8 @@ class DebtItemCard extends StatelessWidget {
           text = 'Đã thanh toán';
           break;
         default:
-          bgColor = Colors.grey[100]!;
-          textColor = Colors.grey[700]!;
+          bgColor = Theme.of(context).colorScheme.outlineVariant;
+          textColor = Theme.of(context).colorScheme.outlineVariant;
           text = 'Không rõ';
       }
     }

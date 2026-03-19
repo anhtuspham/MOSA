@@ -46,38 +46,39 @@ class _AccountTabScreenState extends ConsumerState<AccountTabScreen> {
             ],
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                walletState.when(
-                  data: (wallets) {
-                    return Column(
-                      children: List.generate(wallets.length, (index) {
-                        final wallet = wallets[index];
-                        return CustomListTile(
-                          leading: LogoContainer(assetPath: wallet.iconPath),
-                          title: Text(wallet.name, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-                          subTitle: Text(
-                            Helpers.formatCurrency(wallet.balance),
-                            style: TextStyle(
-                              color: wallet.balance >= 0 ? Theme.of(context).colorScheme.onSurface : AppColors.expense,
-                            ),
-                          ),
-                          trailing: IconButton(
-                            onPressed: () => _handleShowBottomSheet(wallet),
-                            icon: Icon(Icons.more_vert, color: Theme.of(context).colorScheme.onSurface),
-                          ),
-                        );
-                      }),
-                    );
-                  },
-                  loading: () => LoadingSectionWidget(),
-                  error: (error, stackTrace) => ErrorSectionWidget(error: error),
-                ),
-              ],
-            ),
+        Expanded(
+          child: walletState.when(
+            data: (wallets) {
+              if (wallets.isEmpty) {
+                return const Center(child: Text('Chưa có ví nào'));
+              }
+
+              return ListView.separated(
+                // padding cho toàn bộ danh sách
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                itemCount: wallets.length,
+                separatorBuilder: (context, index) => const SizedBox(height: 8), // (Tuỳ chọn) Khoảng cách giữa các ví
+                itemBuilder: (context, index) {
+                  final wallet = wallets[index];
+                  return CustomListTile(
+                    leading: LogoContainer(assetPath: wallet.iconPath),
+                    title: Text(wallet.name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+                    subTitle: Text(
+                      Helpers.formatCurrency(wallet.balance),
+                      style: TextStyle(
+                        color: wallet.balance >= 0 ? Theme.of(context).colorScheme.onSurface : AppColors.expense,
+                      ),
+                    ),
+                    trailing: IconButton(
+                      onPressed: () => _handleShowBottomSheet(wallet),
+                      icon: Icon(Icons.more_vert, color: Theme.of(context).colorScheme.onSurface),
+                    ),
+                  );
+                },
+              );
+            },
+            loading: () => const LoadingSectionWidget(),
+            error: (error, stackTrace) => ErrorSectionWidget(error: error),
           ),
         ),
       ],

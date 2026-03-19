@@ -138,7 +138,7 @@ class TransactionModel {
       syncId: syncId ?? this.syncId,
       walletId: walletId ?? this.walletId,
       debtId: debtId ?? this.debtId,
-      personId: personId ?? this.personId,
+      personId: personId ?? personId,
     );
   }
 

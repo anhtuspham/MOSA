@@ -9,7 +9,7 @@ class LoadingSectionWidget extends StatelessWidget {
       height: 60,
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
+        color: Theme.of(context).colorScheme.outlineVariant,
         borderRadius: BorderRadius.circular(10),
       ),
       child: const Center(child: CircularProgressIndicator()),

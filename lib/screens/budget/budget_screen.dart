@@ -47,7 +47,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.account_balance_wallet_outlined, size: 64, color: AppColors.textHint),
+                    Icon(Icons.account_balance_wallet_outlined, size: 64, color: Theme.of(context).colorScheme.onSurfaceVariant),
                     const SizedBox(height: 16),
                     Text(
                       'Bạn chưa tạo ngân sách nào cho tháng này.',
@@ -55,7 +55,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
                     ),
                     const SizedBox(height: 16),
                     ElevatedButton(
-                      style: ElevatedButton.styleFrom(backgroundColor: AppColors.buttonPrimary),
+                      style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.primary),
                       onPressed: () => context.pushNamed('add-budget'),
                       child: const Text('Tạo Ngân Sách', style: TextStyle(color: Colors.white)),
                     ),
@@ -82,7 +82,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.primary,
+        backgroundColor: Theme.of(context).colorScheme.primary,
         onPressed: () => context.pushNamed('add-budget'),
         child: const Icon(Icons.add, color: Colors.white),
       ),

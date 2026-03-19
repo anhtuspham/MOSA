@@ -68,7 +68,7 @@ class _OutcomeScreenState extends ConsumerState<OutcomeScreen> {
                             children: [
                               Text(
                                 '(${group.percentage.toStringAsFixed(2)}%)',
-                                style: TextStyle(color: Colors.grey[500], fontSize: 11.sp),
+                                style: TextStyle(color: Theme.of(context).colorScheme.outlineVariant, fontSize: 11.sp),
                               ),
                               const SizedBox(width: 3),
                               Text(

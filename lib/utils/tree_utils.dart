@@ -48,7 +48,7 @@ class TreeUtils {
 
     // Assign children
     for (var parentId in itemMap.keys) {
-      final parent = itemMap[parentId]!;
+      final parent = itemMap[parentId] as T;
       final children =
           items.where((item) => parentIdGetter(item) == parentId).toList();
       childrenSetter(parent, children);

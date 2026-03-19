@@ -106,7 +106,7 @@ class _AddBudgetScreenState extends ConsumerState<AddBudgetScreen> {
                   children: [
                     Icon(
                       _selectedCategory == null ? Icons.category_outlined : Icons.category,
-                      color: AppColors.primary,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                     const SizedBox(width: 16),
                     Expanded(
@@ -121,7 +121,7 @@ class _AddBudgetScreenState extends ConsumerState<AddBudgetScreen> {
                         ),
                       ),
                     ),
-                    const Icon(Icons.arrow_forward_ios, size: 16, color: AppColors.textHint),
+                    Icon(Icons.arrow_forward_ios, size: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
                   ],
                 ),
               ),
@@ -136,7 +136,7 @@ class _AddBudgetScreenState extends ConsumerState<AddBudgetScreen> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.monetization_on_outlined, color: AppColors.primary),
+                  Icon(Icons.monetization_on_outlined, color: Theme.of(context).colorScheme.primary),
                   const SizedBox(width: 16),
                   Expanded(
                     child: TextField(
@@ -161,7 +161,7 @@ class _AddBudgetScreenState extends ConsumerState<AddBudgetScreen> {
               height: 48,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.buttonPrimary,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
                 onPressed: _isLoading ? null : _saveBudget,

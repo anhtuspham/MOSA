@@ -56,12 +56,12 @@ class _SelectWalletScreenState
                 ),
                 subTitle: Text(Helpers.formatCurrency(wallet.balance)),
                 backgroundColor:
-                    isSelected ? AppColors.lightBackGroundColor : null,
+                    isSelected ? Theme.of(context).colorScheme.surfaceContainerHighest : null,
                 trailing:
                     isSelected
                         ? IconButton(
                           onPressed: null,
-                          icon: Icon(Icons.check, color: AppColors.primary),
+                          icon: Icon(Icons.check, color: Theme.of(context).colorScheme.primary),
                         )
                         : null,
 

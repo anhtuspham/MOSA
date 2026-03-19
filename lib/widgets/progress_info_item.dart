@@ -63,7 +63,7 @@ class ProgressInfoItem extends StatelessWidget {
               ),
               if (actionIcon != null) ...[
                 const SizedBox(width: 10),
-                Icon(actionIcon, size: 16, color: Colors.grey[700]),
+                Icon(actionIcon, size: 16, color: Theme.of(context).colorScheme.outlineVariant),
               ],
             ],
           ),

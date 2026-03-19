@@ -23,8 +23,8 @@ class WalletShellScreen extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         onPressed: () => context.push(AppRoutes.addWallet),
         shape: CircleBorder(),
-        backgroundColor: AppColors.buttonPrimary,
-        foregroundColor: AppColors.textWhite,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
         child: Icon(Icons.add),
       ),
       children: [AccountTabScreen(), _buildWalletTab(context, 'Sổ tiết kiệm'), AccumulatedTabScreen()],

@@ -160,8 +160,9 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
       final currentDebt = currentDebts[debtIndex];
 
       final remainingAmount = currentDebt.amount - currentDebt.paidAmount;
-      if (paymentAmount > remainingAmount)
+      if (paymentAmount > remainingAmount) {
         throw 'Số tiền thanh toán vượt quá khoản nợ';
+      }
 
       final newPaidAmount = currentDebt.paidAmount + paymentAmount;
       final newStatus =
@@ -231,8 +232,9 @@ class DebtNotifier extends AsyncNotifier<List<Debt>> {
       final currentDebt = currentDebts[debtIndex];
 
       final remainingAmount = currentDebt.amount - currentDebt.paidAmount;
-      if (paymentAmount > remainingAmount)
+      if (paymentAmount > remainingAmount) {
         throw 'Số tiền thanh toán vượt quá khoản nợ';
+      }
 
       final newPaidAmount = currentDebt.paidAmount + paymentAmount;
       final newStatus =

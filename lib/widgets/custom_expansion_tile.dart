@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mosa/config/app_colors.dart';
 import 'package:mosa/config/section_container_config.dart';
 import 'package:mosa/widgets/section_container.dart';
 

@@ -46,18 +46,18 @@ class AdjustBalanceSection extends ConsumerWidget {
                     decoration: InputDecoration(
                       counterText: '',
                       border: UnderlineInputBorder(
-                        borderSide: BorderSide(color: AppColors.borderLight),
+                        borderSide: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
                       ),
                       contentPadding: const EdgeInsets.symmetric(vertical: 4),
                       hintText: TransactionConstants.enterActualBalance,
                       hintStyle: TextStyle(
                         fontSize: 12,
-                        color: AppColors.textHint,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                       suffix: Text(
                         TransactionConstants.currencySymbol,
                         style: TextStyle(
-                          color: AppColors.textPrimary,
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),

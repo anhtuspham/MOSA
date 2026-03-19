@@ -45,7 +45,7 @@ class _LatestMonthStatisticWidgetState extends State<LatestMonthStatisticWidget>
                 ),
                 TextButton(
                   onPressed: () => context.pushNamed('dashboard-chart'),
-                  child: Text('Xem chi tiết', style: TextStyle(color: AppColors.buttonPrimary)),
+                  child: Text('Xem chi tiết', style: TextStyle(color: Theme.of(context).colorScheme.primary)),
                 ),
               ],
             ),
@@ -65,7 +65,7 @@ class _LatestMonthStatisticWidgetState extends State<LatestMonthStatisticWidget>
                             barRods: [
                               BarChartRodData(
                                 toY: 20,
-                                color: AppColors.firstBackGroundColor,
+                                color: Theme.of(context).colorScheme.surface,
                                 rodStackItems: [
                                   BarChartRodStackItem(0, 8, AppColors.expense),
                                   BarChartRodStackItem(8, 15, AppColors.income),
