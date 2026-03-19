@@ -1,4 +1,4 @@
-package com.example.mosa
+package com.tupham.mosa
 
 import io.flutter.embedding.android.FlutterActivity
 
