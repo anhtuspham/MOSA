@@ -7,7 +7,6 @@ import 'package:mosa/providers/wallet_provider.dart';
 import 'package:mosa/screens/dashboard/widgets/asset_debt_summary_card.dart';
 import 'package:mosa/screens/dashboard/widgets/cash_flow_bar_chart.dart';
 import 'package:mosa/screens/dashboard/widgets/expense_pie_chart.dart';
-import 'package:mosa/config/app_colors.dart';
 import 'package:mosa/widgets/common_scaffold.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {

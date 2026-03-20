@@ -6,7 +6,6 @@ import 'package:mosa/models/category.dart';
 import 'package:mosa/models/enums.dart';
 import 'package:mosa/providers/budget_provider.dart';
 import 'package:mosa/providers/transaction_provider.dart';
-import 'package:mosa/config/app_colors.dart';
 import 'package:mosa/utils/number_input_formatter.dart';
 import 'package:mosa/widgets/common_scaffold.dart';
 import 'package:mosa/utils/toast.dart';

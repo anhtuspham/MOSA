@@ -10,7 +10,6 @@ import 'package:mosa/providers/transaction_prefill_data_provider.dart';
 import 'package:mosa/providers/transaction_provider.dart';
 import 'package:mosa/providers/wallet_provider.dart';
 import 'package:mosa/services/transaction_service.dart';
-import 'package:mosa/config/app_colors.dart';
 import 'package:mosa/utils/constants.dart';
 import 'package:mosa/utils/helpers.dart';
 import 'package:mosa/utils/toast.dart';

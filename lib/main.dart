@@ -4,12 +4,14 @@ import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mosa/firebase_options.dart';
 import 'package:mosa/router/app_router.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:mosa/services/database_service.dart';
 import 'package:mosa/services/fcm_service.dart';
 import 'package:mosa/utils/notification_helper.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:toastification/toastification.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:mosa/providers/theme_provider.dart';
@@ -20,7 +22,18 @@ void main() async {
   // Initialize timezone database
   tz.initializeTimeZones();
 
+  // Load environment variables
+  await dotenv.load(fileName: ".env");
+
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  await Supabase.initialize(
+    url: dotenv.env['SUPABASE_URL'] ?? '',
+    anonKey: dotenv.env['SUPABASE_ANON_KEY'] ?? '',
+    authOptions: const FlutterAuthClientOptions(authFlowType: AuthFlowType.pkce),
+    realtimeClientOptions: RealtimeClientOptions(logLevel: RealtimeLogLevel.info),
+    storageOptions: StorageClientOptions(retryAttempts: 10),
+  );
 
   // Initialize FCM
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);

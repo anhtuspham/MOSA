@@ -61,6 +61,8 @@ dependencies:
   flex_color_scheme: ^8.4.0
   permission_handler: ^12.0.1
   image_picker: ^1.2.1
+  supabase_flutter: ^2.12.0
+  flutter_dotenv: ^6.0.0
 
 dev_dependencies:
   flutter_test:
@@ -96,6 +98,7 @@ flutter:
   uses-material-design: true
 
   assets:
+    - .env
     - assets/images/
     - assets/data/
     - assets/icons/

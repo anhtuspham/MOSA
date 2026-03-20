@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mosa/providers/budget_provider.dart';
 import 'package:mosa/screens/budget/widgets/budget_progress_card.dart';
-import 'package:mosa/config/app_colors.dart';
 import 'package:mosa/widgets/common_scaffold.dart';
 
 class BudgetScreen extends ConsumerStatefulWidget {
