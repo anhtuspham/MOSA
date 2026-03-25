@@ -12,7 +12,6 @@ import 'package:mosa/widgets/common_scaffold.dart';
 
 import '../../../models/wallets.dart';
 import '../../../router/app_routes.dart';
-import '../../../config/app_colors.dart';
 import '../../../utils/utils.dart';
 import '../../../widgets/amount_text_field.dart';
 import '../../../widgets/card_section.dart';

@@ -47,6 +47,8 @@ void main() async {
   runApp(ProviderScope(child: const MyApp()));
 }
 
+final supabase = Supabase.instance.client;
+
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
@@ -68,7 +70,7 @@ class MyApp extends ConsumerWidget {
           blockBackgroundInteraction: false,
         ),
         child: MaterialApp.router(
-          title: 'Finance Tracker',
+          title: 'Mosa',
           locale: Locale('vi', 'VN'),
           localizationsDelegates: const [
             GlobalMaterialLocalizations.delegate,

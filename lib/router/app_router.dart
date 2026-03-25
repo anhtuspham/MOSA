@@ -8,6 +8,7 @@ import 'package:mosa/screens/debt/loan_tracking_screen.dart';
 import 'package:mosa/screens/debt/person_debt_detail_screen.dart';
 import 'package:mosa/screens/home/home_screen.dart';
 import 'package:mosa/screens/login/login_screen.dart';
+import 'package:mosa/screens/onboarding/onboarding_screen.dart';
 import 'package:mosa/screens/setting/setting_screen.dart';
 import 'package:mosa/screens/shell_scaffold/shell_scaffold_screen.dart';
 import 'package:mosa/screens/stats/screen/stats_screen.dart';
@@ -42,7 +43,7 @@ import 'package:mosa/screens/budget/add_budget_screen.dart';
 ///    └─ /edit-transaction/:id → AddTransactionScreen
 
 final goRouter = GoRouter(
-  initialLocation: AppRoutes.addTransaction,
+  initialLocation: AppRoutes.onboarding,
   debugLogDiagnostics: true,
 
   routes: [
@@ -109,6 +110,7 @@ final goRouter = GoRouter(
       ],
     ),
 
+    GoRoute(path: AppRoutes.onboarding, name: 'onboarding', builder: (context, state) => OnboardingScreen()),
     GoRoute(path: AppRoutes.login, name: 'login', builder: (context, state) => LoginScreen()),
     GoRoute(path: AppRoutes.categoryList, name: 'categoryList', builder: (context, state) => CategoryScreen()),
     GoRoute(

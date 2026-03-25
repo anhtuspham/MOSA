@@ -23,6 +23,7 @@ abstract class AppRoutes {
   // ===== BRANCH 5: SETTINGS / CÀI ĐẶT =====
   static const String settings = '/settings';
 
+  static const String onboarding = '/onboarding';
   static const String login = '/login';
 
   // ===== TRANSACTION FLOWS (OVERLAY / MODAL) =====

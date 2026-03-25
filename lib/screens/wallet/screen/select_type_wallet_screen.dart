@@ -9,7 +9,6 @@ import 'package:mosa/widgets/loading_widget.dart';
 import 'package:mosa/widgets/common_scaffold.dart';
 import 'package:mosa/widgets/logo_container.dart';
 
-import '../../../config/app_colors.dart';
 
 class SelectTypeWalletScreen extends ConsumerStatefulWidget {
   const SelectTypeWalletScreen({super.key});

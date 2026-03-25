@@ -6,6 +6,7 @@ class AppIcons {
   static const String logoMomo = 'assets/icons/logo_momo.png';
   static const String logoZalopay = 'assets/icons/logo_zalopay.png';
   static const String moneyBag = 'assets/icons/money-bag.png';
+  static const String google = 'assets/icons/google.png';
   static const String plusIcon = 'assets/icons/icon_plus.png';
   static const String interface = 'assets/icons/interface.png';
   static const String sampleRecord = 'assets/icons/sample_record.png';
@@ -14,4 +15,7 @@ class AppIcons {
   static const String shopList = 'assets/icons/shop_list.png';
   static const String limitTransaction = 'assets/icons/limit_transaction.png';
   static const String debtTracking = 'assets/icons/debt_tracking.png';
+  static const String globalIcon = 'assets/icons/global.png';
+  static const String logOutIcon = 'assets/icons/log_out.png';
+  static const String exchangeMoneyIcon = 'assets/icons/money-exchange.png';
 }
