@@ -15,7 +15,7 @@ class AppIcons {
   static const String shopList = 'assets/icons/shop_list.png';
   static const String limitTransaction = 'assets/icons/limit_transaction.png';
   static const String debtTracking = 'assets/icons/debt_tracking.png';
-  static const String globalIcon = 'assets/icons/global.png';
+  static const String globalIcon = 'assets/icons/globe.png';
   static const String logOutIcon = 'assets/icons/log_out.png';
   static const String exchangeMoneyIcon = 'assets/icons/money-exchange.png';
 }

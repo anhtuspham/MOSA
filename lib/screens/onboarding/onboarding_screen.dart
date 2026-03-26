@@ -326,8 +326,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 children: [
                   ElevatedButton(
                     onPressed: () {
-                      // Navigate to Register (Currently goes to Login as placeholder, update if register is created)
-                      context.push(AppRoutes.login);
+                      context.push(AppRoutes.signUp);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.success,

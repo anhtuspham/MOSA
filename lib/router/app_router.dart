@@ -7,7 +7,9 @@ import 'package:mosa/screens/debt/debt_selection_screen.dart';
 import 'package:mosa/screens/debt/loan_tracking_screen.dart';
 import 'package:mosa/screens/debt/person_debt_detail_screen.dart';
 import 'package:mosa/screens/home/home_screen.dart';
+import 'package:mosa/screens/login/forgot_password_screen.dart';
 import 'package:mosa/screens/login/login_screen.dart';
+import 'package:mosa/screens/login/sign_up_screen.dart';
 import 'package:mosa/screens/onboarding/onboarding_screen.dart';
 import 'package:mosa/screens/setting/setting_screen.dart';
 import 'package:mosa/screens/shell_scaffold/shell_scaffold_screen.dart';
@@ -112,6 +114,8 @@ final goRouter = GoRouter(
 
     GoRoute(path: AppRoutes.onboarding, name: 'onboarding', builder: (context, state) => OnboardingScreen()),
     GoRoute(path: AppRoutes.login, name: 'login', builder: (context, state) => LoginScreen()),
+    GoRoute(path: AppRoutes.signUp, name: 'signUp', builder: (context, state) => SignUpScreen()),
+    GoRoute(path: AppRoutes.forgotPassword, name: 'forgotPassword', builder: (context, state) => ForgotPasswordScreen()),
     GoRoute(path: AppRoutes.categoryList, name: 'categoryList', builder: (context, state) => CategoryScreen()),
     GoRoute(
       path: AppRoutes.categoryManagement,

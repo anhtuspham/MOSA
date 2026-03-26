@@ -10,37 +10,30 @@ import 'package:mosa/utils/toast.dart';
 import 'package:mosa/widgets/common_scaffold.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class ForgotPasswordScreen extends StatefulWidget {
+  const ForgotPasswordScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  bool _obscurePassword = true;
-  bool _isLoadingGoogle = false;
 
   @override
   void dispose() {
     _emailController.dispose();
-    _passwordController.dispose();
     super.dispose();
   }
 
-  Future<void> _handleLogin() async {
+  Future<void> _handleForgotPassword() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
     try{
-      await supabase.auth.signInWithPassword(
-        email: _emailController.text,
-        password: _passwordController.text,
-      );
+      await supabase.auth.resetPasswordForEmail(_emailController.text);
       if(mounted){
-        showResultToast('Đăng nhập thành công');
-        context.go(AppRoutes.overview);
+        showResultToast('Đã gửi email xác nhận');
+        context.go(AppRoutes.login);
       }
     } on AuthException catch(e){
       appConfig.printLog('e', e.message);
@@ -51,64 +44,22 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  Future<void> _handleGoogleLogin() async {
-    if (_isLoadingGoogle) return;
-
-    setState(() {
-      _isLoadingGoogle = true;
-    });
-
-    try {
-      await nativeGoogleSignIn();
-      if (mounted) {
-        showResultToast('Đăng nhập thành công');
-        context.go(AppRoutes.overview);
-      }
-    } catch (e) {
-      if (mounted) {
-        appConfig.printLog('e', e.toString());
-        showResultToast('Đăng nhập thất bại: $e', isError: true);
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoadingGoogle = false;
-        });
-      }
-    }
-  }
 
   Widget _buildTextField({
     required TextEditingController controller,
     required String label,
     required String hint,
     required IconData prefixIcon,
-    bool isPassword = false,
     TextInputType? keyboardType,
   }) {
     return TextFormField(
       controller: controller,
-      obscureText: isPassword && _obscurePassword,
       keyboardType: keyboardType,
       style: const TextStyle(fontSize: 16),
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
         prefixIcon: Icon(prefixIcon, color: AppColors.primary),
-        suffixIcon:
-            isPassword
-                ? IconButton(
-                  icon: Icon(
-                    _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                    color: AppColors.textSecondary,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _obscurePassword = !_obscurePassword;
-                    });
-                  },
-                )
-                : null,
         filled: true,
         fillColor: Theme.of(context).colorScheme.surface,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
@@ -147,19 +98,9 @@ class _LoginScreenState extends State<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 20),
-                // App Logo or Welcome Graphic can go here
-                // Center(
-                //   child: Container(
-                //     width: 100,
-                //     height: 100,
-                //     decoration: BoxDecoration(color: AppColors.primary.withOpacity(0.1), shape: BoxShape.circle),
-                //     child: const Icon(Icons.account_balance_wallet_rounded, size: 50, color: AppColors.primary),
-                //   ),
-                // ),
-                // const SizedBox(height: 32),
                 Center(
                   child: Text(
-                    'Chào Mừng Trở Lại!',
+                    'Quên mật khẩu',
                     style: Theme.of(
                       context,
                     ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold, color: AppColors.textPrimary),
@@ -168,7 +109,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 8),
                 Center(
                   child: Text(
-                    'Vui lòng đăng nhập để tiếp tục',
+                    'Vui lòng nhập email để đặt lại mật khẩu',
                     style: TextStyle(fontSize: 16, color: AppColors.textSecondary),
                   ),
                 ),
@@ -182,30 +123,20 @@ class _LoginScreenState extends State<LoginScreen> {
                   keyboardType: TextInputType.emailAddress,
                 ),
                 const SizedBox(height: 20),
-
-                _buildTextField(
-                  controller: _passwordController,
-                  label: 'Mật khẩu',
-                  hint: 'Nhập mật khẩu',
-                  prefixIcon: Icons.lock_outline,
-                  isPassword: true,
-                ),
                 const SizedBox(height: 12),
 
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
-                    onPressed: () {
-                      context.push(AppRoutes.forgotPassword);
-                    },
+                    onPressed: () => context.go(AppRoutes.login),
                     style: TextButton.styleFrom(foregroundColor: AppColors.primary),
-                    child: const Text('Quên mật khẩu?', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+                    child: const Text('Quay lại đăng nhập', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
                   ),
                 ),
                 const SizedBox(height: 24),
 
                 ElevatedButton(
-                  onPressed: _handleLogin,
+                  onPressed: _handleForgotPassword,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
@@ -229,26 +160,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 24),
 
-                OutlinedButton.icon(
-                  onPressed: _isLoadingGoogle ? null : _handleGoogleLogin,
-                  icon:
-                      _isLoadingGoogle
-                          ? const SizedBox(
-                            height: 24,
-                            width: 24,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
-                          )
-                          : Image.asset(AppIcons.google, height: 24),
-                  label: Text(
-                    _isLoadingGoogle ? 'Đang đăng nhập...' : 'Kết nối với Google',
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
-                  ),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    side: const BorderSide(color: AppColors.borderLight),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  ),
-                ),
+                
                 const SizedBox(height: 48),
 
                 Row(

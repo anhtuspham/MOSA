@@ -117,12 +117,17 @@ class SettingsShellScreen extends StatelessWidget {
                           name: 'Quản lý ngân sách',
                           onTap: () => context.pushNamed('budgets'),
                         ),
-                        ItemWidget.iconPath(
-                          itemId: '5',
-                          iconPath: AppIcons.scanBill,
-                          name: 'Trích xuất hóa đơn',
-                        ),
+                        ItemWidget.iconPath(itemId: '5', iconPath: AppIcons.scanBill, name: 'Trích xuất hóa đơn'),
                         ItemWidget.iconPath(itemId: '6', iconPath: AppIcons.shopList, name: 'Danh sách mua sắm'),
+                        ItemWidget.iconPath(itemId: '7', iconPath: AppIcons.globalIcon, name: 'Ngôn ngữ'),
+                        ItemWidget.iconPath(
+                          itemId: '8',
+                          iconPath: AppIcons.exchangeMoneyIcon,
+                          name: 'Chuyển đổi tiền tệ',
+                        ),
+                        ItemWidget.iconPath(itemId: '9', iconPath: AppIcons.logOutIcon, name: 'Đăng xuất', onTap: () {
+                          
+                        }),
                       ],
                     ),
                   ),

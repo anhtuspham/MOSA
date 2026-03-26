@@ -12,7 +12,7 @@ Future<void> nativeGoogleSignIn() async {
 
   await googleSignIn.initialize(serverClientId: webClientId, clientId: iosClientId);
 
-  // Clear any existing session to prevent cached token issues leading to Account reauth failed (Code 16)
+  // Clear any existing session to prevent cached token issues leading to Account reauth failed 
   await googleSignIn.signOut();
 
   final googleUser = await googleSignIn.authenticate();

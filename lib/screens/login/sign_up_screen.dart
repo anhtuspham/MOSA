@@ -10,14 +10,14 @@ import 'package:mosa/utils/toast.dart';
 import 'package:mosa/widgets/common_scaffold.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _SignUpScreenState extends State<SignUpScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
@@ -31,15 +31,15 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  Future<void> _handleLogin() async {
+  Future<void> _handleSignUp() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
     try{
-      await supabase.auth.signInWithPassword(
+      await supabase.auth.signUp(
         email: _emailController.text,
         password: _passwordController.text,
       );
       if(mounted){
-        showResultToast('Đăng nhập thành công');
+        showResultToast('Đăng ký thành công');
         context.go(AppRoutes.overview);
       }
     } on AuthException catch(e){
@@ -51,7 +51,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  Future<void> _handleGoogleLogin() async {
+  Future<void> _handleGoogleSignUp() async {
     if (_isLoadingGoogle) return;
 
     setState(() {
@@ -61,13 +61,13 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       await nativeGoogleSignIn();
       if (mounted) {
-        showResultToast('Đăng nhập thành công');
+        showResultToast('Đăng ký thành công');
         context.go(AppRoutes.overview);
       }
     } catch (e) {
       if (mounted) {
         appConfig.printLog('e', e.toString());
-        showResultToast('Đăng nhập thất bại: $e', isError: true);
+        showResultToast('Đăng ký thất bại: $e', isError: true);
       }
     } finally {
       if (mounted) {
@@ -134,7 +134,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return CommonScaffold.single(
-      title: const Text('Đăng nhập', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22)),
+      title: const Text('Đăng ký', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22)),
       centerTitle: true,
       appBarBackgroundColor: Theme.of(context).colorScheme.surface,
       elevation: false,
@@ -159,7 +159,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 // const SizedBox(height: 32),
                 Center(
                   child: Text(
-                    'Chào Mừng Trở Lại!',
+                    'Chào Mừng Đến Với MOSA!',
                     style: Theme.of(
                       context,
                     ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold, color: AppColors.textPrimary),
@@ -168,7 +168,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 8),
                 Center(
                   child: Text(
-                    'Vui lòng đăng nhập để tiếp tục',
+                    'Vui lòng đăng ký để tiếp tục',
                     style: TextStyle(fontSize: 16, color: AppColors.textSecondary),
                   ),
                 ),
@@ -190,22 +190,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   prefixIcon: Icons.lock_outline,
                   isPassword: true,
                 ),
-                const SizedBox(height: 12),
-
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () {
-                      context.push(AppRoutes.forgotPassword);
-                    },
-                    style: TextButton.styleFrom(foregroundColor: AppColors.primary),
-                    child: const Text('Quên mật khẩu?', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
-                  ),
-                ),
                 const SizedBox(height: 24),
 
                 ElevatedButton(
-                  onPressed: _handleLogin,
+                  onPressed: _handleSignUp,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
@@ -213,7 +201,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     elevation: 2,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
-                  child: const Text('Đăng nhập', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  child: const Text('Đăng ký', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 ),
                 const SizedBox(height: 24),
 
@@ -230,7 +218,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 24),
 
                 OutlinedButton.icon(
-                  onPressed: _isLoadingGoogle ? null : _handleGoogleLogin,
+                  onPressed: _isLoadingGoogle ? null : _handleGoogleSignUp,
                   icon:
                       _isLoadingGoogle
                           ? const SizedBox(
@@ -254,13 +242,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('Chưa có tài khoản?', style: TextStyle(color: AppColors.textSecondary, fontSize: 15)),
+                    Text('Đã có tài khoản?', style: TextStyle(color: AppColors.textSecondary, fontSize: 15)),
                     TextButton(
                       onPressed: () {
-                        context.push(AppRoutes.signUp);
+                        context.go(AppRoutes.login);
                       },
                       child: const Text(
-                        'Đăng ký ngay',
+                        'Đăng nhập',
                         style: TextStyle(color: AppColors.primary, fontSize: 15, fontWeight: FontWeight.bold),
                       ),
                     ),
